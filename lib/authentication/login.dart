@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'package:quizlet_final_flutter/constant/color.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  bool obscureText = true;
+
+  void _toggleObscure() {
+    setState(() {
+      obscureText = !obscureText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +53,14 @@ class Login extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: <Widget>[
-                      inputFile(label: "Email"),
-                      inputFile(label: "Password", obscureText: true)
+                      inputFile(label: "Email", prefixIcon: Icons.email),
+                      inputFile(
+                        label: "Password",
+                        prefixIcon: Icons.lock,
+                        suffixIcon: obscureText ? Icons.visibility : Icons.visibility_off,
+                        obscureText: obscureText,
+                        onSuffixIconPressed: _toggleObscure,
+                      ),
                     ],
                   ),
                 ), // Email + Password
@@ -107,40 +126,40 @@ class Login extends StatelessWidget {
     );
   }
 
-  Widget inputFile({label, obscureText = false})
-  {
+  Widget inputFile({
+    required String label,
+    required IconData prefixIcon,
+    IconData? suffixIcon,
+    bool obscureText = false,
+    Function()? onSuffixIconPressed,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color:Colors.black87
-          ),
-
-        ),
         const SizedBox(
           height: 5,
         ),
-        TextField(
+        TextFormField(
+          keyboardType: label == "Email" ? TextInputType.emailAddress : TextInputType.text,
           obscureText: obscureText,
-          decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 0,
-                  horizontal: 10),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: Colors.grey
-                ),
-
-              ),
-              border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)
-              )
+          decoration: InputDecoration(
+            labelText: label,
+            contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey),
+            ),
+            border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey),
+            ),
+            prefixIcon: Icon(prefixIcon),
+            suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon),
+              onPressed: onSuffixIconPressed as void Function()?,
+            ) : null,
           ),
         ),
-        const SizedBox(height: 10,)
+        const SizedBox(
+          height: 10,
+        )
       ],
     );
   }

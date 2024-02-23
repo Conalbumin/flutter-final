@@ -9,14 +9,13 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  bool obscureText = false;
+  bool obscureText = true;
 
   void _toggleObscure() {
     setState(() {
       obscureText = !obscureText;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,12 +127,15 @@ Widget inputFile({
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
+      const SizedBox(
+        height: 5,
+      ),
       TextFormField(
+        keyboardType: label == "Email" ? TextInputType.emailAddress : TextInputType.text,
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
-          contentPadding:
-          const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey),
           ),
@@ -143,8 +145,7 @@ Widget inputFile({
           prefixIcon: Icon(prefixIcon),
           suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon),
             onPressed: onSuffixIconPressed as void Function()?,
-          )
-              : null,
+          ) : null,
         ),
       ),
       const SizedBox(
@@ -153,4 +154,5 @@ Widget inputFile({
     ],
   );
 }
+
 
