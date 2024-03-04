@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
-import 'authentication/login.dart';
+import '../authentication/login.dart';
+import 'app.dart';
 
 void main() {
   runApp(const App());

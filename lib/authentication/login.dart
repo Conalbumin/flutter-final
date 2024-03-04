@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/authentication/recovery.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'package:quizlet_final_flutter/constant/color.dart';
+import 'package:quizlet_final_flutter/constant/text_style.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -36,17 +38,14 @@ class _LoginState extends State<Login> {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Column(
+                 const Column(
                   children: <Widget>[
-                    const Text(
-                      "Login",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    ),
                     Text(
-                      "Login to your account",
-                      style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                    )
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),                    ),
                   ],
                 ),  // Text Login
                 Padding(
@@ -98,16 +97,27 @@ class _LoginState extends State<Login> {
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context)=> SignUp()));
                       },
-                      child: const Text(
+                      child: Text(
                         " Sign up",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                        ),
+                        style: authenticateStyle,
                       ),
                     )
                   ],
                 ), // Go to Sign up
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> RecoveyPage()));
+                      },
+                      child:  Text(
+                        "Forgot Password",
+                        style: authenticateStyle,
+                      ),
+                    )
+                  ],
+                ), // Go to Recovery
 
                 Container(
                   padding: const EdgeInsets.only(top: 100),

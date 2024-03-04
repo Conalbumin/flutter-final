@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/color.dart';
+import 'package:quizlet_final_flutter/constant/text_style.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -101,10 +102,9 @@ class _SignUpState extends State<SignUp> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: const Text(
+                    child: Text(
                       " Login",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                      style: authenticateStyle,
                     ),
                   )
                 ],
