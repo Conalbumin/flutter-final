@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text.dart';
+import 'study.dart';
+import 'setting.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() =>
-      _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -23,9 +24,16 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: bottomNavigationOptions.elementAt(_selectedIndex)
+        title: bottomNavigationOptions.elementAt(_selectedIndex),
       ),
-      body: Center(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          Placeholder(), // Placeholder for Home
+          Placeholder(), // Placeholder for Add
+          StudyPage(), // StudyPage
+          SettingPage(), // Placeholder for Setting
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -45,13 +53,15 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.settings),
+            label: 'Setting',
             backgroundColor: Colors.blue,
           ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.white,
+        selectedFontSize: 18,
+        unselectedItemColor: Colors.grey[400],
         onTap: _onItemTapped,
       ),
     );

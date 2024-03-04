@@ -16,7 +16,7 @@ List<Widget> bottomNavigationOptions = <Widget>[
     style: optionStyle,
   ),
   Text(
-    'Profile',
+    'Setting',
     style: optionStyle,
   ),
 ];
