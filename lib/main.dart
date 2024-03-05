@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study.dart';
+import 'package:quizlet_final_flutter/study/study.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'authentication/login.dart';
-import 'home.dart';
+import 'app.dart';
 
 void main() {
   runApp(const App());
@@ -15,10 +15,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       themeMode: ThemeMode.system,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: const MainApp(),
     );
   }
 }

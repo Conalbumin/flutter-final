@@ -9,10 +9,23 @@ class CustomCardDecoration {
         Colors.blue.shade300,
         Colors.blue.shade500,
         Colors.blue.shade700,
-        Colors.blue.shade900,
       ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
+  );
+}
+
+class CustomSearchBar {
+  static final BoxDecoration searchBarDecoration = BoxDecoration(
+      gradient: LinearGradient(
+          colors: [
+            Colors.blue.shade400,
+            Colors.blue.shade600,
+            Colors.blue.shade800,
+          ],
+      ),
+      borderRadius: BorderRadius.circular(30),
+      border: Border.all(color: Colors.blueGrey)
   );
 }

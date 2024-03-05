@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/constant/style.dart';
 
 class FolderTab extends StatelessWidget {
   const FolderTab({super.key});
@@ -23,12 +24,15 @@ class FolderTab extends StatelessWidget {
         ),
         color: Colors.blue[600],
         elevation: 10,
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.folder, size: 60, color: Colors.white,),
-            title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
-          )
-        ]));
+        child: Container(
+          decoration: CustomCardDecoration.cardDecoration,
+          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.folder, size: 60, color: Colors.white,),
+              title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
+            )
+          ]),
+        ));
   }
 
 }

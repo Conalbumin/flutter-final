@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text.dart';
-import 'tab_in_study/topic.dart';
-import 'tab_in_study/folder.dart';
+import 'topic.dart';
+import 'folder.dart';
+import '../constant/style.dart';
 
 class StudyPage extends StatefulWidget {
   const StudyPage({Key? key}) : super(key: key);
@@ -19,10 +20,9 @@ class _StudyPageState extends State<StudyPage> {
         appBar: null,
         body: Column(
           children: [
-            Divider(
+            const Divider(
               indent: 25.0,
               endIndent: 25.0,
-              color: Colors.grey.withOpacity(1),
               height: 0.8,
             ),
             Container(
@@ -42,11 +42,8 @@ class _StudyPageState extends State<StudyPage> {
                 ],
               ),
             ),
-            const Expanded(
-              child: TabBarView(children: [
-                TopicTab(),
-                FolderTab()
-              ]),
+            Expanded(
+              child: TabBarView(children: [TopicTab(), FolderTab()]),
             )
           ],
         ),

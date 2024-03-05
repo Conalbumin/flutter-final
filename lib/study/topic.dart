@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/constant/style.dart';
 
 class TopicTab extends StatelessWidget {
   const TopicTab({super.key});
@@ -23,13 +24,16 @@ class TopicTab extends StatelessWidget {
         ),
         color: Colors.blue[600],
         elevation: 10,
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.topic, size: 60, color: Colors.white,),
-            title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
-            subtitle: Text('${numberOfWords} words', style: const TextStyle(fontSize: 18.0, color: Colors.white)),
+        child: Container(
+          decoration: CustomCardDecoration.cardDecoration,
+          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.topic, size: 60, color: Colors.white,),
+              title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
+              subtitle: Text('${numberOfWords} words', style: const TextStyle(fontSize: 18.0, color: Colors.white)),
 
-    )
-        ]));
+              )
+          ]),
+        ));
   }
 }
