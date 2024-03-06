@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "851022714785",
+    "project_id": "quizlet-flutter",
+    "storage_bucket": "quizlet-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851022714785:android:5007081a560314eee3dde0",
+        "android_client_info": {
+          "package_name": "com.example.quizlet_final_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxpHr_rNCOHpbYgUgBnSUVRwljOJrZokU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
