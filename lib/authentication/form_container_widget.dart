@@ -27,7 +27,7 @@ class FormContainerWidget extends StatefulWidget {
 
 
   @override
-  _FormContainerWidgetState createState() => new _FormContainerWidgetState();
+  _FormContainerWidgetState createState() => _FormContainerWidgetState();
 }
 
 class _FormContainerWidgetState extends State<FormContainerWidget> {
@@ -39,10 +39,10 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
       width: double.infinity,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(.35),
+        color: Colors.blueGrey,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: new TextFormField(
+      child: TextFormField(
         style: TextStyle(color: Colors.black),
         controller: widget.controller,
         keyboardType: widget.inputType,
@@ -51,12 +51,12 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
         onSaved: widget.onSaved,
         validator: widget.validator,
         onFieldSubmitted: widget.onFieldSubmitted,
-        decoration: new InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           filled: true,
           hintText: widget.hintText,
           hintStyle: TextStyle(color: Colors.black45),
-          suffixIcon: new GestureDetector(
+          suffixIcon: GestureDetector(
             onTap: () {
               setState(() {
                 _obscureText = !_obscureText;

@@ -74,6 +74,9 @@ class _RecoveyPageState extends State<RecoveyPage> {
                         )),
                   ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
