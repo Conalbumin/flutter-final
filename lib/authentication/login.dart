@@ -4,8 +4,6 @@ import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart'
 import 'package:quizlet_final_flutter/authentication/recovery.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'package:quizlet_final_flutter/authentication/toast.dart';
-import 'package:quizlet_final_flutter/constant/color.dart';
-import 'package:quizlet_final_flutter/constant/text_style.dart';
 import 'form_container_widget.dart';
 
 class Login extends StatefulWidget {
@@ -30,103 +28,116 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  void _toggleObscure() {
-    setState(() {
-      obscureText = !obscureText;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text("Login"),
-      ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Login",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              FormContainerWidget(
-                controller: _emailController,
-                hintText: "Email",
-                isPasswordField: false,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FormContainerWidget(
-                controller: _passwordController,
-                hintText: "Password",
-                isPasswordField: true,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              GestureDetector(
-                onTap: () {
-                  _signIn();
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: _isSigning ? CircularProgressIndicator(
-                      color: Colors.white,) : Text(
-                      "Login",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Login",
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                FormContainerWidget(
+                  controller: _emailController,
+                  hintText: "Email",
+                  isPasswordField: false,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                FormContainerWidget(
+                  controller: _passwordController,
+                  hintText: "Password",
+                  isPasswordField: true,
+                ),
+                const SizedBox(
+                  height: 40
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _signIn();
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: _isSigning ? const CircularProgressIndicator(
+                        color: Colors.white,) : const Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 10,),
-
-              SizedBox(
-                height: 20,
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Don't have an account?"),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
-                            (route) => false,
-                      );
-                    },
-                    child: Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
+                const SizedBox(height: 20),
+          
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignUp()),
+                              (route) => false,
+                        );
+                      },
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RecoveyPage()),
+                              (route) => false,
+                        );
+                      },
+                      child: const Text("Forgot your password?", style: TextStyle(fontSize: 15, color: Colors.lightBlue, fontWeight: FontWeight.bold),)
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                    height: 30
+                ),
+
+                Container(
+                  child: Image.asset('assets/login.png'),
+                )
+              ],
+            ),
           ),
         ),
       ),

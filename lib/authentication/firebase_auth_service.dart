@@ -32,4 +32,10 @@ class FirebaseAuthService {
     }
     return null;
   }
+
+
+  Future<User?> resetPassword(String email) async {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email);
+  }
 }

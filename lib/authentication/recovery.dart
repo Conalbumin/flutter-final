@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'package:quizlet_final_flutter/constant/color.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
+
+import 'form_container_widget.dart';
+import 'login.dart';
+import 'toast.dart';
 
 class RecoveyPage extends StatefulWidget {
   const RecoveyPage({Key? key}) : super(key: key);
@@ -11,92 +17,96 @@ class RecoveyPage extends StatefulWidget {
 }
 
 class _RecoveyPageState extends State<RecoveyPage> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
   bool obscureText = true;
+  bool isRecovery = false;
+  TextEditingController _emailController = TextEditingController();
 
-  void _toggleObscure() {
-    setState(() {
-      obscureText = !obscureText;
-    });
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-      ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Column(
-                    children: <Widget>[
-                      const Text(
-                        "Recovery",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        "Enter the email you signed up with. We'll send you a link to log in and reset your password",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[800]),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ), // Email + Password
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Recovery",
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  "Enter the email you signed up with. We'll send you a link to log in and reset your password. "
+                      "If you signed up with your parent’s email, we’ll send them a link.",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                FormContainerWidget(
+                  controller: _emailController,
+                  hintText: "Email",
+                  isPasswordField: false,
+                ),
+              
+                const SizedBox(
+                  height: 35,
+                ),
+                GestureDetector(
+                  onTap:  (){
+                    _resetPassword();
+                  },
                   child: Container(
-                    padding: const EdgeInsets.only(top: 3, left: 3),
+                    width: double.infinity,
+                    height: 45,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 60,
-                      onPressed: () {},
-                      color: button,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Text(
-                        "Send link",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    child: Center(
+                        child: isRecovery ? const CircularProgressIndicator(color: Colors.white,):const Text(
+                          "Send",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        )),
                   ),
                 ),
-
                 Container(
-                  height: 400,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/forgot-password.png"),
-                        fit: BoxFit.fitHeight),
-                  ),
-                ) // Image
+                  child: Image.asset('assets/forgot-password.png'),
+                )
               ],
-            ))
-          ],
+            ),
+          ),
         ),
       ),
     );
   }
+
+  void _resetPassword() async {
+    setState(() {
+      isRecovery = true;
+    });
+
+    String email = _emailController.text;
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      showToast(message: "Password reset email sent successfully.");
+    } catch (e) {
+      showToast(message: "Error sending password reset email: $e");
+    }
+
+    setState(() {
+      isRecovery = false;
+    });
+  }
+
 }
