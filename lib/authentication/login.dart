@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
 import 'package:quizlet_final_flutter/authentication/recovery.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
-import 'package:quizlet_final_flutter/authentication/toast.dart';
 import 'form_container_widget.dart';
 
 class Login extends StatefulWidget {
@@ -159,10 +158,10 @@ class _LoginState extends State<Login> {
     });
 
     if (user != null) {
-      showToast(message: "User is successfully signed in");
+      print("Log in successful!");
       Navigator.pushNamed(context, "/home");
     } else {
-      showToast(message: "some error occured");
+      print("Log in failed!");
     }
   }
 

@@ -1,13 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
-import 'package:quizlet_final_flutter/authentication/signup.dart';
-import 'package:quizlet_final_flutter/constant/color.dart';
-import 'package:quizlet_final_flutter/constant/text_style.dart';
-
 import 'form_container_widget.dart';
 import 'login.dart';
-import 'toast.dart';
 
 class RecoveyPage extends StatefulWidget {
   const RecoveyPage({Key? key}) : super(key: key);
@@ -79,6 +74,21 @@ class _RecoveyPageState extends State<RecoveyPage> {
                         )),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const Login()),
+                                (route) => false,
+                          );
+                        },
+                        child: const Text("Back to login page", style: TextStyle(fontSize: 15, color: Colors.lightBlue, fontWeight: FontWeight.bold),)
+                    ),
+                  ],
+                ),
                 Container(
                   child: Image.asset('assets/forgot-password.png'),
                 )
@@ -99,9 +109,9 @@ class _RecoveyPageState extends State<RecoveyPage> {
 
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      showToast(message: "Password reset email sent successfully.");
+      print("Recovery successful!");
     } catch (e) {
-      showToast(message: "Error sending password reset email: $e");
+      print("Recovery failed!");
     }
 
     setState(() {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
 import 'package:quizlet_final_flutter/authentication/login.dart';
 import 'form_container_widget.dart';
-import 'toast.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -143,10 +142,10 @@ class _SignUpState extends State<SignUp> {
       isSigningUp = false;
     });
     if (user != null) {
-      showToast(message: "User is successfully created");
+      print("Sign up successful!");
       Navigator.pushNamed(context, "/home");
     } else {
-      showToast(message: "Some error happen");
+      print("Sign up failed!");
     }
   }
 }

@@ -41,7 +41,6 @@ dependencies:
   firebase_storage: ^11.6.8
   firebase_database: ^10.4.8
   cloud_firestore: ^4.15.7
-  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:
