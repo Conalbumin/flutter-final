@@ -54,7 +54,6 @@ class _RecoveyPageState extends State<RecoveyPage> {
                         style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                       ),
                       const SizedBox(height: 20),
-                      inputFile(label: "Email", prefixIcon: Icons.email),
                     ],
                   ),
                 ), // Email + Password

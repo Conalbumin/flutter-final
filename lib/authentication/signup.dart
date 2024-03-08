@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/constant/color.dart';
-import 'package:quizlet_final_flutter/constant/text_style.dart';
+import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
+import 'package:quizlet_final_flutter/authentication/login.dart';
+import 'package:quizlet_final_flutter/home/home.dart';
+import 'form_container_widget.dart';
+import 'toast.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -10,7 +14,20 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
   bool obscureText = true;
+  bool isSigningUp = false;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _toggleObscure() {
     setState(() {
@@ -21,138 +38,124 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Text("SignUp"),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          height: MediaQuery.of(context).size.height - 50,
-          width: double.infinity,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(top: 100),
-                height: 200,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage("assets/signup.png"),
-                      fit: BoxFit.fitHeight),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Sign Up",
+                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              FormContainerWidget(
+                controller: _usernameController,
+                hintText: "Username",
+                isPasswordField: false,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              FormContainerWidget(
+                controller: _emailController,
+                hintText: "Email",
+                isPasswordField: false,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              FormContainerWidget(
+                controller: _passwordController,
+                hintText: "Password",
+                isPasswordField: true,
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap:  (){
+                  _signUp();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                      child: isSigningUp ? CircularProgressIndicator(color: Colors.white,):Text(
+                        "Sign Up",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
                 ),
-              ), // Image
-              const Column(
-                children: <Widget>[
-                  Text(
-                    "Sign up",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Create an account, It's free ",
-                    style: TextStyle(fontSize: 15, color: Colors.grey),
-                  )
-                ],
-              ), // Sign up Text
-              Column(
-                children: <Widget>[
-                  inputFile(label: "Username", prefixIcon: Icons.person),
-                  inputFile(label: "Email", prefixIcon: Icons.email),
-                  inputFile(
-                    label: "Password",
-                    prefixIcon: Icons.lock,
-                    suffixIcon: obscureText ? Icons.visibility : Icons.visibility_off,
-                    obscureText: obscureText,
-                    onSuffixIconPressed: _toggleObscure,
-                  ),
-                ],
-              ), // 4 fields to sign up
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: MaterialButton(
-                  minWidth: double.infinity,
-                  height: 60,
-                  onPressed: () {},
-                  color: Colors.blue,
-                  // Change this color to your desired color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: const Text(
-                    "Sign up",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ), // Sign Up button
+              ),
+              SizedBox(
+                height: 20,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text("Already have an account?"),
+                children: [
+                  Text("Already have an account?"),
+                  SizedBox(
+                    width: 5,
+                  ),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      " Login",
-                      style: authenticateStyle,
-                    ),
-                  )
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Login()),
+                                (route) => false);
+                      },
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                            color: Colors.blue, fontWeight: FontWeight.bold),
+                      ))
                 ],
-              ) // Back to Login
+              )
             ],
           ),
         ),
       ),
     );
   }
+
+  void _signUp() async {
+
+    setState(() {
+      isSigningUp = true;
+    });
+
+    String username = _usernameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    setState(() {
+      isSigningUp = false;
+    });
+    if (user != null) {
+      showToast(message: "User is successfully created");
+      Navigator.pushNamed(context, "/home");
+    } else {
+      showToast(message: "Some error happen");
+    }
+  }
 }
 
-Widget inputFile({
-  required String label,
-  required IconData prefixIcon,
-  IconData? suffixIcon,
-  bool obscureText = false,
-  Function()? onSuffixIconPressed,
-}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      const SizedBox(
-        height: 5,
-      ),
-      TextFormField(
-        keyboardType: label == "Email" ? TextInputType.emailAddress : TextInputType.text,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: label,
-          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey),
-          ),
-          border: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey),
-          ),
-          prefixIcon: Icon(prefixIcon),
-          suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon),
-            onPressed: onSuffixIconPressed as void Function()?,
-          ) : null,
-        ),
-      ),
-      const SizedBox(
-        height: 10,
-      )
-    ],
-  );
-}
+
+
+
 
 

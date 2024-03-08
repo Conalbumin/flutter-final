@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/home/home.dart';
+import 'package:quizlet_final_flutter/setting/setting.dart';
 import 'package:quizlet_final_flutter/study/study.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'authentication/login.dart';
@@ -21,8 +23,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       themeMode: ThemeMode.system,
+      title: 'QuizPop',
       debugShowCheckedModeBanner: false,
-      home: const MainApp(),
+      routes: {
+        '/': (context) => Login(),
+        '/login': (context) => Login(),
+        '/signUp': (context) => SignUp(),
+        '/home': (context) => MainApp(),
+      },
     );
   }
 }

@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
 import 'package:quizlet_final_flutter/authentication/recovery.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
+import 'package:quizlet_final_flutter/authentication/toast.dart';
 import 'package:quizlet_final_flutter/constant/color.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
+import 'form_container_widget.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -13,6 +17,18 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool obscureText = true;
+  bool _isSigning = false;
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _toggleObscure() {
     setState(() {
@@ -23,154 +39,121 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Text("Login"),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                 const Column(
-                  children: <Widget>[
-                    Text(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Login",
+                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              FormContainerWidget(
+                controller: _emailController,
+                hintText: "Email",
+                isPasswordField: false,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              FormContainerWidget(
+                controller: _passwordController,
+                hintText: "Password",
+                isPasswordField: true,
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap: () {
+                  _signIn();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: _isSigning ? CircularProgressIndicator(
+                      color: Colors.white,) : Text(
                       "Login",
                       style: TextStyle(
-                        fontSize: 30,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                      ),                    ),
-                  ],
-                ),  // Text Login
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Column(
-                    children: <Widget>[
-                      inputFile(label: "Email", prefixIcon: Icons.email),
-                      inputFile(
-                        label: "Password",
-                        prefixIcon: Icons.lock,
-                        suffixIcon: obscureText ? Icons.visibility : Icons.visibility_off,
-                        obscureText: obscureText,
-                        onSuffixIconPressed: _toggleObscure,
-                      ),
-                    ],
-                  ),
-                ), // Email + Password
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Container(
-                    padding: const EdgeInsets.only(top: 3, left: 3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 60,
-                      onPressed: () {},
-                      color: button,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
                       ),
                     ),
                   ),
-                ), // Login Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text("Don't have an account?"),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> SignUp()));
-                      },
-                      child: Text(
-                        " Sign up",
-                        style: authenticateStyle,
-                      ),
-                    )
-                  ],
-                ), // Go to Sign up
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> RecoveyPage()));
-                      },
-                      child:  Text(
-                        "Forgot Password",
-                        style: authenticateStyle,
-                      ),
-                    )
-                  ],
-                ), // Go to Recovery
+                ),
+              ),
+              SizedBox(height: 10,),
 
-                Container(
-                  padding: const EdgeInsets.only(top: 100),
-                  height: 200,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/login.png"),
-                        fit: BoxFit.fitHeight),
+              SizedBox(
+                height: 20,
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Don't have an account?"),
+                  SizedBox(
+                    width: 5,
                   ),
-                ) // Image
-              ],
-            ))
-          ],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignUp()),
+                            (route) => false,
+                      );
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget inputFile({
-    required String label,
-    required IconData prefixIcon,
-    IconData? suffixIcon,
-    bool obscureText = false,
-    Function()? onSuffixIconPressed,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const SizedBox(
-          height: 5,
-        ),
-        TextFormField(
-          keyboardType: label == "Email" ? TextInputType.emailAddress : TextInputType.text,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            labelText: label,
-            contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            border: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            prefixIcon: Icon(prefixIcon),
-            suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon),
-              onPressed: onSuffixIconPressed as void Function()?,
-            ) : null,
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        )
-      ],
-    );
+  void _signIn() async {
+    setState(() {
+      _isSigning = true;
+    });
+
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigning = false;
+    });
+
+    if (user != null) {
+      showToast(message: "User is successfully signed in");
+      Navigator.pushNamed(context, "/home");
+    } else {
+      showToast(message: "some error occured");
+    }
   }
+
+
 }
