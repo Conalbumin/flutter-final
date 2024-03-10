@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../constant/style.dart';
 
@@ -134,6 +137,21 @@ class _SettingPageState extends State<SettingPage> {
           ],
         ),
       ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 50),
+        child: FloatingActionButton(
+          backgroundColor: Colors.blue,
+          onPressed: () {
+            logout();
+          },
+          child: const Icon(Icons.logout, color: Colors.white, size: 30,),
+        ),
+      ),
     );
+  }
+
+  void logout() async {
+    await FirebaseAuth.instance.signOut();
+    print("success sign out");
   }
 }
