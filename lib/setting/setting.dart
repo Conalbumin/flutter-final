@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../constant/style.dart';
@@ -12,6 +10,15 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user profile when the screen loads
+    getUserProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +59,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
-            ),
+            ), // Profile
 
             const SizedBox(height: 20),
             Container(
@@ -79,7 +86,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
-            ),
+            ), // Change username
 
             const SizedBox(height: 20),
             Container(
@@ -106,7 +113,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
-            ),
+            ), // Change avatar
 
             const SizedBox(height: 20),
             Container(
@@ -133,7 +140,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
-            ),
+            ), // Change password
           ],
         ),
       ),
@@ -150,8 +157,26 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  Future<void> getUserProfile() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
+    setState(() {
+      _user = user;
+    });
+  }
+
+  void changeUsername() async {
+  }
+
+  void changeAvatar() async {
+  }
+
+  void changePassword() async {
+  }
+
   void logout() async {
     await FirebaseAuth.instance.signOut();
     print("success sign out");
   }
+
 }
