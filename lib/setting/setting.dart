@@ -176,7 +176,7 @@ class _SettingPageState extends State<SettingPage> {
 
   void logout() async {
     await FirebaseAuth.instance.signOut();
-    print("success sign out");
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
 }
