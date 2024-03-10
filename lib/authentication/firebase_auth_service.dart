@@ -4,9 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FirebaseAuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<User?> signUpWithEmailAndPassword(String email, String password) async {
+  Future<User?> signUpWithEmailAndPassword(String email, String password, String username) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      await addUserToFirestore(credential.user!, username); // Pass username to add to Firestore
+      await credential.user!.updateDisplayName(username); // Update display name
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -17,6 +19,7 @@ class FirebaseAuthService {
     }
     return null;
   }
+
 
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -43,7 +46,7 @@ class FirebaseAuthService {
     }
   }
 
-  Future<void> addUserToFirestore(User user) async {
+  Future<void> addUserToFirestore(User user, String username) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     String uid = user.uid;
@@ -51,12 +54,10 @@ class FirebaseAuthService {
     DocumentReference userDoc = users.doc(uid);
 
     String email = user.email ?? '';
-    String displayName = user.displayName ?? '';
 
-    // Create a map of user data
     Map<String, dynamic> userData = {
       'email': email,
-      'username': displayName,
+      'displayName': username,
     };
 
     await userDoc.set(userData);
@@ -65,8 +66,6 @@ class FirebaseAuthService {
   void handleSignIn(User user) async {
     // Handle user sign-in (e.g., navigate to the home screen, show a success message, etc.)
     print('User signed in: ${user.displayName}');
-
-    await addUserToFirestore(user);
   }
 
 }
