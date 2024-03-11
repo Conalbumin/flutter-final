@@ -37,6 +37,9 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(
+                  height: 40,
+                ),
                 const Text(
                   "Login",
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),

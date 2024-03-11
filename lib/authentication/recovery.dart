@@ -33,6 +33,9 @@ class _RecoveyPageState extends State<RecoveyPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(
+                  height: 40,
+                ),
                 const Text(
                   "Recovery",
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),

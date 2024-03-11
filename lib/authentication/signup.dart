@@ -37,6 +37,9 @@ class _SignUpState extends State<SignUp> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(
+                  height: 40,
+                ),
                 const Text(
                   "Sign Up",
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
