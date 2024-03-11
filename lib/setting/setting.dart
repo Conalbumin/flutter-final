@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../constant/style.dart';
-import 'firebase_setting_page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -40,8 +39,11 @@ class _SettingPageState extends State<SettingPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const CircleAvatar(
+                          CircleAvatar(
                             radius: 50,
+                            backgroundImage: _user?.photoURL != null
+                                ? NetworkImage(_user!.photoURL!)
+                                : AssetImage('assets/default_avatar.png') as ImageProvider, // Set default image asset
                           ),
                           const SizedBox(height: 20),
                           Text(

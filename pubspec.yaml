@@ -70,6 +70,7 @@ flutter:
     - assets/login.png
     - assets/signup.png
     - assets/forgot-password.png
+    - assets/default_avatar.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
