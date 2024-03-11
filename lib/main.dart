@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:quizlet_final_flutter/home/home.dart';
 import 'package:quizlet_final_flutter/setting/setting.dart';
 import 'package:quizlet_final_flutter/study/study.dart';

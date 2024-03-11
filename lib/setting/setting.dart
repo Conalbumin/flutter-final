@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../constant/style.dart';
 import 'firebase_setting_page.dart';
 
@@ -63,7 +64,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ), // Profile
-        
+
               const SizedBox(height: 20),
               Container(
                 child: GestureDetector(
@@ -93,7 +94,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ), // Change username
-        
+
               const SizedBox(height: 20),
               Container(
                 child: GestureDetector(
@@ -120,11 +121,13 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ), // Change avatar
-        
+
               const SizedBox(height: 20),
               Container(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    changePassword();
+                  },
                   child: Card(
                     color: Colors.blue[500],
                     child: Container(
@@ -191,20 +194,18 @@ class _SettingPageState extends State<SettingPage> {
           title: const Text('Enter New Username'),
           content: TextField(
             controller: _usernameController,
-            onChanged: (value) {
-              // You can perform validation or other actions here
-            },
+            onChanged: (value) {},
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(null); // Return null when canceled
+                Navigator.of(context).pop(null);
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(_usernameController.text); // Return the entered value when OK is pressed
+                Navigator.of(context).pop(_usernameController.text);
               },
               child: const Text('OK'),
             ),
@@ -219,34 +220,79 @@ class _SettingPageState extends State<SettingPage> {
 
     if (newUsername != null && newUsername.isNotEmpty) {
       try {
-        // Update the user's profile display name
-        await FirebaseAuth.instance.currentUser!.updateProfile(displayName: newUsername);
-
-        // Update the username in Firestore database
-        FirebaseFirestore.instance
+        await FirebaseAuth.instance.currentUser!.updateDisplayName(newUsername);
+        await FirebaseFirestore.instance
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser?.uid)
             .update({'displayName': newUsername});
-
-        // Refresh the user profile
         await getUserProfile();
+        showToast("Username updated successfully.");
       } catch (e) {
-        print('Error updating username: $e');
+        print("Error updating username: $e");
+        showToast("Error updating username: $e");
       }
     } else {
-      print('Error: Invalid username or canceled');
+      showToast("Error: Invalid username or canceled");
     }
   }
 
 
-
-
   void changeAvatar() async {}
 
-  void changePassword() async {}
+  Future<String?> _showPasswordInputDialog() async {
+    TextEditingController _passwordController = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter New Password'),
+          content: TextField(
+            controller: _passwordController,
+            onChanged: (value) {},
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(_passwordController.text);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void changePassword() async {
+    String? newPassword = await _showPasswordInputDialog();
+
+    if (newPassword != null && newPassword.isNotEmpty) {
+      try {
+        await FirebaseAuth.instance.currentUser!.updatePassword(newPassword);
+        showToast("Password updated successfully.");
+      } catch (e) {
+        showToast("Error updating password: $e");
+      }
+    } else {
+      showToast("Error: Invalid password or canceled");
+    }
+  }
 
   void logout() async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+    );
   }
 }

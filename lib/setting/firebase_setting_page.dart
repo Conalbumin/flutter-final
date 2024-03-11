@@ -14,3 +14,22 @@ Future<void> updateUsername(User user, String newUsername) async {
     print('Error updating username: $e');
   }
 }
+
+Future<void> updatePassword(String newPassword) async {
+  try {
+    // Get the current user
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    // If the user is signed in
+    if (currentUser != null) {
+      // Update the password
+      await currentUser.updatePassword(newPassword);
+
+      print('Password updated successfully.');
+    } else {
+      print('Error: No user is currently signed in.');
+    }
+  } catch (e) {
+    print('Error updating password: $e');
+  }
+}
