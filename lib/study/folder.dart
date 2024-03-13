@@ -1,38 +1,42 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/constant/style.dart';
 
 class FolderTab extends StatelessWidget {
-  const FolderTab({super.key});
+  const FolderTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          _folderItem('Folder Tab'),
-          _folderItem('Folder Tab'),
-          _folderItem('Folder Tab'),
-        ],
-      ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('folders').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            return FolderItem(
+              folderName: document['name'],
+            );
+          }).toList(),
+        );
+      },
     );
   }
+}
 
-  Widget _folderItem(String text) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        color: Colors.blue[600],
-        elevation: 10,
-        child: Container(
-          decoration: CustomCardDecoration.cardDecoration,
-          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.folder, size: 60, color: Colors.white,),
-              title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
-            )
-          ]),
-        ));
+class FolderItem extends StatelessWidget {
+  final String folderName;
+
+  const FolderItem({required this.folderName});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(folderName),
+      // Add more customization as needed
+    );
   }
-
 }

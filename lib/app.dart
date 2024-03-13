@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text.dart';
+import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import 'study/study.dart';
 import 'setting/setting.dart';
 import 'home/home.dart';
@@ -33,6 +34,7 @@ class _MainAppState extends State<MainApp> {
             IconButton(
             icon: Icon(Icons.add_circle, size: 40, color: Colors.white,),
             onPressed: () {
+              _showAddOptionsDialog(context);
             },
           ),
         ],
@@ -60,5 +62,45 @@ class _MainAppState extends State<MainApp> {
         animationDuration: Duration(milliseconds: 300),
       ),
     );
+  }
+
+  void _showAddOptionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Create New'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _createNewTopic(context);
+                  },
+                  child: Text('Create New Topic'),
+                ),
+                Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _createNewFolder(context);
+                  },
+                  child: Text('Create New Folder'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _createNewTopic(BuildContext context) {
+    addTopic('New Topic');
+  }
+
+  void _createNewFolder(BuildContext context) {
+    addFolder('New Folder');
   }
 }

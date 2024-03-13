@@ -1,39 +1,43 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/constant/style.dart';
+import 'folder.dart';
 
 class TopicTab extends StatelessWidget {
-  const TopicTab({super.key});
+  const TopicTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          _topicItem('Topic Tab', 2),
-          _topicItem('Topic Tab', 3),
-          _topicItem('Topic Tab', 4),
-        ],
-      ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('topics').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            return TopicItem(
+              topicName: document['name'],
+            );
+          }).toList(),
+        );
+      },
     );
   }
+}
 
-  Widget _topicItem(String text, int numberOfWords) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        color: Colors.blue[600],
-        elevation: 10,
-        child: Container(
-          decoration: CustomCardDecoration.cardDecoration,
-          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.topic, size: 60, color: Colors.white,),
-              title: Text(text, style: const TextStyle(fontSize: 30.0, color: Colors.white)),
-              subtitle: Text('${numberOfWords} words', style: const TextStyle(fontSize: 18.0, color: Colors.white)),
+class TopicItem extends StatelessWidget {
+  final String topicName;
 
-              )
-          ]),
-        ));
+  const TopicItem({required this.topicName});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(topicName),
+      // Add more customization as needed
+    );
   }
 }
