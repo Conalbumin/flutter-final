@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../constant/style.dart';
+import 'firebase_setting_page.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -13,6 +15,7 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   User? _user;
+  String? _avatarURL;
 
   @override
   void initState() {
@@ -39,12 +42,14 @@ class _SettingPageState extends State<SettingPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: _user?.photoURL != null
-                                ? NetworkImage(_user!.photoURL!)
-                                : AssetImage('assets/default_avatar.png') as ImageProvider, // Set default image asset
-                          ),
+                        CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _avatarURL != null
+                            ? NetworkImage(_avatarURL!)
+                            : _user?.photoURL != null
+                            ? NetworkImage(_user!.photoURL!)
+                            : AssetImage('assets/default_avatar.png') as ImageProvider,
+                      ),
                           const SizedBox(height: 20),
                           Text(
                             _user?.displayName ?? '',
@@ -100,7 +105,9 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 20),
               Container(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    changeAvatar();
+                  },
                   child: Card(
                     color: Colors.blue[500],
                     child: Container(
@@ -181,11 +188,12 @@ class _SettingPageState extends State<SettingPage> {
       DocumentSnapshot userSnapshot = await firestore.collection('users').doc(user.uid).get();
       setState(() {
         _user = user;
+        Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
+        _avatarURL = userData?['avatarURL']; // Retrieve avatar URL from Firestore
       });
-    };
+    }
   }
 
-// Function to show a dialog for entering a new username
   Future<String?> _showUsernameInputDialog() async {
     TextEditingController _usernameController = TextEditingController();
 
@@ -238,8 +246,28 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
+  void changeAvatar() async {
+    try {
+      final ImagePicker _picker = ImagePicker();
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-  void changeAvatar() async {}
+      if (pickedFile != null) {
+        String imagePath = pickedFile.path;
+
+        String newAvatarURL = await updateAvatar(_user!, imagePath);
+        showToast('Avatar updated successfully.');
+
+        setState(() {
+          _avatarURL = newAvatarURL;
+        });
+      } else {
+        showToast('No image selected.');
+      }
+    } catch (e) {
+      print('Error changing avatar: $e');
+      showToast('Error changing avatar: $e');
+    }
+  }
 
   Future<String?> _showPasswordInputDialog() async {
     TextEditingController _passwordController = TextEditingController();
@@ -274,7 +302,6 @@ class _SettingPageState extends State<SettingPage> {
 
   void changePassword() async {
     String? newPassword = await _showPasswordInputDialog();
-
     if (newPassword != null && newPassword.isNotEmpty) {
       try {
         await FirebaseAuth.instance.currentUser!.updatePassword(newPassword);
