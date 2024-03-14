@@ -5,6 +5,7 @@ import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import 'study/study.dart';
 import 'setting/setting.dart';
 import 'home/home.dart';
+import 'study/add_topic_page.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({Key? key}) : super(key: key);
@@ -76,7 +77,10 @@ class _MainAppState extends State<MainApp> {
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
-                    _createNewTopic(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddTopicPage()),
+                    );
                   },
                   child: Text('Create New Topic'),
                 ),
@@ -84,7 +88,7 @@ class _MainAppState extends State<MainApp> {
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
-                    _createNewFolder(context);
+                    _showNewFolderDialog(context);
                   },
                   child: Text('Create New Folder'),
                 ),
@@ -96,11 +100,49 @@ class _MainAppState extends State<MainApp> {
     );
   }
 
-  void _createNewTopic(BuildContext context) {
-    addTopic('New Topic');
-  }
+  void _showNewFolderDialog(BuildContext context) {
+    String folderName = '';
+    String text = '';
 
-  void _createNewFolder(BuildContext context) {
-    addFolder('New Folder');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('New Folder'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Folder Name'),
+                onChanged: (value) {
+                  folderName = value;
+                },
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Description'),
+                onChanged: (value) {
+                  text = value;
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Create'),
+              onPressed: () {
+                addFolder(folderName, text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

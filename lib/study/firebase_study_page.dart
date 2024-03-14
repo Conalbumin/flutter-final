@@ -1,20 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Function to add a topic to Firestore
-Future<void> addTopic(String topicName) async {
+Future<void> addTopic(String topicName,  String text, int numberOfWords) async {
   try {
     await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
+      'text': text,
+      'numberOfWords': numberOfWords
     });
   } catch (e) {
     print('Error adding topic: $e');
   }
 }
 
-Future<void> addFolder(String folderName) async {
+Future<void> addFolder(String folderName, String text) async {
   try {
     await FirebaseFirestore.instance.collection('folders').add({
       'name': folderName,
+      'text': text
     });
   } catch (e) {
     print('Error adding folder: $e');

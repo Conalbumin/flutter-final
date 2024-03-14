@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:quizlet_final_flutter/home/home.dart';
 import 'package:quizlet_final_flutter/setting/setting.dart';
+import 'package:quizlet_final_flutter/study/add_topic_page.dart';
+import 'package:quizlet_final_flutter/study/add_word.dart';
 import 'package:quizlet_final_flutter/study/study.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'authentication/login.dart';
@@ -27,7 +29,7 @@ class App extends StatelessWidget {
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => Login(),
+        '/': (context) => MainApp(),
         '/login': (context) => Login(),
         '/signUp': (context) => SignUp(),
         '/home': (context) => MainApp(),
