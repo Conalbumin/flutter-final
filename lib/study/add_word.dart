@@ -5,11 +5,25 @@ class AddWordPage extends StatefulWidget {
 
   @override
   State<AddWordPage> createState() => _AddWordPageState();
+
+  // Method to get the state object
+  static _AddWordPageState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_AddWordPageState>();
 }
 
 class _AddWordPageState extends State<AddWordPage> {
   String word = '';
   String definition = '';
+
+  // Method to get the word entered by the user
+  String getWord() {
+    return word;
+  }
+
+  // Method to get the definition entered by the user
+  String getDefinition() {
+    return definition;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +51,9 @@ class _AddWordPageState extends State<AddWordPage> {
                 return null;
               },
               onChanged: (value) {
-                word = value;
+                setState(() {
+                  word = value;
+                });
               },
             ),
           ),
@@ -56,7 +72,9 @@ class _AddWordPageState extends State<AddWordPage> {
                 return null;
               },
               onChanged: (value) {
-                definition = value;
+                setState(() {
+                  definition = value;
+                });
               },
             ),
           ),

@@ -1,5 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'add_word.dart';
 
 class AddTopicPage extends StatefulWidget {
@@ -14,7 +14,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
 
   String _topicName = '';
   String _text = '';
-  List<Widget> wordPages = []; // List to hold AddWordPage widgets
+  List<Widget> wordPages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +36,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white, size: 40),
             onPressed: () {
+              _submitForm();
             },
           ),
           const SizedBox(width: 10),
@@ -91,10 +92,58 @@ class _AddTopicPageState extends State<AddTopicPage> {
   }
 
   void _submitForm() {
-    // Handle form submission here, e.g., call a function to add the topic to Firestore
-    // addTopic(_topicName, _text, _numberOfWords);
-    // Then navigate back to the previous page
-    Navigator.pop(context);
+    print("Context: $context");
+    if (_formKey.currentState!.validate()) {
+      // Create a list to store the word data
+      List<Map<String, String>> wordsData = [];
+
+      // Loop through each AddWordPage and extract the word and definition
+      for (Widget wordPage in wordPages) {
+        if (wordPage is AddWordPage) {
+          // Extract the word and definition using the of() method
+          print("Attempting to get word and definition...");
+          String? word = AddWordPage.of(context)?.getWord();
+          String? definition = AddWordPage.of(context)?.getDefinition();
+          print("Word: $word, Definition: $definition");
+
+          // Add the word data to the list
+          if (word != null && definition != null) {
+            wordsData.add({'word': word, 'definition': definition});
+          }
+        }
+      }
+
+      // Now you have the list of word data, you can add it to Firestore
+      addTopicWithWords(_topicName, _text, wordsData);
+      print("click");
+    }
+  }
+
+
+
+// Function to add a topic to Firestore along with the words
+  void addTopicWithWords(String topicName, String text, List<Map<String, String>> wordsData) async {
+    try {
+      // Add the topic to Firestore
+      DocumentReference topicRef = await FirebaseFirestore.instance.collection('topics').add({
+        'name': topicName,
+        'text': text,
+        'numberOfWords': wordsData.length,
+      });
+
+      // Loop through each word data and add it to Firestore
+      for (var wordData in wordsData) {
+        await topicRef.collection('words').add({
+          'word': wordData['word'],
+          'definition': wordData['definition'],
+        });
+      }
+
+      // Navigate back to the previous page
+      Navigator.pop(context);
+    } catch (e) {
+      print('Error adding topic with words: $e');
+    }
   }
 
   // Function to add a new AddWordPage widget
