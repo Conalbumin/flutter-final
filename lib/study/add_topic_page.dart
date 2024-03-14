@@ -120,7 +120,6 @@ class _AddTopicPageState extends State<AddTopicPage> {
   }
 
 
-
 // Function to add a topic to Firestore along with the words
   void addTopicWithWords(String topicName, String text, List<Map<String, String>> wordsData) async {
     try {
