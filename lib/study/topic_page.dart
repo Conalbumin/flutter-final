@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/quiz.dart';
+import 'flashcard.dart';
+import 'quiz.dart';
+import 'type.dart';
 
 class TopicPage extends StatelessWidget {
   final String topicId;
@@ -12,26 +16,51 @@ class TopicPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(topicName),
+        backgroundColor: Colors.blue,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(topicName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25)),
+            Text('Number of Words: $numberOfWords', style: TextStyle(color: Colors.white, fontSize: 15)), // Add your subtitle here
+          ],
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: Icon(Icons.delete, color: Colors.white, size: 35,),
             onPressed: () {
-              // Add your action here
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Remove Topic'),
+                    content: Text('Are you sure you want to remove this topic?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Here you can add the logic to remove the topic
+                          // Once the topic is removed, you might want to navigate back or perform any other action
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Remove'),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
+
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Number of Words: $numberOfWords',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
           SizedBox(
             height: 200, // Adjust the height as needed
             child: FutureBuilder(
@@ -67,6 +96,18 @@ class TopicPage extends StatelessWidget {
                   );
                 }
               },
+            ),
+          ),
+          SizedBox(height: 20), // Add some spacing
+          Container(
+            child: Column(
+              children: [
+                FlashCard(),
+                const SizedBox(height: 10),
+                Quiz(),
+                const SizedBox(height: 10),
+                Type(),
+              ],
             ),
           ),
         ],
