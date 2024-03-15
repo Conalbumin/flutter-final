@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class Type extends StatefulWidget {
   const Type({super.key});
 

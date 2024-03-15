@@ -5,7 +5,7 @@ import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import 'study/study.dart';
 import 'setting/setting.dart';
 import 'home/home.dart';
-import 'study/add_topic_page.dart';
+import 'study/topic/add_topic_page.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({Key? key}) : super(key: key);

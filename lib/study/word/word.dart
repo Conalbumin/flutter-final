@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constant/style.dart';
+import '../../constant/style.dart';
 
 class WordItem extends StatelessWidget {
   final String wordId;

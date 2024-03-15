@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'add_word.dart';
+import '../word/add_word.dart';
 
 class AddTopicPage extends StatefulWidget {
   const AddTopicPage({Key? key}) : super(key: key);
@@ -26,12 +26,6 @@ class _AddTopicPageState extends State<AddTopicPage> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white, size: 40),
-            onPressed: () {
-              _showConfirmationDialog();
-            },
-          ),
           const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white, size: 40),
@@ -156,31 +150,4 @@ class _AddTopicPageState extends State<AddTopicPage> {
   }
 
   // Function to show the confirmation dialog for removing the topic
-  void _showConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Remove Topic"),
-          content: const Text("Are you sure you want to remove this topic?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                // Perform the action to remove the topic here
-                // For now, let's just close the dialog
-                Navigator.of(context).pop();
-              },
-              child: const Text("Remove"),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

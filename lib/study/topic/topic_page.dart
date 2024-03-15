@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'quiz.dart';
-import 'flashcard.dart';
-import 'type.dart';
+import '../firebase_study_page.dart';
+import '../study_mode/quiz.dart';
+import '../study_mode/flashcard.dart';
+import '../study_mode/type.dart';
 
 class TopicPage extends StatelessWidget {
   final String topicId;
@@ -20,42 +21,44 @@ class TopicPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(topicName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25)),
-            Text('Number of Words: $numberOfWords', style: const TextStyle(color: Colors.white, fontSize: 15)), // Add your subtitle here
+            Text('Number of Words: $numberOfWords', style: const TextStyle(color: Colors.white, fontSize: 15)),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.white, size: 35,),
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Remove Topic'),
-                    content: const Text('Are you sure you want to remove this topic?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          _deleteTopic(context, topicId);
-                          // Here you can add the logic to remove the topic
-                          // Once the topic is removed, you might want to navigate back or perform any other action
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Remove'),
-                      ),
-                    ],
-                  );
-                },
-              );
+              _showDeleteConfirmationDialog(context, topicId);
             },
           ),
-
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.white),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'addToFolder',
+                child: ListTile(
+                  leading: Icon(Icons.folder),
+                  title: Text('Add to Folder'),
+                ),
+              ),
+            ],
+            onSelected: (String choice) {
+              if (choice == 'edit') {
+                // Handle edit action
+                print('Edit action');
+              } else if (choice == 'addToFolder') {
+                // Handle add to folder action
+                print('Add to folder action');
+              }
+            },
+          ),
         ],
       ),
       body: Column(
@@ -137,21 +140,30 @@ class TopicPage extends StatelessWidget {
     );
   }
 
-  void _deleteTopic(BuildContext context, String topicId) {
-    try {
-      FirebaseFirestore.instance
-          .collection('topics')
-          .doc(topicId)
-          .delete()
-          .then((_) {
-        print('Topic deleted successfully');
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        print('Error deleting topic: $error');
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
+  void _showDeleteConfirmationDialog(BuildContext context, String topicId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove Topic'),
+          content: const Text('Are you sure you want to remove this topic?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteTopic(context, topicId);
+              },
+              child: const Text('Remove'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<List<DocumentSnapshot>> _fetchWords(String topicId) async {

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-// Function to add a topic to Firestore
 Future<void> addTopic(String topicName,  String text, int numberOfWords) async {
   try {
     await FirebaseFirestore.instance.collection('topics').add({
@@ -24,7 +24,6 @@ Future<void> addFolder(String folderName, String text) async {
   }
 }
 
-// Function to add a topic to a folder in Firestore
 Future<void> addTopicToFolder(String topicId, String folderId) async {
   try {
     await FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').add({
@@ -35,14 +34,46 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
   }
 }
 
-// Function to retrieve topics from Firestore
 Stream<QuerySnapshot> getTopics() {
   return FirebaseFirestore.instance.collection('topics').snapshots();
 }
 
-// Function to retrieve topics in a folder from Firestore
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
   return FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').snapshots();
+}
+
+void deleteFolder(BuildContext context, String folderId) {
+  try {
+    FirebaseFirestore.instance
+        .collection('folders')
+        .doc(folderId)
+        .delete()
+        .then((_) {
+      print('Folder deleted successfully');
+      Navigator.of(context).pop();
+    }).catchError((error) {
+      print('Error deleting folder: $error');
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+void deleteTopic(BuildContext context, String topicId) {
+  try {
+    FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .delete()
+        .then((_) {
+      print('Topic deleted successfully');
+      Navigator.of(context).pop();
+    }).catchError((error) {
+      print('Error deleting topic: $error');
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
 }
 
 // Add other CRUD operations as needed

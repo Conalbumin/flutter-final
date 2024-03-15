@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'folder_tab.dart';
+import '../firebase_study_page.dart';
 
 class FolderPage extends StatelessWidget {
   final String folderId;
@@ -33,7 +33,7 @@ class FolderPage extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          _deleteFolder(context, folderId);
+                          deleteFolder(context, folderId);
                           // Here you can add the logic to remove the topic
                           // Once the topic is removed, you might want to navigate back or perform any other action
                           Navigator.of(context).pop(); // Close the dialog
@@ -92,23 +92,6 @@ class FolderPage extends StatelessWidget {
       )
 
     );
-  }
-
-  void _deleteFolder(BuildContext context, String folderId) {
-    try {
-      FirebaseFirestore.instance
-          .collection('folders')
-          .doc(folderId)
-          .delete()
-          .then((_) {
-        print('Folder deleted successfully');
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        print('Error deleting folder: $error');
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
   }
 
 
