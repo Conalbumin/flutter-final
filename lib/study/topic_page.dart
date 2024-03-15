@@ -42,9 +42,10 @@ class TopicPage extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
+                          _deleteTopic(context, topicId);
                           // Here you can add the logic to remove the topic
                           // Once the topic is removed, you might want to navigate back or perform any other action
-                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).pop();
                         },
                         child: const Text('Remove'),
                       ),
@@ -134,6 +135,23 @@ class TopicPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _deleteTopic(BuildContext context, String topicId) {
+    try {
+      FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .delete()
+          .then((_) {
+        print('Topic deleted successfully');
+        Navigator.of(context).pop();
+      }).catchError((error) {
+        print('Error deleting topic: $error');
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Future<List<DocumentSnapshot>> _fetchWords(String topicId) async {
