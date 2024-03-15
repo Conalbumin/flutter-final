@@ -100,13 +100,35 @@ class TopicPage extends StatelessWidget {
           ),
           SizedBox(height: 20), // Add some spacing
           Container(
+            margin: EdgeInsets.symmetric(horizontal: 20), // Add margin here
             child: Column(
               children: [
-                FlashCard(),
-                const SizedBox(height: 10),
-                Quiz(),
-                const SizedBox(height: 10),
-                Type(),
+                GestureDetector(
+                  onTap: () {
+                    // Handle onTap for FlashCard
+                    print('FlashCard tapped');
+                    // Add navigation or other actions as needed
+                  },
+                  child: FlashCard(),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    // Handle onTap for Quiz
+                    print('Quiz tapped');
+                    // Add navigation or other actions as needed
+                  },
+                  child: Quiz(),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    // Handle onTap for Type
+                    print('Type tapped');
+                    // Add navigation or other actions as needed
+                  },
+                  child: Type(),
+                ),
               ],
             ),
           ),

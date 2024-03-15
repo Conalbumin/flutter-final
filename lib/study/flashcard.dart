@@ -15,7 +15,7 @@ class _FlashCardState extends State<FlashCard> {
       decoration: BoxDecoration(
         color: Colors.indigo,
         border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [

@@ -19,6 +19,15 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Colors.white,
+        hintColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.white), // Set back button color to white
+        ),
+        // Add more theme configurations as needed
+      ),
       themeMode: ThemeMode.light,
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
