@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'firebase_study_page.dart';
-import 'package:quizlet_final_flutter/study/topic.dart';
+import 'package:quizlet_final_flutter/study/topic_tab.dart';
 
-import 'folder.dart'; // Import your Firebase functions here
+import 'folder_tab.dart'; // Import your Firebase functions here
 
 class StudyPage extends StatefulWidget {
   const StudyPage({Key? key}) : super(key: key);

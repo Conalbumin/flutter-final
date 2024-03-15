@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quizlet_final_flutter/study/quiz.dart';
-import 'flashcard.dart';
 import 'quiz.dart';
+import 'flashcard.dart';
 import 'type.dart';
 
 class TopicPage extends StatelessWidget {
@@ -20,26 +19,26 @@ class TopicPage extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(topicName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25)),
-            Text('Number of Words: $numberOfWords', style: TextStyle(color: Colors.white, fontSize: 15)), // Add your subtitle here
+            Text(topicName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25)),
+            Text('Number of Words: $numberOfWords', style: const TextStyle(color: Colors.white, fontSize: 15)), // Add your subtitle here
           ],
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete, color: Colors.white, size: 35,),
+            icon: const Icon(Icons.delete, color: Colors.white, size: 35,),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text('Remove Topic'),
-                    content: Text('Are you sure you want to remove this topic?'),
+                    title: const Text('Remove Topic'),
+                    content: const Text('Are you sure you want to remove this topic?'),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(); // Close the dialog
                         },
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                       ),
                       TextButton(
                         onPressed: () {
@@ -47,7 +46,7 @@ class TopicPage extends StatelessWidget {
                           // Once the topic is removed, you might want to navigate back or perform any other action
                           Navigator.of(context).pop(); // Close the dialog
                         },
-                        child: Text('Remove'),
+                        child: const Text('Remove'),
                       ),
                     ],
                   );
@@ -67,7 +66,7 @@ class TopicPage extends StatelessWidget {
               future: _fetchWords(topicId),
               builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
@@ -79,14 +78,14 @@ class TopicPage extends StatelessWidget {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
                       return Card(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(word, style: TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 4),
+                              Text(word, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
                               Text(definition),
                             ],
                           ),
@@ -98,9 +97,9 @@ class TopicPage extends StatelessWidget {
               },
             ),
           ),
-          SizedBox(height: 20), // Add some spacing
+          const SizedBox(height: 20), // Add some spacing
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20), // Add margin here
+            margin: const EdgeInsets.symmetric(horizontal: 20), // Add margin here
             child: Column(
               children: [
                 GestureDetector(
@@ -109,25 +108,25 @@ class TopicPage extends StatelessWidget {
                     print('FlashCard tapped');
                     // Add navigation or other actions as needed
                   },
-                  child: FlashCard(),
+                  child: const FlashCard(),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
                     // Handle onTap for Quiz
                     print('Quiz tapped');
                     // Add navigation or other actions as needed
                   },
-                  child: Quiz(),
+                  child: const Quiz(),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
                     // Handle onTap for Type
                     print('Type tapped');
                     // Add navigation or other actions as needed
                   },
-                  child: Type(),
+                  child: const Type(),
                 ),
               ],
             ),

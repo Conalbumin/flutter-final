@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quizlet_final_flutter/study/topic_page.dart';
+import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/study/folder_page.dart';
 import '../constant/style.dart';
-import 'folder.dart';
 
-class TopicTab extends StatelessWidget {
-  const TopicTab({Key? key}) : super(key: key);
+class FolderTab extends StatelessWidget {
+  const FolderTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('topics').snapshots(),
+      stream: FirebaseFirestore.instance.collection('folders').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -22,16 +21,13 @@ class TopicTab extends StatelessWidget {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (BuildContext context, int index) {
             DocumentSnapshot document = snapshot.data!.docs[index];
-            String topicId = document.id; // Extract topicId from DocumentSnapshot
-            String topicName = document['name'];
+            String folderId = document.id;
+            String folderName = document['name'];
             String text = document['text'];
-            int numberOfWords = document['numberOfWords'];
-
-            return TopicItem(
-              topicId: topicId,
-              topicName: topicName,
+            return FolderItem(
+              folderName: folderName,
               text: text,
-              numberOfWords: numberOfWords,
+              folderId: folderId,
             );
           },
         );
@@ -40,17 +36,15 @@ class TopicTab extends StatelessWidget {
   }
 }
 
-class TopicItem extends StatelessWidget {
-  final String topicId;
-  final String topicName;
+class FolderItem extends StatelessWidget {
+  final String folderId;
+  final String folderName;
   final String text;
-  final int numberOfWords;
 
-  const TopicItem({
-    required this.topicId,
-    required this.topicName,
+  const FolderItem({
+    required this.folderId,
+    required this.folderName,
     required this.text,
-    required this.numberOfWords,
   });
 
   @override
@@ -61,10 +55,9 @@ class TopicItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TopicPage(
-              topicId: topicId,
-              topicName: topicName,
-              numberOfWords: numberOfWords,
+            builder: (context) => FolderPage(
+              folderId: folderId,
+              folderName: folderName,
             ),
           ),
         );
@@ -80,21 +73,12 @@ class TopicItem extends StatelessWidget {
           child: ListTile(
             leading: const Icon(Icons.topic, size: 60, color: Colors.white),
             title: Text(
-              topicName,
+              folderName,
               style: const TextStyle(fontSize: 30.0, color: Colors.white),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  text,
-                  style: const TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                Text(
-                  '$numberOfWords words',
-                  style: const TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-              ],
+            subtitle: Text(
+              text,
+              style: const TextStyle(fontSize: 15.0, color: Colors.white),
             ),
           ),
         ),
