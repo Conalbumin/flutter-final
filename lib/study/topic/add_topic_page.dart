@@ -59,9 +59,13 @@ class _AddTopicPageState extends State<AddTopicPage> {
                     return null;
                   },
                   onChanged: (value) {
-                    _topicName = value;
+                    setState(() {
+                      _topicName = value;
+                    });
                   },
+                  // onChanged: (value) { _topicName = value; }, // Remove this line
                 ),
+
                 const SizedBox(height: 16),
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Description'),

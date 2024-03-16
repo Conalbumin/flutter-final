@@ -38,6 +38,18 @@ Stream<QuerySnapshot> getTopics() {
   return FirebaseFirestore.instance.collection('topics').snapshots();
 }
 
+Future<void> updateTopicInFirestore(String topicId, String newTopicName, String newDescription) async {
+  try {
+    await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
+      'name': newTopicName,
+      'text': newDescription,
+    });
+    print('Topic updated successfully');
+  } catch (e) {
+    print('Error updating topic: $e');
+  }
+}
+
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
   return FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').snapshots();
 }

@@ -4,13 +4,19 @@ import '../firebase_study_page.dart';
 import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
+import 'edit_topic_page.dart';
 
 class TopicPage extends StatelessWidget {
   final String topicId;
   final String topicName;
   final int numberOfWords;
+  final String text;
 
-  TopicPage({required this.topicId, required this.topicName, required this.numberOfWords});
+  TopicPage(
+      {required this.topicId,
+      required this.topicName,
+      required this.numberOfWords,
+      required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +26,22 @@ class TopicPage extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(topicName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25)),
-            Text('Number of Words: $numberOfWords', style: const TextStyle(color: Colors.white, fontSize: 15)),
+            Text(topicName,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25)),
+            Text('Number of Words: $numberOfWords',
+                style: const TextStyle(color: Colors.white, fontSize: 15)),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white, size: 35,),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.white,
+              size: 35,
+            ),
             onPressed: () {
               _showDeleteConfirmationDialog(context, topicId);
             },
@@ -51,91 +66,112 @@ class TopicPage extends StatelessWidget {
             ],
             onSelected: (String choice) {
               if (choice == 'edit') {
-                // Handle edit action
+                editAction(context, topicName, text);
                 print('Edit action');
               } else if (choice == 'addToFolder') {
-                // Handle add to folder action
+                // addTopicToFolder(topicId, folderId);
                 print('Add to folder action');
               }
             },
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 200, // Adjust the height as needed
-            child: FutureBuilder(
-              future: _fetchWords(topicId),
-              builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  List<DocumentSnapshot> words = snapshot.data!;
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: words.length,
-                    itemBuilder: (context, index) {
-                      String word = words[index]['word'];
-                      String definition = words[index]['definition'];
-                      return Card(
-                        margin: const EdgeInsets.all(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(word, style: const TextStyle(fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 4),
-                              Text(definition),
-                            ],
+      body: SingleChildScrollView(
+        // Wrap the Column with SingleChildScrollView
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 200, // Adjust the height as needed
+              child: FutureBuilder(
+                future: _fetchWords(topicId),
+                builder:
+                    (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    List<DocumentSnapshot> words = snapshot.data!;
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: words.length,
+                      itemBuilder: (context, index) {
+                        String word = words[index]['word'];
+                        String definition = words[index]['definition'];
+                        return Card(
+                          margin: const EdgeInsets.all(8),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(word,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 4),
+                                Text(definition),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 20), // Add some spacing
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              // Add margin here
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      // Handle onTap for FlashCard
+                      print('FlashCard tapped');
+                      // Add navigation or other actions as needed
                     },
-                  );
-                }
-              },
+                    child: const FlashCard(),
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      // Handle onTap for Quiz
+                      print('Quiz tapped');
+                      // Add navigation or other actions as needed
+                    },
+                    child: const Quiz(),
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      // Handle onTap for Type
+                      print('Type tapped');
+                      // Add navigation or other actions as needed
+                    },
+                    child: const Type(),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20), // Add some spacing
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20), // Add margin here
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    // Handle onTap for FlashCard
-                    print('FlashCard tapped');
-                    // Add navigation or other actions as needed
-                  },
-                  child: const FlashCard(),
-                ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () {
-                    // Handle onTap for Quiz
-                    print('Quiz tapped');
-                    // Add navigation or other actions as needed
-                  },
-                  child: const Quiz(),
-                ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () {
-                    // Handle onTap for Type
-                    print('Type tapped');
-                    // Add navigation or other actions as needed
-                  },
-                  child: const Type(),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void editAction(BuildContext context, String initialTopicName,
+      String initialDescription) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTopicPage(
+          topicId: topicId,
+          initialTopicName: initialTopicName,
+          initialDescription: initialDescription,
+        ),
       ),
     );
   }

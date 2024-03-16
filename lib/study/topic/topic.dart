@@ -28,6 +28,7 @@ class TopicItem extends StatelessWidget {
               topicId: topicId,
               topicName: topicName,
               numberOfWords: numberOfWords,
+              text: text,
             ),
           ),
         );
