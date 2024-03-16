@@ -77,7 +77,6 @@ class TopicPage extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        // Wrap the Column with SingleChildScrollView
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -121,10 +120,29 @@ class TopicPage extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 20), // Add some spacing
+            const SizedBox(height: 20),
+            Center(
+              child: Container(
+                height: 60,
+                width: 300,
+                decoration: BoxDecoration(
+                  color: Colors.indigo,
+                  borderRadius: BorderRadius.circular(10), // Set the border radius here
+                ),
+                child: Center(
+                  child: Text(
+                    "Description: $text",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              // Add margin here
               child: Column(
                 children: [
                   GestureDetector(
