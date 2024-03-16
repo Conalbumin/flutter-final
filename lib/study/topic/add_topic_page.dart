@@ -98,17 +98,20 @@ class _AddTopicPageState extends State<AddTopicPage> {
       for (Widget wordPage in wordPages) {
         // Check if the widget is an instance of AddWordPage
         if (wordPage is AddWordPage) {
-          // Retrieve the state of AddWordPage using global key
-          AddWordPageState? wordPageState = AddWordPage.addWordPageKey.currentState;
+          // Retrieve the state of AddWordPage using key
+          AddWordPageState? wordPageState = (wordPage.key as GlobalKey<AddWordPageState>).currentState;
 
-          // Access word and definition data using the state object
-          String? word = wordPageState?.getWord();
-          String? definition = wordPageState?.getDefinition();
-          print("Word: $word, Definition: $definition");
+          // Check if the wordPageState is not null before accessing properties
+          if (wordPageState != null) {
+            // Access word and definition data using the state object
+            String? word = wordPageState.getWord();
+            String? definition = wordPageState.getDefinition();
+            print("Word: $word, Definition: $definition");
 
-          // Add the word data to the list
-          if (word != null && definition != null) {
-            wordsData.add({'word': word, 'definition': definition});
+            // Add the word data to the list
+            if (word != null && definition != null) {
+              wordsData.add({'word': word, 'definition': definition});
+            }
           }
         }
       }
@@ -124,7 +127,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
       if (wordPages.isNotEmpty) {
         wordPages.add(const SizedBox(height: 20));
       }
-      wordPages.add(AddWordPage(key: AddWordPage.addWordPageKey));
+      wordPages.add(AddWordPage(key: AddWordPage.generateUniqueKey()));
     });
   }
 }

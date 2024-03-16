@@ -6,8 +6,10 @@ class AddWordPage extends StatefulWidget {
   @override
   AddWordPageState createState() => AddWordPageState();
 
-  // Define a global key for AddWordPage
-  static final GlobalKey<AddWordPageState> addWordPageKey = GlobalKey<AddWordPageState>();
+  // Generate a unique key for each instance of AddWordPage
+  static GlobalKey<AddWordPageState> generateUniqueKey() {
+    return GlobalKey<AddWordPageState>();
+  }
 }
 
 class AddWordPageState extends State<AddWordPage> {
@@ -53,7 +55,6 @@ class AddWordPageState extends State<AddWordPage> {
                 setState(() {
                   word = value;
                   print('Word updated: $word');
-
                 });
               },
             ),
@@ -75,8 +76,7 @@ class AddWordPageState extends State<AddWordPage> {
               onChanged: (value) {
                 setState(() {
                   definition = value;
-                  print('definition updated: $definition');
-
+                  print('Definition updated: $definition');
                 });
               },
             ),
