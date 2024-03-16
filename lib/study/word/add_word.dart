@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AddWordPage extends StatefulWidget {
-  const AddWordPage({super.key});
+  const AddWordPage({Key? key}) : super(key: key);
 
   @override
-  State<AddWordPage> createState() => _AddWordPageState();
+  AddWordPageState createState() => AddWordPageState();
 
-  // Method to get the state object
-  static _AddWordPageState? of(BuildContext context) =>
-      context.findAncestorStateOfType<_AddWordPageState>();
+  // Define a global key for AddWordPage
+  static final GlobalKey<AddWordPageState> addWordPageKey = GlobalKey<AddWordPageState>();
 }
 
-class _AddWordPageState extends State<AddWordPage> {
+class AddWordPageState extends State<AddWordPage> {
   String word = '';
   String definition = '';
 
@@ -53,6 +52,8 @@ class _AddWordPageState extends State<AddWordPage> {
               onChanged: (value) {
                 setState(() {
                   word = value;
+                  print('Word updated: $word');
+
                 });
               },
             ),
@@ -74,6 +75,8 @@ class _AddWordPageState extends State<AddWordPage> {
               onChanged: (value) {
                 setState(() {
                   definition = value;
+                  print('definition updated: $definition');
+
                 });
               },
             ),

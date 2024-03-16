@@ -24,6 +24,30 @@ Future<void> addFolder(String folderName, String text) async {
   }
 }
 
+Future<void> addTopicWithWords(String topicName, String text, List<Map<String, String>> wordsData) async {
+  try {
+    DocumentReference topicRef = await FirebaseFirestore.instance.collection('topics').add({
+      'name': topicName,
+      'text': text,
+      'numberOfWords': wordsData.length,
+    });
+
+    String topicId = topicRef.id;
+
+    for (var wordData in wordsData) {
+      await FirebaseFirestore.instance.collection('topics').doc(topicId).collection('words').add({
+        'word': wordData['word'],
+        'definition': wordData['definition'],
+      });
+    }
+
+    print('Topic with words added successfully');
+  } catch (e) {
+    print('Error adding topic with words: $e');
+  }
+}
+
+
 Future<void> addTopicToFolder(String topicId, String folderId) async {
   try {
     await FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').add({
