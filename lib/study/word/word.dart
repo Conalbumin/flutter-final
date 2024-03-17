@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import '../../constant/style.dart';
 
 class WordItem extends StatelessWidget {
-  final String wordId;
   final String word;
   final String definition;
 
   const WordItem({
-    required this.wordId,
     required this.definition,
     required this.word,
   });
@@ -20,29 +18,26 @@ class WordItem extends StatelessWidget {
         print("object");
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        color: Colors.blue[600],
+        color: Color.fromARGB(255, 0, 191, 255),
         elevation: 10,
-        child: Container(
-          decoration: CustomCardDecoration.cardDecoration,
-          child: ListTile(
-            leading: const Icon(Icons.topic, size: 60, color: Colors.white),
-            title: Text(
-              definition,
-              style: const TextStyle(fontSize: 30.0, color: Colors.white),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        margin: const EdgeInsets.all(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   word,
                   style: const TextStyle(fontSize: 18.0, color: Colors.white),
+                  textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 8), // Adjust the spacing between word and definition
                 Text(
                   definition,
                   style: const TextStyle(fontSize: 18.0, color: Colors.white),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

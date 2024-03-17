@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../firebase_study_page.dart';
 import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
 import 'edit_topic_page.dart';
+import 'package:card_swiper/card_swiper.dart';
 
 class TopicPage extends StatelessWidget {
   final String topicId;
@@ -47,7 +49,7 @@ class TopicPage extends StatelessWidget {
             },
           ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.white),
+            icon: const Icon(Icons.more_vert, color: Colors.white),
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'edit',
@@ -92,28 +94,21 @@ class TopicPage extends StatelessWidget {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     List<DocumentSnapshot> words = snapshot.data!;
-                    return ListView.builder(
+                    return Swiper(
+                      pagination: const SwiperPagination(
+                        builder: DotSwiperPaginationBuilder(
+                          color: Colors.white,
+                          activeColor: Colors.indigo,
+                          activeSize: 15,
+                          size: 10,
+                        ),
+                      ),
                       scrollDirection: Axis.horizontal,
                       itemCount: words.length,
                       itemBuilder: (context, index) {
                         String word = words[index]['word'];
                         String definition = words[index]['definition'];
-                        return Card(
-                          margin: const EdgeInsets.all(8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(word,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(definition),
-                              ],
-                            ),
-                          ),
-                        );
+                        return WordItem(definition: definition, word: word);
                       },
                     );
                   }
@@ -127,12 +122,13 @@ class TopicPage extends StatelessWidget {
                 width: 300,
                 decoration: BoxDecoration(
                   color: Colors.indigo,
-                  borderRadius: BorderRadius.circular(10), // Set the border radius here
+                  borderRadius:
+                      BorderRadius.circular(10), // Set the border radius here
                 ),
                 child: Center(
                   child: Text(
                     "Description: $text",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                     ),
