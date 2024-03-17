@@ -86,7 +86,8 @@ class TopicPage extends StatelessWidget {
               height: 200, // Adjust the height as needed
               child: FutureBuilder(
                 future: _fetchWords(topicId),
-                builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                builder:
+                    (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -171,7 +172,8 @@ class TopicPage extends StatelessWidget {
             const SizedBox(height: 20),
             FutureBuilder(
               future: _fetchWords(topicId),
-              builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+              builder:
+                  (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -185,7 +187,8 @@ class TopicPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
-                      return WordItem(definition: definition, word: word);
+                      return WordItem(definition: definition, word: word)
+                          .card();
                     },
                   );
                 }

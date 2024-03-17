@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
+import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'authentication/login.dart';
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,7 +33,7 @@ class App extends StatelessWidget {
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => MainApp(),
+        '/': (context) => QuizPage(),
         '/login': (context) => Login(),
         '/signUp': (context) => SignUp(),
         '/home': (context) => MainApp(),
