@@ -207,6 +207,7 @@ class TopicPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 deleteTopic(context, topicId);
+                Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('Remove'),
             ),
