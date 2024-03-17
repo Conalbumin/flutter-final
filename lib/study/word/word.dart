@@ -84,4 +84,30 @@ class _WordItemState extends State<WordItem> {
       ),
     );
   }
+
+  Widget card() {
+    return Card(
+      color: Colors.grey,
+      elevation: 5,
+      margin: const EdgeInsets.all(8),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              widget.word,
+              style: const TextStyle(fontSize: 35, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              widget.definition,
+              style: const TextStyle(fontSize: 35, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
