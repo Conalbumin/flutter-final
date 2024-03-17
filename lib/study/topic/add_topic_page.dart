@@ -89,7 +89,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm(){
     if (_formKey.currentState!.validate()) {
       // Create a list to store the word data
       List<Map<String, String>> wordsData = [];

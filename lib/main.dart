@@ -33,7 +33,7 @@ class App extends StatelessWidget {
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => QuizPage(),
+        '/': (context) => MainApp(),
         '/login': (context) => Login(),
         '/signUp': (context) => SignUp(),
         '/home': (context) => MainApp(),
