@@ -8,17 +8,32 @@ import '../study_mode/type.dart';
 import 'edit_topic_page.dart';
 import 'package:card_swiper/card_swiper.dart';
 
-class TopicPage extends StatelessWidget {
+class TopicPage extends StatefulWidget {
   final String topicId;
   final String topicName;
   final int numberOfWords;
   final String text;
 
-  const TopicPage(
-      {super.key, required this.topicId,
-      required this.topicName,
-      required this.numberOfWords,
-      required this.text});
+  const TopicPage({
+    Key? key,
+    required this.topicId,
+    required this.topicName,
+    required this.numberOfWords,
+    required this.text,
+  }) : super(key: key);
+
+  @override
+  State<TopicPage> createState() => _TopicPageState();
+}
+
+class _TopicPageState extends State<TopicPage> {
+  late List<DocumentSnapshot> words;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWords(widget.topicId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +43,12 @@ class TopicPage extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(topicName,
+            Text(widget.topicName,
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 25)),
-            Text('Number of Words: $numberOfWords',
+            Text('Number of Words: ${widget.numberOfWords}',
                 style: const TextStyle(color: Colors.white, fontSize: 15)),
           ],
         ),
@@ -45,12 +60,13 @@ class TopicPage extends StatelessWidget {
               size: 35,
             ),
             onPressed: () {
-              _showDeleteConfirmationDialog(context, topicId);
+              _showDeleteConfirmationDialog(context, widget.topicId);
             },
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            itemBuilder: (BuildContext context) =>
+            <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'edit',
                 child: ListTile(
@@ -68,7 +84,7 @@ class TopicPage extends StatelessWidget {
             ],
             onSelected: (String choice) {
               if (choice == 'edit') {
-                editAction(context, topicName, text);
+                editAction(context, widget.topicName, widget.text);
                 print('Edit action');
               } else if (choice == 'addToFolder') {
                 // addTopicToFolder(topicId, folderId);
@@ -85,7 +101,7 @@ class TopicPage extends StatelessWidget {
             SizedBox(
               height: 200, // Adjust the height as needed
               child: FutureBuilder(
-                future: _fetchWords(topicId),
+                future: _fetchWords(widget.topicId),
                 builder:
                     (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -108,7 +124,12 @@ class TopicPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         String word = words[index]['word'];
                         String definition = words[index]['definition'];
-                        return WordItem(definition: definition, word: word);
+                        return WordItem(
+                          definition: definition,
+                          word: word,
+                          wordId: words[index].id,
+                          topicId: widget.topicId,
+                        ); // Pass context here
                       },
                     );
                   }
@@ -126,7 +147,7 @@ class TopicPage extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    "Description: $text",
+                    "Description: ${widget.text}",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -171,7 +192,7 @@ class TopicPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             FutureBuilder(
-              future: _fetchWords(topicId),
+              future: _fetchWords(widget.topicId),
               builder:
                   (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -187,8 +208,12 @@ class TopicPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
-                      return WordItem(definition: definition, word: word)
-                          .card();
+                      return WordItem(
+                        definition: definition,
+                        word: word,
+                        wordId: words[index].id,
+                        topicId: widget.topicId,
+                      ).card(context); // Pass context here
                     },
                   );
                 }
@@ -205,11 +230,12 @@ class TopicPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditTopicPage(
-          topicId: topicId,
-          initialTopicName: initialTopicName,
-          initialDescription: initialDescription,
-        ),
+        builder: (context) =>
+            EditTopicPage(
+              topicId: widget.topicId,
+              initialTopicName: initialTopicName,
+              initialDescription: initialDescription,
+            ),
       ),
     );
   }
@@ -230,8 +256,9 @@ class TopicPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                print("topicId ${topicId}");
                 deleteTopic(context, topicId);
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Remove'),
             ),

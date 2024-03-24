@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-Future<void> addTopic(String topicName,  String text, int numberOfWords) async {
+Future<void> addTopic(String topicName, String text, int numberOfWords) async {
   try {
-    await FirebaseFirestore.instance.collection('topics').add({
-      'name': topicName,
-      'text': text,
-      'numberOfWords': numberOfWords
-    });
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .add({'name': topicName, 'text': text, 'numberOfWords': numberOfWords});
   } catch (e) {
     print('Error adding topic: $e');
   }
@@ -15,18 +13,19 @@ Future<void> addTopic(String topicName,  String text, int numberOfWords) async {
 
 Future<void> addFolder(String folderName, String text) async {
   try {
-    await FirebaseFirestore.instance.collection('folders').add({
-      'name': folderName,
-      'text': text
-    });
+    await FirebaseFirestore.instance
+        .collection('folders')
+        .add({'name': folderName, 'text': text});
   } catch (e) {
     print('Error adding folder: $e');
   }
 }
 
-Future<void> addTopicWithWords(String topicName, String text, List<Map<String, String>> wordsData) async {
+Future<void> addTopicWithWords(
+    String topicName, String text, List<Map<String, String>> wordsData) async {
   try {
-    DocumentReference topicRef = await FirebaseFirestore.instance.collection('topics').add({
+    DocumentReference topicRef =
+        await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
@@ -35,7 +34,11 @@ Future<void> addTopicWithWords(String topicName, String text, List<Map<String, S
     String topicId = topicRef.id;
 
     for (var wordData in wordsData) {
-      await FirebaseFirestore.instance.collection('topics').doc(topicId).collection('words').add({
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .add({
         'word': wordData['word'],
         'definition': wordData['definition'],
       });
@@ -47,10 +50,13 @@ Future<void> addTopicWithWords(String topicName, String text, List<Map<String, S
   }
 }
 
-
 Future<void> addTopicToFolder(String topicId, String folderId) async {
   try {
-    await FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').add({
+    await FirebaseFirestore.instance
+        .collection('folders')
+        .doc(folderId)
+        .collection('topics')
+        .add({
       'topicId': topicId,
     });
   } catch (e) {
@@ -62,7 +68,8 @@ Stream<QuerySnapshot> getTopics() {
   return FirebaseFirestore.instance.collection('topics').snapshots();
 }
 
-Future<void> updateTopicInFirestore(String topicId, String newTopicName, String newDescription) async {
+Future<void> updateTopicInFirestore(
+    String topicId, String newTopicName, String newDescription) async {
   try {
     await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
       'name': newTopicName,
@@ -75,7 +82,11 @@ Future<void> updateTopicInFirestore(String topicId, String newTopicName, String 
 }
 
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
-  return FirebaseFirestore.instance.collection('folders').doc(folderId).collection('topics').snapshots();
+  return FirebaseFirestore.instance
+      .collection('folders')
+      .doc(folderId)
+      .collection('topics')
+      .snapshots();
 }
 
 void deleteFolder(BuildContext context, String folderId) {
@@ -112,18 +123,32 @@ void deleteTopic(BuildContext context, String topicId) {
   }
 }
 
-Future<void> deleteWord(String topicId, String wordId) async {
+void deleteWord(BuildContext context, String topicId, String wordId) {
   try {
-    await FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('words')
         .doc(wordId)
-        .delete();
-    print('Word deleted successfully');
+        .delete()
+        .then((_) {
+      // Update the number of words in the topic document
+      FirebaseFirestore.instance.collection('topics').doc(topicId).update({
+        'numberOfWords': FieldValue.increment(-1),
+      }).then((_) {
+        print('Number of words updated successfully');
+        Navigator.of(context).pop();
+      }).catchError((error) {
+        print('Error updating number of words: $error');
+      });
+    }).catchError((error) {
+      print('Error deleting word: $error');
+    });
   } catch (e) {
-    print('Error deleting word: $e');
+    print('Error: $e');
   }
 }
+
+
 
 // Add other CRUD operations as needed

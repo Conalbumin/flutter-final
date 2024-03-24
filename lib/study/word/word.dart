@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/modal/flip_side.dart';
+import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 
 class WordItem extends StatefulWidget {
   final String word;
   final String definition;
+  final String wordId;
+  final String topicId;
 
-  const WordItem({super.key, 
-    required this.definition,
+  const WordItem({
+    Key? key,
     required this.word,
-  });
+    required this.definition,
+    required this.wordId,
+    required this.topicId,
+  }) : super(key: key);
 
   @override
   State<WordItem> createState() => _WordItemState();
 
-  Widget card() {
+  Widget card(BuildContext context) {
     return Card(
       color: Colors.indigo[900],
       elevation: 5,
@@ -66,6 +72,7 @@ class WordItem extends StatefulWidget {
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
+                    showDeleteConfirmationDialog(context, topicId, wordId);
                     print("Second icon clicked");
                   },
                   child: const Icon(
@@ -79,6 +86,35 @@ class WordItem extends StatefulWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void showDeleteConfirmationDialog(BuildContext context, String topicId, String wordId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove word'),
+          content: const Text('Are you sure you want to remove this word?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                print("wordId ${wordId}");
+                print("topicId ${topicId}");
+                deleteWord(context, topicId, wordId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Remove'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -152,3 +188,4 @@ class _WordItemState extends State<WordItem> {
     );
   }
 }
+
