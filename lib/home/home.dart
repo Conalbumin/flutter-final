@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/constant/text.dart';
-import 'package:quizlet_final_flutter/constant/text_style.dart';
-import '../constant/style.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();

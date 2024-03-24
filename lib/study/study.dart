@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'firebase_study_page.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_tab.dart';
 
 import 'folder/folder_tab.dart'; // Import your Firebase functions here
 
 class StudyPage extends StatefulWidget {
-  const StudyPage({Key? key}) : super(key: key);
+  const StudyPage({super.key});
 
   @override
   State<StudyPage> createState() => _StudyPageState();
@@ -43,7 +42,7 @@ class _StudyPageState extends State<StudyPage> {
                 ],
               ),
             ),
-            Expanded(
+            const Expanded(
               child: TabBarView(
                 children: [
                   TopicTab(),

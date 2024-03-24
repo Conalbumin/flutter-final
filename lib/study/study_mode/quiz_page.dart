@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/main.dart';
 import 'answer.dart'; // Import the Answer widget
 
 class QuizPage extends StatefulWidget {
-  const QuizPage({Key? key}) : super(key: key);
+  const QuizPage({super.key});
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -15,9 +14,9 @@ class _QuizPageState extends State<QuizPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Row(
+        title: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             Text(
               "Quiz",
               style: TextStyle(
@@ -38,17 +37,17 @@ class _QuizPageState extends State<QuizPage> {
       ),
       body: Container(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text("questions"),
                 Text("pick the answer:"),
               ],
             ),
-            const SizedBox(height: 20), // Add spacing between text and answer options
+            SizedBox(height: 20), // Add spacing between text and answer options
             // Add your answer options widgets here
             // Answer widget from answer.dart added here
             Answer(), // Include the Answer widget

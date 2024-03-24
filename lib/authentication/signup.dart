@@ -5,7 +5,7 @@ import 'package:quizlet_final_flutter/authentication/login.dart';
 import 'form_container_widget.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+  const SignUp({super.key});
 
   @override
   _SignUpState createState() => _SignUpState();
@@ -15,9 +15,9 @@ class _SignUpState extends State<SignUp> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   bool obscureText = true;
   bool isSigningUp = false;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {

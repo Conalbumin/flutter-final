@@ -7,7 +7,7 @@ import 'firebase_setting_page.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  const SettingPage({super.key});
 
   @override
   _SettingPageState createState() => _SettingPageState();
@@ -48,7 +48,7 @@ class _SettingPageState extends State<SettingPage> {
                             ? NetworkImage(_avatarURL!)
                             : _user?.photoURL != null
                             ? NetworkImage(_user!.photoURL!)
-                            : AssetImage('assets/default_avatar.png') as ImageProvider,
+                            : const AssetImage('assets/default_avatar.png') as ImageProvider,
                       ),
                           const SizedBox(height: 20),
                           Text(
@@ -195,7 +195,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<String?> _showUsernameInputDialog() async {
-    TextEditingController _usernameController = TextEditingController();
+    TextEditingController usernameController = TextEditingController();
 
     return showDialog<String>(
       context: context,
@@ -203,7 +203,7 @@ class _SettingPageState extends State<SettingPage> {
         return AlertDialog(
           title: const Text('Enter New Username'),
           content: TextField(
-            controller: _usernameController,
+            controller: usernameController,
             onChanged: (value) {},
           ),
           actions: <Widget>[
@@ -215,7 +215,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(_usernameController.text);
+                Navigator.of(context).pop(usernameController.text);
               },
               child: const Text('OK'),
             ),
@@ -248,8 +248,8 @@ class _SettingPageState extends State<SettingPage> {
 
   void changeAvatar() async {
     try {
-      final ImagePicker _picker = ImagePicker();
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         String imagePath = pickedFile.path;
@@ -270,7 +270,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<String?> _showPasswordInputDialog() async {
-    TextEditingController _passwordController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
 
     return showDialog<String>(
       context: context,
@@ -278,7 +278,7 @@ class _SettingPageState extends State<SettingPage> {
         return AlertDialog(
           title: const Text('Enter New Password'),
           content: TextField(
-            controller: _passwordController,
+            controller: passwordController,
             onChanged: (value) {},
           ),
           actions: <Widget>[
@@ -290,7 +290,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(_passwordController.text);
+                Navigator.of(context).pop(passwordController.text);
               },
               child: const Text('OK'),
             ),

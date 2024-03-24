@@ -7,10 +7,10 @@ class EditTopicPage extends StatefulWidget {
   final String initialDescription;
 
   const EditTopicPage({
-    Key? key,
+    super.key,
     required this.initialTopicName,
     required this.initialDescription, required this.topicId,
-  }) : super(key: key);
+  });
 
   @override
   _EditTopicPageState createState() => _EditTopicPageState();
@@ -52,7 +52,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -60,7 +60,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
             children: [
               TextFormField(
                 initialValue: _topicName,
-                decoration: InputDecoration(labelText: 'Topic Name'),
+                decoration: const InputDecoration(labelText: 'Topic Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a topic name';
@@ -75,10 +75,10 @@ class _EditTopicPageState extends State<EditTopicPage> {
                 // onSaved: (value) => _topicName = value!, // Remove this line
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 initialValue: _description,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a description';
@@ -87,7 +87,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
                 },
                 onSaved: (value) => _description = value!,
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -98,7 +98,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      updateTopicInFirestore(topicId, _topicName, _description); // Assuming you have access to topicId in EditTopicPage
+      updateTopicInFirestore(topicId, _topicName, _description);
       Navigator.pop(context);
     }
   }

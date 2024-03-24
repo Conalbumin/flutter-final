@@ -7,7 +7,7 @@ class WordItem extends StatefulWidget {
   final String word;
   final String definition;
 
-  const WordItem({
+  const WordItem({super.key, 
     required this.definition,
     required this.word,
   });
@@ -52,7 +52,7 @@ class WordItem extends StatefulWidget {
                     size: 40,
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
                     print("First icon clicked");
@@ -63,7 +63,7 @@ class WordItem extends StatefulWidget {
                     size: 35,
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
                     print("Second icon clicked");

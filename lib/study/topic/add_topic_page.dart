@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import '../word/add_word.dart';
 
 class AddTopicPage extends StatefulWidget {
-  const AddTopicPage({Key? key}) : super(key: key);
+  const AddTopicPage({super.key});
 
   @override
   _AddTopicPageState createState() => _AddTopicPageState();
@@ -109,10 +108,8 @@ class _AddTopicPageState extends State<AddTopicPage> {
             print("Word: $word, Definition: $definition");
 
             // Add the word data to the list
-            if (word != null && definition != null) {
-              wordsData.add({'word': word, 'definition': definition});
-            }
-          }
+            wordsData.add({'word': word, 'definition': definition});
+                    }
         }
       }
 

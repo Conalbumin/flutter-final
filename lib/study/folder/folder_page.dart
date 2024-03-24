@@ -6,7 +6,7 @@ class FolderPage extends StatelessWidget {
   final String folderId;
   final String folderName;
 
-  const FolderPage({required this.folderId, required this.folderName});
+  const FolderPage({super.key, required this.folderId, required this.folderName});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class FolderPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(folderName,
               style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.blue[600],
           actions: [
             IconButton(
@@ -65,19 +65,19 @@ class FolderPage extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ),
         body: FutureBuilder(
           future: _fetchTopics(folderId),
           builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No data available'));
+              return const Center(child: Text('No data available'));
             }
             List<DocumentSnapshot> topics = snapshot.data!;
             return ListView.builder(
@@ -118,7 +118,7 @@ class FolderPage extends StatelessWidget {
       return querySnapshot.docs;
     } catch (e) {
       print('Error fetching topics: $e');
-      throw e;
+      rethrow;
     }
   }
 }

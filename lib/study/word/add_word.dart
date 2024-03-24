@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AddWordPage extends StatefulWidget {
-  const AddWordPage({Key? key}) : super(key: key);
+  const AddWordPage({super.key});
 
   @override
   AddWordPageState createState() => AddWordPageState();

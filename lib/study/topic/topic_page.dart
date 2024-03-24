@@ -14,8 +14,8 @@ class TopicPage extends StatelessWidget {
   final int numberOfWords;
   final String text;
 
-  TopicPage(
-      {required this.topicId,
+  const TopicPage(
+      {super.key, required this.topicId,
       required this.topicName,
       required this.numberOfWords,
       required this.text});
@@ -182,7 +182,7 @@ class TopicPage extends StatelessWidget {
                   List<DocumentSnapshot> words = snapshot.data!;
                   return ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: words.length,
                     itemBuilder: (context, index) {
                       String word = words[index]['word'];
@@ -251,7 +251,7 @@ class TopicPage extends StatelessWidget {
       return querySnapshot.docs;
     } catch (e) {
       print('Error fetching words: $e');
-      throw e;
+      rethrow;
     }
   }
 }

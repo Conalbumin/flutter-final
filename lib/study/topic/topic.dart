@@ -9,7 +9,7 @@ class TopicItem extends StatelessWidget {
   final String text;
   final int numberOfWords;
 
-  const TopicItem({
+  const TopicItem({super.key, 
     required this.topicId,
     required this.topicName,
     required this.text,

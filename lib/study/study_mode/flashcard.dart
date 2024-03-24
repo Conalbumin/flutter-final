@@ -22,7 +22,7 @@ class _FlashCardState extends State<FlashCard> {
           const SizedBox(width: 10),
           Icon(Icons.credit_card_rounded, color: Colors.cyan[200], size: 35,),
           const SizedBox(width: 10),
-          Text("Flash Card", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
+          const Text("Flash Card", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
         ],
       ),
     );

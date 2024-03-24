@@ -8,7 +8,7 @@ import 'home/home.dart';
 import 'study/topic/add_topic_page.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({Key? key}) : super(key: key);
+  const MainApp({super.key});
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -33,7 +33,7 @@ class _MainAppState extends State<MainApp> {
         actions: [
           if (_selectedIndex == 1)
             IconButton(
-            icon: Icon(Icons.add_circle, size: 40, color: Colors.white,),
+            icon: const Icon(Icons.add_circle, size: 40, color: Colors.white,),
             onPressed: () {
               _showAddOptionsDialog(context);
             },
@@ -42,7 +42,7 @@ class _MainAppState extends State<MainApp> {
       ),
       body: IndexedStack(
         index: _selectedIndex,
-        children: [
+        children: const [
           HomePage(),
           StudyPage(),
           SettingPage(),
@@ -52,7 +52,7 @@ class _MainAppState extends State<MainApp> {
         color: Colors.blue,
         backgroundColor: Colors.white,
         buttonBackgroundColor: Colors.blue,
-        items:  <Widget>[
+        items:  const <Widget>[
           Icon(Icons.home, size: 40, color: Colors.white),
           Icon(Icons.book, size: 40, color: Colors.white),
           Icon(Icons.settings, size: 40, color: Colors.white),
@@ -60,7 +60,7 @@ class _MainAppState extends State<MainApp> {
         onTap: _onItemTapped,
         index: _selectedIndex,
         height: 50,
-        animationDuration: Duration(milliseconds: 300),
+        animationDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -70,7 +70,7 @@ class _MainAppState extends State<MainApp> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Create New'),
+          title: const Text('Create New'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -79,18 +79,18 @@ class _MainAppState extends State<MainApp> {
                     Navigator.of(context).pop();
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddTopicPage()),
+                      MaterialPageRoute(builder: (context) => const AddTopicPage()),
                     );
                   },
-                  child: Text('Create New Topic'),
+                  child: const Text('Create New Topic'),
                 ),
-                Padding(padding: EdgeInsets.all(8.0)),
+                const Padding(padding: EdgeInsets.all(8.0)),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
                     _showNewFolderDialog(context);
                   },
-                  child: Text('Create New Folder'),
+                  child: const Text('Create New Folder'),
                 ),
               ],
             ),
@@ -108,18 +108,18 @@ class _MainAppState extends State<MainApp> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('New Folder'),
+          title: const Text('New Folder'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextField(
-                decoration: InputDecoration(labelText: 'Folder Name'),
+                decoration: const InputDecoration(labelText: 'Folder Name'),
                 onChanged: (value) {
                   folderName = value;
                 },
               ),
               TextField(
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 onChanged: (value) {
                   text = value;
                 },
@@ -128,13 +128,13 @@ class _MainAppState extends State<MainApp> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Create'),
+              child: const Text('Create'),
               onPressed: () {
                 addFolder(folderName, text);
                 Navigator.of(context).pop();

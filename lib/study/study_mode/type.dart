@@ -22,7 +22,7 @@ class _TypeState extends State<Type> {
           const SizedBox(width: 10),
           Icon(Icons.type_specimen, color: Colors.cyan[200], size: 35,),
           const SizedBox(width: 10),
-          Text("Type", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
+          const Text("Type", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
         ],
       ),
     );

@@ -22,7 +22,7 @@ class _QuizState extends State<Quiz> {
           const SizedBox(width: 10),
           Icon(Icons.quiz, color: Colors.cyan[200], size: 35,),
           const SizedBox(width: 10),
-          Text("Quiz", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
+          const Text("Quiz", style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),)
         ],
       ),
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
-import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'authentication/login.dart';
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,7 +14,7 @@ Future<void> main() async {
 }
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class App extends StatelessWidget {
         primaryColor: Colors.white,
         hintColor: Colors.white,
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           iconTheme: IconThemeData(color: Colors.white), // Set back button color to white
         ),
         // Add more theme configurations as needed
@@ -33,10 +32,10 @@ class App extends StatelessWidget {
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => MainApp(),
-        '/login': (context) => Login(),
-        '/signUp': (context) => SignUp(),
-        '/home': (context) => MainApp(),
+        '/': (context) => const MainApp(),
+        '/login': (context) => const Login(),
+        '/signUp': (context) => const SignUp(),
+        '/home': (context) => const MainApp(),
       },
     );
   }

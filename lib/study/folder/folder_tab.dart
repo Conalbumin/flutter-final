@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/folder/folder_page.dart';
-import '../../constant/style.dart';
 import 'folder.dart';
 
 class FolderTab extends StatelessWidget {
-  const FolderTab({Key? key}) : super(key: key);
+  const FolderTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +11,7 @@ class FolderTab extends StatelessWidget {
       stream: FirebaseFirestore.instance.collection('folders').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');

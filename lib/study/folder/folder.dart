@@ -8,7 +8,7 @@ class FolderItem extends StatelessWidget {
   final String folderName;
   final String text;
 
-  const FolderItem({
+  const FolderItem({super.key, 
     required this.folderId,
     required this.folderName,
     required this.text,

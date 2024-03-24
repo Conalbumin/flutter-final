@@ -5,7 +5,7 @@ import 'form_container_widget.dart';
 import 'login.dart';
 
 class RecoveyPage extends StatefulWidget {
-  const RecoveyPage({Key? key}) : super(key: key);
+  const RecoveyPage({super.key});
 
   @override
   State<RecoveyPage> createState() => _RecoveyPageState();
@@ -15,7 +15,7 @@ class _RecoveyPageState extends State<RecoveyPage> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   bool obscureText = true;
   bool isRecovery = false;
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {

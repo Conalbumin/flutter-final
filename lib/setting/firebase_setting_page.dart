@@ -50,7 +50,7 @@ Future<String> updateAvatar(User user, String imagePath) async {
     return newAvatarURL;
   } catch (e) {
     print('Error updating avatar: $e');
-    throw e; // Rethrow the error to handle it appropriately in the caller
+    rethrow; // Rethrow the error to handle it appropriately in the caller
   }
 }
 
