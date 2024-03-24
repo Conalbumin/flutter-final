@@ -112,4 +112,18 @@ void deleteTopic(BuildContext context, String topicId) {
   }
 }
 
+Future<void> deleteWord(String topicId, String wordId) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .doc(wordId)
+        .delete();
+    print('Word deleted successfully');
+  } catch (e) {
+    print('Error deleting word: $e');
+  }
+}
+
 // Add other CRUD operations as needed
