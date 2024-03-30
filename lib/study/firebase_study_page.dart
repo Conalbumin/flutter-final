@@ -68,7 +68,16 @@ Stream<QuerySnapshot> getTopics() {
   return FirebaseFirestore.instance.collection('topics').snapshots();
 }
 
-Future<void> updateTopicInFirestore(
+Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
+  return FirebaseFirestore.instance
+      .collection('folders')
+      .doc(folderId)
+      .collection('topics')
+      .snapshots();
+}
+
+
+Future<void> updateTopic(
     String topicId, String newTopicName, String newDescription) async {
   try {
     await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
@@ -81,13 +90,24 @@ Future<void> updateTopicInFirestore(
   }
 }
 
-Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
-  return FirebaseFirestore.instance
-      .collection('folders')
-      .doc(folderId)
-      .collection('topics')
-      .snapshots();
+Future<void> updateWords(String topicId, List<Map<String, String>> wordsData) async {
+  try {
+    for (var wordData in wordsData) {
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .add({
+        'word': wordData['word'],
+        'definition': wordData['definition'],
+      });
+    }
+    print('Words updated successfully');
+  } catch (e) {
+    print('Error updating words: $e');
+  }
 }
+
 
 void deleteFolder(BuildContext context, String folderId) {
   try {
@@ -151,4 +171,3 @@ void deleteWord(BuildContext context, String topicId, String wordId) {
 
 
 
-// Add other CRUD operations as needed

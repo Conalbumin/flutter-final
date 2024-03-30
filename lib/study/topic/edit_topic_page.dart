@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import '../word/add_word.dart';
+
+List<Widget> wordPages = [];
 
 class EditTopicPage extends StatefulWidget {
   final String topicId;
@@ -7,10 +11,11 @@ class EditTopicPage extends StatefulWidget {
   final String initialDescription;
 
   const EditTopicPage({
-    super.key,
+    Key? key,
     required this.initialTopicName,
-    required this.initialDescription, required this.topicId,
-  });
+    required this.initialDescription,
+    required this.topicId,
+  }) : super(key: key);
 
   @override
   _EditTopicPageState createState() => _EditTopicPageState();
@@ -18,17 +23,72 @@ class EditTopicPage extends StatefulWidget {
 
 class _EditTopicPageState extends State<EditTopicPage> {
   final _formKey = GlobalKey<FormState>();
-  late String topicId; // Initialize topicId here
-
+  late String topicId;
   late String _topicName;
   late String _description;
+  late List<Map<String, String>> wordsData; // Define wordsData here
 
   @override
   void initState() {
     super.initState();
     _topicName = widget.initialTopicName;
     _description = widget.initialDescription;
-    topicId = widget.topicId; // Assign the value from the constructor to topicId here
+    topicId = widget.topicId;
+    _fetchCurrentWords(topicId);
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      updateTopic(topicId, _topicName, _description);
+      updateWords(topicId, wordsData);
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .get();
+      return querySnapshot.docs;
+    } catch (e) {
+      print('Error fetching words: $e');
+      rethrow;
+    }
+  }
+
+  void _fetchCurrentWords(String topicId) async {
+    try {
+      List<DocumentSnapshot> snapshots = await fetchWords(topicId);
+      List<Map<String, String>> wordsData = snapshots.map((snapshot) {
+        String initialWord = snapshot['word'];
+        String initialDefinition = snapshot['definition'];
+        return {'word': initialWord, 'definition': initialDefinition};
+      }).toList();
+      print("wordsData ${wordsData}");
+
+      setState(() {
+        wordPages = wordsData.map((data) {
+          return Card(
+            child: ListTile(
+              title: Text(data['word'] ?? ''),
+              subtitle: Text(data['definition'] ?? ''),
+            ),
+          );
+        }).toList();
+
+        if (wordPages.isEmpty) {
+          wordPages.add(const SizedBox(height: 20));
+        }
+      });
+
+      print('wordPages after setState: $wordPages');
+    } catch (e) {
+      print('Error fetching current words: $e');
+      // Handle error
+    }
   }
 
   @override
@@ -37,16 +97,14 @@ class _EditTopicPageState extends State<EditTopicPage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: const Text(
-          'Create New Topic',
+          'Edit Topic',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white, size: 40),
-            onPressed: () {
-              _submitForm();
-            },
+            onPressed: _submitForm,
           ),
           const SizedBox(width: 10),
         ],
@@ -72,7 +130,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
                     _topicName = value;
                   });
                 },
-                // onSaved: (value) => _topicName = value!, // Remove this line
               ),
 
               const SizedBox(height: 16),
@@ -88,19 +145,11 @@ class _EditTopicPageState extends State<EditTopicPage> {
                 onSaved: (value) => _description = value!,
               ),
               const SizedBox(height: 32),
+              ...wordPages,
             ],
           ),
         ),
       ),
     );
   }
-
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      updateTopicInFirestore(topicId, _topicName, _description);
-      Navigator.pop(context);
-    }
-  }
-
 }

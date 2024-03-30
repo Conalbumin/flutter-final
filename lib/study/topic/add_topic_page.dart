@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import '../word/add_word.dart';
+import '../word/word_pages.dart';
 
 class AddTopicPage extends StatefulWidget {
   const AddTopicPage({super.key});
@@ -11,10 +12,8 @@ class AddTopicPage extends StatefulWidget {
 
 class _AddTopicPageState extends State<AddTopicPage> {
   final _formKey = GlobalKey<FormState>();
-
   String _topicName = '';
   String _text = '';
-  List<Widget> wordPages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -88,32 +87,23 @@ class _AddTopicPageState extends State<AddTopicPage> {
     );
   }
 
-  void _submitForm(){
+  void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Create a list to store the word data
       List<Map<String, String>> wordsData = [];
 
-      // Iterate through each widget in the wordPages list
       for (Widget wordPage in wordPages) {
-        // Check if the widget is an instance of AddWordPage
         if (wordPage is AddWordPage) {
-          // Retrieve the state of AddWordPage using key
-          AddWordPageState? wordPageState = (wordPage.key as GlobalKey<AddWordPageState>).currentState;
+          AddWordPageState? wordPageState =
+              (wordPage.key as GlobalKey<AddWordPageState>).currentState;
 
-          // Check if the wordPageState is not null before accessing properties
           if (wordPageState != null) {
-            // Access word and definition data using the state object
             String? word = wordPageState.getWord();
             String? definition = wordPageState.getDefinition();
             print("Word: $word, Definition: $definition");
-
-            // Add the word data to the list
             wordsData.add({'word': word, 'definition': definition});
-                    }
+          }
         }
       }
-
-      // Call the function to add the topic with words
       addTopicWithWords(_topicName, _text, wordsData);
       Navigator.of(context).pop();
     }

@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AddWordPage extends StatefulWidget {
-  const AddWordPage({super.key});
+  final String? initialWord;
+  final String? initialDefinition;
+
+  const AddWordPage({
+    Key? key,
+    this.initialWord,
+    this.initialDefinition,
+  }) : super(key: key);
+
 
   @override
   AddWordPageState createState() => AddWordPageState();
@@ -13,15 +21,20 @@ class AddWordPage extends StatefulWidget {
 }
 
 class AddWordPageState extends State<AddWordPage> {
-  String word = '';
-  String definition = '';
+  late String word;
+  late String definition;
 
-  // Method to get the word entered by the user
+  @override
+  void initState() {
+    super.initState();
+    word = widget.initialWord ?? '';
+    definition = widget.initialDefinition ?? '';
+  }
+
   String getWord() {
     return word;
   }
 
-  // Method to get the definition entered by the user
   String getDefinition() {
     return definition;
   }
