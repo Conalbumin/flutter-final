@@ -45,20 +45,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
     }
   }
 
-  Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('topics')
-          .doc(topicId)
-          .collection('words')
-          .get();
-      return querySnapshot.docs;
-    } catch (e) {
-      print('Error fetching words: $e');
-      rethrow;
-    }
-  }
-
   void _fetchCurrentWords(String topicId) async {
     try {
       List<DocumentSnapshot> snapshots = await fetchWords(topicId);

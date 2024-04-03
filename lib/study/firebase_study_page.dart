@@ -76,6 +76,20 @@ Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
       .snapshots();
 }
 
+Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .get();
+      return querySnapshot.docs;
+    } catch (e) {
+      print('Error fetching words: $e');
+      rethrow;
+    }
+  }
+
 
 Future<void> updateTopic(
     String topicId, String newTopicName, String newDescription) async {
