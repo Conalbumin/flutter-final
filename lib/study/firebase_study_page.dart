@@ -97,8 +97,6 @@ Future<void> updateTopic(
       'name': newTopicName,
       'text': newDescription,
     });
-    print("name ${newTopicName}");
-    print("text ${newDescription}");
     print('Topic updated successfully');
   } catch (e) {
     print('Error updating topic: $e');
@@ -109,13 +107,9 @@ Future<void> updateWords(
     String topicId, List<Map<String, String>> wordsData) async {
   try {
     for (var wordData in wordsData) {
-      print("wordsData ${wordsData}");
-      print("wordData ${wordData}");
-
       // Get the document ID of the word
       String wordId =
           wordData['id'] ?? ''; // Assuming 'id' is the key for the document ID
-      print("wordId ${wordId}");
       // Update the document with the new data
       await FirebaseFirestore.instance
           .collection('topics')

@@ -99,7 +99,6 @@ class _AddTopicPageState extends State<AddTopicPage> {
           if (wordPageState != null) {
             String? word = wordPageState.getWord();
             String? definition = wordPageState.getDefinition();
-            print("Word: $word, Definition: $definition");
             wordsData.add({'word': word, 'definition': definition});
           }
         }

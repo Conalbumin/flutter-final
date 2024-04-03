@@ -40,10 +40,15 @@ class _EditTopicPageState extends State<EditTopicPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      updateWords(topicId, wordsData).then((_) {
-        Navigator.of(context).pop();
+      updateTopic(topicId, _topicName, _description).then((_) {
+        updateWords(topicId, wordsData).then((_) {
+          // Pop with data to update the TopicPage
+          Navigator.pop(context, {'topicName': _topicName, 'description': _description});
+        }).catchError((error) {
+          print('Error updating words: $error');
+        });
       }).catchError((error) {
-        print('Error updating words: $error');
+        print('Error updating topic: $error');
       });
     }
   }
@@ -62,7 +67,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
           'definition': initialDefinition,
         };
       }).toList();
-      print("wordsData $wordsData");
 
       setState(() {
         wordPages = wordsData.map((data) {
@@ -78,8 +82,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
           wordPages.add(const SizedBox(height: 20));
         }
       });
-
-      print('wordPages after setState: $wordPages');
     } catch (e) {
       print('Error fetching current words: $e');
       // Handle error
