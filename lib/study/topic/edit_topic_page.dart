@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
-import '../word/add_word.dart';
 
 List<Widget> wordPages = [];
 
@@ -40,7 +39,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       updateTopic(topicId, _topicName, _description);
-      updateWords(topicId, wordsData);
+      // updateWords(topicId, wordsData);
       Navigator.of(context).pop();
     }
   }
@@ -117,7 +116,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
                   });
                 },
               ),
-
               const SizedBox(height: 16),
               TextFormField(
                 initialValue: _description,
@@ -128,7 +126,11 @@ class _EditTopicPageState extends State<EditTopicPage> {
                   }
                   return null;
                 },
-                onSaved: (value) => _description = value!,
+                onChanged: (value) {
+                  setState(() {
+                    _description = value;
+                  });
+                },
               ),
               const SizedBox(height: 32),
               ...wordPages,

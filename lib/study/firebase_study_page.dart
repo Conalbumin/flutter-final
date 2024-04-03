@@ -77,19 +77,18 @@ Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
 }
 
 Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('topics')
-          .doc(topicId)
-          .collection('words')
-          .get();
-      return querySnapshot.docs;
-    } catch (e) {
-      print('Error fetching words: $e');
-      rethrow;
-    }
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .get();
+    return querySnapshot.docs;
+  } catch (e) {
+    print('Error fetching words: $e');
+    rethrow;
   }
-
+}
 
 Future<void> updateTopic(
     String topicId, String newTopicName, String newDescription) async {
@@ -98,13 +97,16 @@ Future<void> updateTopic(
       'name': newTopicName,
       'text': newDescription,
     });
+    print("name ${newTopicName}");
+    print("text ${newDescription}");
     print('Topic updated successfully');
   } catch (e) {
     print('Error updating topic: $e');
   }
 }
 
-Future<void> updateWords(String topicId, List<Map<String, String>> wordsData) async {
+Future<void> updateWords(
+    String topicId, List<Map<String, String>> wordsData) async {
   try {
     for (var wordData in wordsData) {
       await FirebaseFirestore.instance
@@ -121,7 +123,6 @@ Future<void> updateWords(String topicId, List<Map<String, String>> wordsData) as
     print('Error updating words: $e');
   }
 }
-
 
 void deleteFolder(BuildContext context, String folderId) {
   try {
@@ -182,6 +183,3 @@ void deleteWord(BuildContext context, String topicId, String wordId) {
     print('Error: $e');
   }
 }
-
-
-
