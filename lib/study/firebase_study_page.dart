@@ -109,11 +109,20 @@ Future<void> updateWords(
     String topicId, List<Map<String, String>> wordsData) async {
   try {
     for (var wordData in wordsData) {
+      print("wordsData ${wordsData}");
+      print("wordData ${wordData}");
+
+      // Get the document ID of the word
+      String wordId =
+          wordData['id'] ?? ''; // Assuming 'id' is the key for the document ID
+      print("wordId ${wordId}");
+      // Update the document with the new data
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
           .collection('words')
-          .add({
+          .doc(wordId)
+          .set({
         'word': wordData['word'],
         'definition': wordData['definition'],
       });
