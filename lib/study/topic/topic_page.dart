@@ -28,11 +28,15 @@ class TopicPage extends StatefulWidget {
 
 class _TopicPageState extends State<TopicPage> {
   late List<DocumentSnapshot> words;
+  late String _topicName;
+  late String _text;
 
   @override
   void initState() {
     super.initState();
-    _fetchWords(widget.topicId);
+    _topicName = widget.topicName;
+    _text = widget.text;
+    fetchWords(widget.topicId); // Note: This line may need modification based on how fetchWords is implemented
   }
 
   @override
@@ -43,7 +47,7 @@ class _TopicPageState extends State<TopicPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.topicName,
+            Text(_topicName,
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -84,7 +88,7 @@ class _TopicPageState extends State<TopicPage> {
             ],
             onSelected: (String choice) {
               if (choice == 'edit') {
-                editAction(context, widget.topicName, widget.text);
+                editAction(context);
                 print('Edit action');
               } else if (choice == 'addToFolder') {
                 // addTopicToFolder(topicId, folderId);
@@ -101,7 +105,7 @@ class _TopicPageState extends State<TopicPage> {
             SizedBox(
               height: 200, // Adjust the height as needed
               child: FutureBuilder(
-                future: _fetchWords(widget.topicId),
+                future: fetchWords(widget.topicId),
                 builder:
                     (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -147,7 +151,7 @@ class _TopicPageState extends State<TopicPage> {
                 ),
                 child: Center(
                   child: Text(
-                    "Description: ${widget.text}",
+                    "Description: $_text",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -192,7 +196,7 @@ class _TopicPageState extends State<TopicPage> {
             ),
             const SizedBox(height: 20),
             FutureBuilder(
-              future: _fetchWords(widget.topicId),
+              future: fetchWords(widget.topicId),
               builder:
                   (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -225,19 +229,26 @@ class _TopicPageState extends State<TopicPage> {
     );
   }
 
-  void editAction(BuildContext context, String initialTopicName,
-      String initialDescription) {
-    Navigator.push(
+  void editAction(BuildContext context) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
             EditTopicPage(
+              initialTopicName: _topicName,
+              initialDescription: _text,
               topicId: widget.topicId,
-              initialTopicName: initialTopicName,
-              initialDescription: initialDescription,
             ),
       ),
     );
+
+    if (result != null && result['topicName'] != null && result['description'] != null) {
+      setState(() {
+        _topicName = result['topicName'];
+        _text = result['description'];
+        fetchWords(widget.topicId);
+      });
+    }
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, String topicId) {
@@ -266,19 +277,5 @@ class _TopicPageState extends State<TopicPage> {
         );
       },
     );
-  }
-
-  Future<List<DocumentSnapshot>> _fetchWords(String topicId) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('topics')
-          .doc(topicId)
-          .collection('words')
-          .get();
-      return querySnapshot.docs;
-    } catch (e) {
-      print('Error fetching words: $e');
-      rethrow;
-    }
   }
 }
