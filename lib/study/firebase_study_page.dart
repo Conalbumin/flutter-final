@@ -47,7 +47,6 @@ Future<void> addWord(String topicId, List<Map<String, String>> wordsData) async 
   }
 }
 
-
 Future<void> addTopicWithWords(
     String topicName, String text, List<Map<String, String>> wordsData) async {
   try {
@@ -79,13 +78,45 @@ Future<void> addTopicWithWords(
 
 Future<void> addTopicToFolder(String topicId, String folderId) async {
   try {
-    await FirebaseFirestore.instance
+    // Fetch topic details
+    DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .get();
+    Map<String, dynamic> topicData = topicSnapshot.data() as Map<String, dynamic>;
+
+    // Fetch topic words
+    QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .get();
+
+    // Create a batch to perform multiple operations atomically
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Add topic details to the folder
+    DocumentReference topicRef = FirebaseFirestore.instance
         .collection('folders')
         .doc(folderId)
         .collection('topics')
-        .add({
+        .doc(topicId);
+    batch.set(topicRef, {
       'topicId': topicId,
+      'name': topicData['name'],
+      'text': topicData['text'],
+      'numberOfWords': topicData['numberOfWords'],
     });
+
+    // Add topic words to the folder
+    wordsSnapshot.docs.forEach((wordDoc) {
+      batch.set(topicRef.collection('words').doc(wordDoc.id), wordDoc.data());
+    });
+
+    // Commit the batch
+    await batch.commit();
+
+    print('Topic and related data added to folder successfully');
   } catch (e) {
     print('Error adding topic to folder: $e');
   }
@@ -116,6 +147,15 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
     rethrow;
   }
 }
+
+Stream<QuerySnapshot> fetchTopics(String folderId) {
+  return FirebaseFirestore.instance
+      .collection('folders')
+      .doc(folderId)
+      .collection('topics')
+      .snapshots();
+}
+
 
 Future<void> updateTopic(
     String topicId, String newTopicName, String newDescription) async {
