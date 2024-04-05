@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../firebase_study_page.dart';
+import '../folder/add_topic_to_folder.dart';
 import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
@@ -99,7 +100,7 @@ class _TopicPageState extends State<TopicPage> {
                 editAction(context);
                 print('Edit action');
               } else if (choice == 'addToFolder') {
-                // addTopicToFolder(topicId, folderId);
+                _showFolderTab(context);
                 print('Add to folder action');
               } else if (choice == 'addWordInTopic') {
                 Navigator.push(
@@ -242,6 +243,19 @@ class _TopicPageState extends State<TopicPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showFolderTab(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return AddTopicToFolderPage(
+          onSelectFolder: (folderId) {
+            addTopicToFolder(widget.topicId, folderId);
+          },
+        );
+      },
     );
   }
 

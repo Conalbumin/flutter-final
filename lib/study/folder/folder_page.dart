@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase_study_page.dart';
+import '../topic/topic.dart';
 
 class FolderPage extends StatelessWidget {
   final String folderId;
@@ -68,7 +69,7 @@ class FolderPage extends StatelessWidget {
           child: const Icon(Icons.add),
         ),
         body: FutureBuilder(
-          future: _fetchTopics(folderId),
+          future: fetchTopics(folderId),
           builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -83,23 +84,17 @@ class FolderPage extends StatelessWidget {
             return ListView.builder(
               itemCount: topics.length,
               itemBuilder: (BuildContext context, int index) {
-                String topicName = topics[index]['name'];
-                String text = topics[index]['text'];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(topicName,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 4),
-                        Text(text),
-                      ],
-                    ),
-                  ),
+                DocumentSnapshot document = snapshot.data![index];
+                String topicId = document.id;
+                String topicName = document['name'];
+                String text = document['text'];
+                int numberOfWords = document['numberOfWords'];
+
+                return TopicItem(
+                  topicId: topicId,
+                  topicName: topicName,
+                  text: text,
+                  numberOfWords: numberOfWords,
                 );
               },
             );
@@ -107,18 +102,5 @@ class FolderPage extends StatelessWidget {
         ));
   }
 
-  Future<List<DocumentSnapshot>> _fetchTopics(String folderId) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('folders') // Assuming 'topics' are stored under 'folders'
-          .doc(folderId)
-          .collection(
-              'topics') // Assuming 'topics' is a subcollection of 'folders'
-          .get();
-      return querySnapshot.docs;
-    } catch (e) {
-      print('Error fetching topics: $e');
-      rethrow;
-    }
-  }
+
 }
