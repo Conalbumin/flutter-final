@@ -5,6 +5,7 @@ import '../firebase_study_page.dart';
 import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
+import '../word/add_word_in_topic.dart';
 import 'edit_topic_page.dart';
 import 'package:card_swiper/card_swiper.dart';
 
@@ -36,7 +37,7 @@ class _TopicPageState extends State<TopicPage> {
     super.initState();
     _topicName = widget.topicName;
     _text = widget.text;
-    fetchWords(widget.topicId); // Note: This line may need modification based on how fetchWords is implemented
+    fetchWords(widget.topicId);
   }
 
   @override
@@ -85,6 +86,13 @@ class _TopicPageState extends State<TopicPage> {
                   title: Text('Add to Folder'),
                 ),
               ),
+              const PopupMenuItem<String>(
+                value: 'addWordInTopic',
+                child: ListTile(
+                  leading: Icon(Icons.add),
+                  title: Text('Add new Word'),
+                ),
+              )
             ],
             onSelected: (String choice) {
               if (choice == 'edit') {
@@ -93,6 +101,14 @@ class _TopicPageState extends State<TopicPage> {
               } else if (choice == 'addToFolder') {
                 // addTopicToFolder(topicId, folderId);
                 print('Add to folder action');
+              } else if (choice == 'addWordInTopic') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddWordInTopic(topicId: widget.topicId),
+                  ),
+                );
+                print("add word in topic");
               }
             },
           ),
