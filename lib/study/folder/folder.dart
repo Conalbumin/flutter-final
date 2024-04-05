@@ -8,7 +8,8 @@ class FolderItem extends StatelessWidget {
   final String folderName;
   final String text;
 
-  const FolderItem({super.key, 
+  const FolderItem({
+    super.key,
     required this.folderId,
     required this.folderName,
     required this.text,
@@ -25,6 +26,7 @@ class FolderItem extends StatelessWidget {
             builder: (context) => FolderPage(
               folderId: folderId,
               folderName: folderName,
+              text: text,
             ),
           ),
         );
