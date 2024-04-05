@@ -50,7 +50,7 @@ class WordItem extends StatefulWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    print("0 icon clicked");
+                    print("volume_down_rounded icon clicked");
                   },
                   child: const Icon(
                     Icons.volume_down_rounded,
@@ -61,19 +61,8 @@ class WordItem extends StatefulWidget {
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
-                    print("First icon clicked");
-                  },
-                  child: const Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                    size: 35,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
                     showDeleteConfirmationDialog(context, topicId, wordId);
-                    print("Second icon clicked");
+                    print("delete icon clicked");
                   },
                   child: const Icon(
                     Icons.delete,
