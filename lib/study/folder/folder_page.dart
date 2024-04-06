@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase_study_page.dart';
 import '../topic/topic.dart';
+import 'edit_folder_dialog.dart';
 
 class FolderPage extends StatelessWidget {
   final String folderId;
@@ -67,7 +68,9 @@ class FolderPage extends StatelessWidget {
               color: Colors.white,
               size: 35,
             ),
-            onPressed: () {},
+            onPressed: () {
+              editAction(context);
+            },
           ),
         ],
       ),
@@ -137,4 +140,26 @@ class FolderPage extends StatelessWidget {
       ),
     );
   }
+
+  void editAction(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditFolderDialog(
+          initialName: folderName,
+          initialDescription: text,
+          onSave: (String newName, String newDescription) {
+            // Here you can handle saving the new name and description
+            // For now, just print the new values
+            folderName == newName;
+            text == newDescription;
+            updateFolder(folderId, newName, newDescription);
+            print('New Name: $newName');
+            print('New Description: $newDescription');
+          },
+        );
+      },
+    );
+  }
+
 }
