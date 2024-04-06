@@ -72,6 +72,17 @@ class WordItem extends StatefulWidget {
                     size: 35,
                   ),
                 ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    print("star icon clicked");
+                  },
+                  child: const Icon(
+                    Icons.star_border_purple500_outlined,
+                    color: Colors.white,
+                    size: 35,
+                  ),
+                ),
               ],
             ),
           ],
