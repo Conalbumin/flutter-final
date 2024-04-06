@@ -20,10 +20,6 @@ class FolderPage extends StatelessWidget {
               folderName,
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
-            Text(
-              text,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-            ),
           ],
         ),
         backgroundColor: Colors.blue[600],
