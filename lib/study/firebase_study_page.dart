@@ -247,6 +247,27 @@ void deleteTopic(BuildContext context, String topicId) {
   }
 }
 
+void deleteTopicInFolder(BuildContext context, String topicId, String folderId) {
+  try {
+    FirebaseFirestore.instance
+        .collection('folders')
+        .doc(folderId)
+        .collection('topics')
+        .doc(topicId)
+        .delete()
+        .then((_) {
+      print('Topic deleted successfully');
+      Navigator.of(context).pop();
+    }).catchError((error) {
+      print('Error deleting topic: $error');
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+
+
 void deleteWord(BuildContext context, String topicId, String wordId) {
   try {
     FirebaseFirestore.instance

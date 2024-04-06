@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/folder/remove_topic_in_folder.dart';
+import 'package:quizlet_final_flutter/study/topic/topic_tab.dart';
 import '../firebase_study_page.dart';
 import '../topic/topic.dart';
 import 'edit_folder_dialog.dart';
@@ -9,7 +11,11 @@ class FolderPage extends StatelessWidget {
   final String folderName;
   final String text;
 
-  const FolderPage({Key? key, required this.folderId, required this.folderName, required this.text});
+  const FolderPage(
+      {Key? key,
+      required this.folderId,
+      required this.folderName,
+      required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,8 @@ class FolderPage extends StatelessWidget {
           children: [
             Text(
               folderName,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -70,6 +77,16 @@ class FolderPage extends StatelessWidget {
             ),
             onPressed: () {
               editAction(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.more_vert,
+              color: Colors.white,
+              size: 35,
+            ),
+            onPressed: () {
+              _showTopicTab(context);
             },
           ),
         ],
@@ -149,17 +166,24 @@ class FolderPage extends StatelessWidget {
           initialName: folderName,
           initialDescription: text,
           onSave: (String newName, String newDescription) {
-            // Here you can handle saving the new name and description
-            // For now, just print the new values
-            folderName == newName;
-            text == newDescription;
             updateFolder(folderId, newName, newDescription);
-            print('New Name: $newName');
-            print('New Description: $newDescription');
           },
         );
       },
     );
   }
 
+  void _showTopicTab(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return RemoveTopicInFolder(
+          folderId: folderId,
+          onSelectTopic: (topicId ) {
+            deleteTopicInFolder(context, topicId, folderId);
+          },
+        );
+      },
+    );
+  }
 }
