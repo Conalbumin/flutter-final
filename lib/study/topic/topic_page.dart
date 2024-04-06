@@ -16,6 +16,7 @@ class TopicPage extends StatefulWidget {
   final int numberOfWords;
   final String text;
   final bool isPrivate;
+  final String userId;
 
   const TopicPage({
     Key? key,
@@ -23,7 +24,7 @@ class TopicPage extends StatefulWidget {
     required this.topicName,
     required this.numberOfWords,
     required this.text,
-    required this.isPrivate,
+    required this.isPrivate, required this.userId,
   }) : super(key: key);
 
   @override

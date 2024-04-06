@@ -9,6 +9,7 @@ class TopicItem extends StatelessWidget {
   final String text;
   final int numberOfWords;
   final bool isPrivate;
+  final String userId;
 
   const TopicItem({
     super.key,
@@ -16,7 +17,7 @@ class TopicItem extends StatelessWidget {
     required this.topicName,
     required this.text,
     required this.numberOfWords,
-    required this.isPrivate,
+    required this.isPrivate, required this.userId,
   });
 
   @override
@@ -32,7 +33,7 @@ class TopicItem extends StatelessWidget {
                 topicName: topicName,
                 numberOfWords: numberOfWords,
                 text: text,
-                isPrivate: isPrivate),
+                isPrivate: isPrivate, userId: userId,),
           ),
         );
       },

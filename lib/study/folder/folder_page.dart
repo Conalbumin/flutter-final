@@ -142,6 +142,7 @@ class FolderPage extends StatelessWidget {
                     String text = document['text'];
                     int numberOfWords = document['numberOfWords'];
                     bool isPrivate = document['isPrivate'];
+                    String userId = document['userId'];
 
                     return TopicItem(
                       topicId: topicId,
@@ -149,6 +150,7 @@ class FolderPage extends StatelessWidget {
                       text: text,
                       numberOfWords: numberOfWords,
                       isPrivate: isPrivate,
+                      userId: userId,
                     );
                   },
                 );
@@ -181,7 +183,7 @@ class FolderPage extends StatelessWidget {
       builder: (BuildContext context) {
         return RemoveTopicInFolder(
           folderId: folderId,
-          onSelectTopic: (topicId ) {
+          onSelectTopic: (topicId) {
             deleteTopicInFolder(context, topicId, folderId);
           },
         );

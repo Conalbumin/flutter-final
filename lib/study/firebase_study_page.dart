@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 Future<void> addTopic(
     String topicName, String text, int numberOfWords, bool isPrivate) async {
   try {
+    String userUid =
+        FirebaseAuth.instance.currentUser!.uid; // Get current user's UID
     await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': numberOfWords,
-      'isPrivate': isPrivate
+      'isPrivate': isPrivate,
+      'createdBy': userUid, // Store user UID along with the topic
     });
   } catch (e) {
     print('Error adding topic: $e');
@@ -17,9 +21,13 @@ Future<void> addTopic(
 
 Future<void> addFolder(String folderName, String text) async {
   try {
-    await FirebaseFirestore.instance
-        .collection('folders')
-        .add({'name': folderName, 'text': text});
+    String userUid =
+        FirebaseAuth.instance.currentUser!.uid; // Get current user's UID
+    await FirebaseFirestore.instance.collection('folders').add({
+      'name': folderName,
+      'text': text,
+      'createdBy': userUid,
+    });
   } catch (e) {
     print('Error adding folder: $e');
   }
@@ -52,15 +60,17 @@ Future<void> addWord(
   }
 }
 
-Future<void> addTopicWithWords(
-    String topicName, String text, bool isPrivate, List<Map<String, String>> wordsData) async {
+Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
+    List<Map<String, String>> wordsData) async {
   try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     DocumentReference topicRef =
         await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
-      'isPrivate': isPrivate
+      'isPrivate': isPrivate,
+      'createdBy': userUid
     });
 
     String topicId = topicRef.id;
@@ -130,14 +140,22 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
 }
 
 Stream<QuerySnapshot> getTopics() {
-  return FirebaseFirestore.instance.collection('topics').snapshots();
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseFirestore.instance
+      .collection('topics')
+      .where('isPrivate', isEqualTo: false)
+      .where('createdBy', isEqualTo: userUid)
+      .snapshots();
 }
 
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
   return FirebaseFirestore.instance
       .collection('folders')
       .doc(folderId)
       .collection('topics')
+      .where('isPrivate', isEqualTo: false)
+      .where('createdBy', isEqualTo: userUid)
       .snapshots();
 }
 
@@ -158,7 +176,7 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
 Future<List<DocumentSnapshot>> fetchTopics(String folderId) async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('folders') // Assuming 'topics' are stored under 'folders'
+        .collection('folders')
         .doc(folderId)
         .collection('topics')
         .get();

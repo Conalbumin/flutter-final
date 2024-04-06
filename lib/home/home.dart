@@ -71,6 +71,7 @@ class _HomePageState extends State<HomePage> {
                   String text = document['text'];
                   int numberOfWords = document['numberOfWords'];
                   bool isPrivate = document['isPrivate'];
+                  String userId = document['createdBy'];
 
                   // Check if the topic is not private
                   if (!isPrivate) {
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                       topicName: topicName,
                       text: text,
                       numberOfWords: numberOfWords,
-                      isPrivate: isPrivate,
+                      isPrivate: isPrivate, userId: userId,
                     );
                   } else {
                     // Return an empty container if the topic is private
