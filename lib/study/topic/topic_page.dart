@@ -98,10 +98,8 @@ class _TopicPageState extends State<TopicPage> {
             onSelected: (String choice) {
               if (choice == 'edit') {
                 editAction(context);
-                print('Edit action');
               } else if (choice == 'addToFolder') {
                 _showFolderTab(context);
-                print('Add to folder action');
               } else if (choice == 'addWordInTopic') {
                 Navigator.push(
                   context,
@@ -109,7 +107,6 @@ class _TopicPageState extends State<TopicPage> {
                     builder: (context) => AddWordInTopic(topicId: widget.topicId),
                   ),
                 );
-                print("add word in topic");
               }
             },
           ),

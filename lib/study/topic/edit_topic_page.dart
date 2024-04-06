@@ -53,7 +53,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
     }
   }
 
-
   void _fetchCurrentWords(String topicId) async {
     try {
       List<DocumentSnapshot> snapshots = await fetchWords(topicId);

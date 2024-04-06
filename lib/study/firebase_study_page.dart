@@ -176,6 +176,19 @@ Future<void> updateTopic(
   }
 }
 
+Future<void> updateFolder(
+    String folderId, String newFolderName, String newDescription) async {
+  try {
+    await FirebaseFirestore.instance.collection('folders').doc(folderId).update({
+      'name': newFolderName,
+      'text': newDescription,
+    });
+    print('Folder updated successfully');
+  } catch (e) {
+    print('Error updating folder: $e');
+  }
+}
+
 Future<void> updateWords(
     String topicId, List<Map<String, String>> wordsData) async {
   try {
