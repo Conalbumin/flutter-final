@@ -15,6 +15,7 @@ class TopicPage extends StatefulWidget {
   final String topicName;
   final int numberOfWords;
   final String text;
+  final bool isPrivate;
 
   const TopicPage({
     Key? key,
@@ -22,6 +23,7 @@ class TopicPage extends StatefulWidget {
     required this.topicName,
     required this.numberOfWords,
     required this.text,
+    required this.isPrivate,
   }) : super(key: key);
 
   @override
@@ -93,6 +95,13 @@ class _TopicPageState extends State<TopicPage> {
                   leading: Icon(Icons.add),
                   title: Text('Add new Word'),
                 ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'setPrivate',
+                child: ListTile(
+                  leading: Icon(Icons.private_connectivity),
+                  title: Text('Set private'),
+                ),
               )
             ],
             onSelected: (String choice) {
@@ -107,6 +116,8 @@ class _TopicPageState extends State<TopicPage> {
                     builder: (context) => AddWordInTopic(topicId: widget.topicId),
                   ),
                 );
+              } else if (choice == 'setPrivate') {
+                setPrivateTopic(widget.topicId, !widget.isPrivate); // Toggle isPrivate
               }
             },
           ),

@@ -8,12 +8,15 @@ class TopicItem extends StatelessWidget {
   final String topicName;
   final String text;
   final int numberOfWords;
+  final bool isPrivate;
 
-  const TopicItem({super.key, 
+  const TopicItem({
+    super.key,
     required this.topicId,
     required this.topicName,
     required this.text,
     required this.numberOfWords,
+    required this.isPrivate,
   });
 
   @override
@@ -25,11 +28,11 @@ class TopicItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => TopicPage(
-              topicId: topicId,
-              topicName: topicName,
-              numberOfWords: numberOfWords,
-              text: text,
-            ),
+                topicId: topicId,
+                topicName: topicName,
+                numberOfWords: numberOfWords,
+                text: text,
+                isPrivate: isPrivate),
           ),
         );
       },
@@ -59,6 +62,10 @@ class TopicItem extends StatelessWidget {
                   style: const TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
               ],
+            ),
+            trailing: Visibility(
+              visible: isPrivate,
+              child: const Icon(Icons.lock, size: 30, color: Colors.white),
             ),
           ),
         ),

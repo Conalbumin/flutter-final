@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-Future<void> addTopic(String topicName, String text, int numberOfWords) async {
+Future<void> addTopic(
+    String topicName, String text, int numberOfWords, bool isPrivate) async {
   try {
-    await FirebaseFirestore.instance
-        .collection('topics')
-        .add({'name': topicName, 'text': text, 'numberOfWords': numberOfWords});
+    await FirebaseFirestore.instance.collection('topics').add({
+      'name': topicName,
+      'text': text,
+      'numberOfWords': numberOfWords,
+      'isPrivate': isPrivate
+    });
   } catch (e) {
     print('Error adding topic: $e');
   }
@@ -21,7 +25,8 @@ Future<void> addFolder(String folderName, String text) async {
   }
 }
 
-Future<void> addWord(String topicId, List<Map<String, String>> wordsData) async {
+Future<void> addWord(
+    String topicId, List<Map<String, String>> wordsData) async {
   try {
     int totalWordsAdded = wordsData.length;
 
@@ -48,13 +53,14 @@ Future<void> addWord(String topicId, List<Map<String, String>> wordsData) async 
 }
 
 Future<void> addTopicWithWords(
-    String topicName, String text, List<Map<String, String>> wordsData) async {
+    String topicName, String text, bool isPrivate, List<Map<String, String>> wordsData) async {
   try {
     DocumentReference topicRef =
         await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
+      'isPrivate': isPrivate
     });
 
     String topicId = topicRef.id;
@@ -83,7 +89,8 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .collection('topics')
         .doc(topicId)
         .get();
-    Map<String, dynamic> topicData = topicSnapshot.data() as Map<String, dynamic>;
+    Map<String, dynamic> topicData =
+        topicSnapshot.data() as Map<String, dynamic>;
 
     // Fetch topic words
     QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
@@ -153,8 +160,7 @@ Future<List<DocumentSnapshot>> fetchTopics(String folderId) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('folders') // Assuming 'topics' are stored under 'folders'
         .doc(folderId)
-        .collection(
-        'topics')
+        .collection('topics')
         .get();
     return querySnapshot.docs;
   } catch (e) {
@@ -176,10 +182,25 @@ Future<void> updateTopic(
   }
 }
 
+Future<void> setPrivateTopic(String topicId, bool isPrivate) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .update({'isPrivate': isPrivate});
+    print('Topic updated successfully');
+  } catch (e) {
+    print('Error updating topic: $e');
+  }
+}
+
 Future<void> updateFolder(
     String folderId, String newFolderName, String newDescription) async {
   try {
-    await FirebaseFirestore.instance.collection('folders').doc(folderId).update({
+    await FirebaseFirestore.instance
+        .collection('folders')
+        .doc(folderId)
+        .update({
       'name': newFolderName,
       'text': newDescription,
     });
@@ -247,7 +268,8 @@ void deleteTopic(BuildContext context, String topicId) {
   }
 }
 
-void deleteTopicInFolder(BuildContext context, String topicId, String folderId) {
+void deleteTopicInFolder(
+    BuildContext context, String topicId, String folderId) {
   try {
     FirebaseFirestore.instance
         .collection('folders')
@@ -265,8 +287,6 @@ void deleteTopicInFolder(BuildContext context, String topicId, String folderId) 
     print('Error: $e');
   }
 }
-
-
 
 void deleteWord(BuildContext context, String topicId, String wordId) {
   try {

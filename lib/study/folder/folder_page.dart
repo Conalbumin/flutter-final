@@ -141,12 +141,14 @@ class FolderPage extends StatelessWidget {
                     String topicName = document['name'];
                     String text = document['text'];
                     int numberOfWords = document['numberOfWords'];
+                    bool isPrivate = document['isPrivate'];
 
                     return TopicItem(
                       topicId: topicId,
                       topicName: topicName,
                       text: text,
                       numberOfWords: numberOfWords,
+                      isPrivate: isPrivate,
                     );
                   },
                 );
