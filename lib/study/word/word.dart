@@ -3,6 +3,7 @@ import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/modal/flip_side.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import 'package:quizlet_final_flutter/study/word/text_to_speech.dart';
 
 class WordItem extends StatefulWidget {
   final String word;
@@ -50,6 +51,7 @@ class WordItem extends StatefulWidget {
               children: [
                 GestureDetector(
                   onTap: () {
+                    speak(word);
                     print("volume_down_rounded icon clicked");
                   },
                   child: const Icon(
@@ -94,8 +96,6 @@ class WordItem extends StatefulWidget {
             ),
             TextButton(
               onPressed: () {
-                print("wordId ${wordId}");
-                print("topicId ${topicId}");
                 deleteWord(context, topicId, wordId);
                 Navigator.of(context).pop();
               },
