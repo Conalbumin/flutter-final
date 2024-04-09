@@ -9,8 +9,8 @@ class FlashCardPage extends StatefulWidget {
   final String topicId;
   final int numberOfWords;
 
-  const FlashCardPage(
-      {super.key, required this.topicId, required this.numberOfWords});
+  const FlashCardPage({Key? key, required this.topicId, required this.numberOfWords})
+      : super(key: key);
 
   @override
   State<FlashCardPage> createState() => _FlashCardPageState();
@@ -20,16 +20,29 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int _currentIndex = 0;
   late List<String> wordStatuses;
   int countLearned = 0;
-  int countUnlearned = 0;
+  int countunLearned = 0;
+
+  Future<List<DocumentSnapshot>> fetchAllWords() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('topics').doc(widget.topicId).collection('words').get();
+      return snapshot.docs;
+    } catch (error) {
+      print('Error fetching words: $error');
+      return [];
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    wordStatuses = List.filled(widget.numberOfWords, "Unlearned");
+    fetchAllWords();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Declare snapshotData variable
+    List<DocumentSnapshot> snapshotData = [];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -39,9 +52,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
             style: const TextStyle(color: Colors.white, fontSize: 30),
           ),
         ),
-        actions: [
-          const Icon(Icons.settings, size: 30),
-          const SizedBox(width: 15)
+        actions: const [
+          Icon(Icons.settings, size: 30),
+          SizedBox(width: 15),
         ],
       ),
       body: SingleChildScrollView(
@@ -57,15 +70,16 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        wordStatuses[_currentIndex] = "Unlearned";
-                        countUnlearned++;
+                        wordStatuses[_currentIndex] = "unLearned";
+                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, "unLearned");
+                        countunLearned++;
                         _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
                       });
                     },
                     child: Container(
                       width: 40,
                       height: 40,
-                      child: Center(child: Text('${countUnlearned}', style: TextStyle(fontSize: 20),)),
+                      child: Center(child: Text('${countunLearned}', style: TextStyle(fontSize: 20),)),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -103,7 +117,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
             SizedBox(
               height: 500, // Adjust the height as needed
               child: FutureBuilder(
-                future: fetchWords(widget.topicId),
+                future: fetchAllWords(),
                 builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -111,13 +125,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     List<DocumentSnapshot> words = snapshot.data!;
+                    // Assign snapshot data to local variable
+                    snapshotData = words;
                     return Swiper(
                       index: _currentIndex,
                       onIndexChanged: (index) {
                         setState(() {
                           _currentIndex = index;
-                          print(_currentIndex);
-                          print(index);
                         });
                       },
                       pagination: const SwiperPagination(

@@ -259,6 +259,21 @@ Future<void> updateWords(
   }
 }
 
+Future<void> updateWordStatus(String topicId, String wordId, String newStatus) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .doc(wordId)
+        .update({'status': newStatus});
+    print('Word status updated successfully');
+  } catch (e) {
+    print('Error updating word status: $e');
+  }
+}
+
+
 void deleteFolder(BuildContext context, String folderId) {
   try {
     FirebaseFirestore.instance
