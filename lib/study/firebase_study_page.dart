@@ -63,7 +63,6 @@ Future<void> addWord(
   }
 }
 
-
 Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     List<Map<String, String>> wordsData) async {
   try {
@@ -279,20 +278,42 @@ void deleteFolder(BuildContext context, String folderId) {
 
 void deleteTopic(BuildContext context, String topicId) {
   try {
+    // Create a batch to perform multiple delete operations atomically
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Delete the topic document
+    DocumentReference topicRef =
+    FirebaseFirestore.instance.collection('topics').doc(topicId);
+    batch.delete(topicRef);
+
+    // Delete all words associated with the topic
     FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
-        .delete()
-        .then((_) {
-      print('Topic deleted successfully');
+        .collection('words')
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((wordDoc) {
+        batch.delete(wordDoc.reference);
+      });
+
+      // Commit the batch
+      batch.commit().then((_) {
+        print('Topic and associated words deleted successfully');
+        Navigator.of(context).pop();
+      }).catchError((error) {
+        print('Error committing batch delete: $error');
+      });
       Navigator.of(context).pop();
+
     }).catchError((error) {
-      print('Error deleting topic: $error');
+      print('Error fetching words for deletion: $error');
     });
   } catch (e) {
     print('Error: $e');
   }
 }
+
 
 void deleteTopicInFolder(
     BuildContext context, String topicId, String folderId) {
