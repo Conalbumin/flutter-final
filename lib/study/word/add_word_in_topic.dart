@@ -71,7 +71,8 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
           if (wordPageState != null) {
             String? word = wordPageState.getWord();
             String? definition = wordPageState.getDefinition();
-            wordsData.add({'word': word, 'definition': definition});
+            String? status = wordPageState.getStatus();
+            wordsData.add({'word': word, 'definition': definition, 'status': status});
           }
         }
       }

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../firebase_study_page.dart';
 import '../folder/add_topic_to_folder.dart';
+import '../study_mode/flashcard_page.dart';
 import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
@@ -154,11 +155,13 @@ class _TopicPageState extends State<TopicPage> {
                       itemBuilder: (context, index) {
                         String word = words[index]['word'];
                         String definition = words[index]['definition'];
+                        String status = words[index]['status'];
                         return WordItem(
                           definition: definition,
                           word: word,
                           wordId: words[index].id,
                           topicId: widget.topicId,
+                          status: status,
                         ); // Pass context here
                       },
                     );
@@ -193,10 +196,13 @@ class _TopicPageState extends State<TopicPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      // Handle onTap for FlashCard
                       print('FlashCard tapped');
-                      // Add navigation or other actions as needed
-                    },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FlashCardPage(topicId: widget.topicId, numberOfWords: widget.numberOfWords,),
+                        ),
+                      );                    },
                     child: const FlashCard(),
                   ),
                   const SizedBox(height: 10),
@@ -238,12 +244,14 @@ class _TopicPageState extends State<TopicPage> {
                     itemBuilder: (context, index) {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
+                      String status = words[index]['status'];
                       return WordItem(
                         definition: definition,
                         word: word,
                         wordId: words[index].id,
                         topicId: widget.topicId,
-                      ).card(context); // Pass context here
+                        status: status,
+                      ).card(context);
                     },
                   );
                 }

@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 class AddWordPage extends StatefulWidget {
   final String? initialWord;
   final String? initialDefinition;
+  final String? initialStatus;
 
   const AddWordPage({
     Key? key,
     this.initialWord,
     this.initialDefinition,
+    this.initialStatus,
   }) : super(key: key);
-
 
   @override
   AddWordPageState createState() => AddWordPageState();
@@ -23,12 +24,14 @@ class AddWordPage extends StatefulWidget {
 class AddWordPageState extends State<AddWordPage> {
   late String word;
   late String definition;
+  late String status = 'unLearned';
 
   @override
   void initState() {
     super.initState();
     word = widget.initialWord ?? '';
     definition = widget.initialDefinition ?? '';
+    status = 'unLearned';
   }
 
   String getWord() {
@@ -37,6 +40,11 @@ class AddWordPageState extends State<AddWordPage> {
 
   String getDefinition() {
     return definition;
+  }
+
+  String getStatus() {
+    status = 'unLearned';
+    return status;
   }
 
   @override

@@ -39,6 +39,8 @@ Future<void> addWord(
     int totalWordsAdded = wordsData.length;
 
     for (var wordData in wordsData) {
+      String status = wordData['status'] ?? 'unLearned';
+
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -46,6 +48,7 @@ Future<void> addWord(
           .add({
         'word': wordData['word'],
         'definition': wordData['definition'],
+        'status': status,
       });
     }
 
@@ -59,6 +62,7 @@ Future<void> addWord(
     print('Error adding words: $e');
   }
 }
+
 
 Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     List<Map<String, String>> wordsData) async {
@@ -76,6 +80,8 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     String topicId = topicRef.id;
 
     for (var wordData in wordsData) {
+      String status = wordData['status'] ?? 'unLearned';
+
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -83,6 +89,7 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
           .add({
         'word': wordData['word'],
         'definition': wordData['definition'],
+        'status': status
       });
     }
 
@@ -244,6 +251,7 @@ Future<void> updateWords(
           .set({
         'word': wordData['word'],
         'definition': wordData['definition'],
+        'status': wordData['status']
       });
     }
     print('Words updated successfully');

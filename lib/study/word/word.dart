@@ -8,6 +8,7 @@ import 'package:quizlet_final_flutter/study/word/text_to_speech.dart';
 class WordItem extends StatefulWidget {
   final String word;
   final String definition;
+  final String status;
   final String wordId;
   final String topicId;
 
@@ -17,6 +18,7 @@ class WordItem extends StatefulWidget {
     required this.definition,
     required this.wordId,
     required this.topicId,
+    required this.status,
   }) : super(key: key);
 
   @override
@@ -91,7 +93,8 @@ class WordItem extends StatefulWidget {
     );
   }
 
-  void showDeleteConfirmationDialog(BuildContext context, String topicId, String wordId) {
+  void showDeleteConfirmationDialog(
+      BuildContext context, String topicId, String wordId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -126,7 +129,7 @@ class _WordItemState extends State<WordItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("object");
+        // Handle onTap if needed
       },
       child: FlipCard(
         controller: flip,
@@ -146,18 +149,30 @@ class _WordItemState extends State<WordItem> {
       margin: const EdgeInsets.all(8),
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: GestureDetector(
+                onTap: () {
+                  speak(widget.word);
+                  print("volume_down_rounded icon clicked");
+                },
+                child: const Icon(
+                  Icons.volume_down_rounded,
+                  color: Colors.white,
+                  size: 50,
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
                 widget.word,
                 style: const TextStyle(fontSize: 35, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -171,21 +186,18 @@ class _WordItemState extends State<WordItem> {
       margin: const EdgeInsets.all(8),
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
+        child: Stack(
+          children: [
+            Center(
+              child: Text(
                 widget.definition,
                 style: const TextStyle(fontSize: 35, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
