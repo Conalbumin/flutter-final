@@ -1,7 +1,7 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import '../word/text_to_speech.dart';
 import '../firebase_study_page.dart';
 import '../word/word.dart';
 
@@ -22,6 +22,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int countLearned = 0;
   int countunLearned = 0;
 
+
   Future<List<DocumentSnapshot>> fetchAllWords() async {
     try {
       final snapshot = await FirebaseFirestore.instance.collection('topics').doc(widget.topicId).collection('words').get();
@@ -30,6 +31,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
       print('Error fetching words: $error');
       return [];
     }
+  }
+
+  void speakWord(String word) {
+    speak(word);
   }
 
   @override
@@ -52,9 +57,51 @@ class _FlashCardPageState extends State<FlashCardPage> {
             style: const TextStyle(color: Colors.white, fontSize: 30),
           ),
         ),
-        actions: const [
-          Icon(Icons.settings, size: 30),
+        actions: [
           SizedBox(width: 15),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.settings, color: Colors.white, size: 30),
+            itemBuilder: (BuildContext context) =>
+            <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'auto',
+                child: ListTile(
+                  leading: Icon(Icons.auto_mode),
+                  title: Text('Auto'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'shuffle',
+                child: ListTile(
+                  leading: Icon(Icons.shuffle),
+                  title: Text('Shuffle words'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'switchLanguage',
+                child: ListTile(
+                  leading: Icon(Icons.switch_camera),
+                  title: Text('Switch language'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'learnStar',
+                child: ListTile(
+                  leading: Icon(Icons.star),
+                  title: Text('Learn only star word'),
+                ),
+              )
+            ],
+            onSelected: (String choice) {
+              if (choice == 'auto') {
+                // editAction(context);
+              } else if (choice == 'shuffle') {
+                // _showFolderTab(context);
+              } else if (choice == 'switchLanguage') {
+              } else if (choice == 'learnStar') {
+              }
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -76,17 +123,25 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
                       });
                     },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      child: Center(child: Text('${countunLearned}', style: TextStyle(fontSize: 20),)),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.red,
-                          width: 2,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          child: Center(
+                              child: Text('${countunLearned}', style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),)),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.red,
+                              width: 3,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 5),
+                        Text("Unlearned",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),)
+                      ],
                     ),
                   ),
                   GestureDetector(
@@ -97,17 +152,24 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
                       });
                     },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      child: Center(child: Text('${countLearned}', style: TextStyle(fontSize: 20),)),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.green,
-                          width: 2,
+                    child: Row(
+                      children: [
+                        Text("Learned",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
+                        const SizedBox(width: 5),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          child: Center(child: Text('${countLearned}', style: TextStyle(fontSize: 20, color: Colors.green, fontWeight: FontWeight.bold),)),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.green,
+                              width: 3,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
@@ -132,6 +194,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       onIndexChanged: (index) {
                         setState(() {
                           _currentIndex = index;
+                          speakWord(words[index]['word']);
                         });
                       },
                       pagination: const SwiperPagination(
