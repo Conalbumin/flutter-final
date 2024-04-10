@@ -9,7 +9,8 @@ class FlashCardPage extends StatefulWidget {
   final String topicId;
   final int numberOfWords;
 
-  const FlashCardPage({Key? key, required this.topicId, required this.numberOfWords})
+  const FlashCardPage(
+      {Key? key, required this.topicId, required this.numberOfWords})
       : super(key: key);
 
   @override
@@ -21,11 +22,15 @@ class _FlashCardPageState extends State<FlashCardPage> {
   late List<String> wordStatuses;
   int countLearned = 0;
   int countunLearned = 0;
-
+  bool autoSpeak = true;
 
   Future<List<DocumentSnapshot>> fetchAllWords() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('topics').doc(widget.topicId).collection('words').get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(widget.topicId)
+          .collection('words')
+          .get();
       return snapshot.docs;
     } catch (error) {
       print('Error fetching words: $error');
@@ -40,12 +45,16 @@ class _FlashCardPageState extends State<FlashCardPage> {
   @override
   void initState() {
     super.initState();
-    fetchAllWords();
+    fetchAllWords().then((words) {
+      if (words.isNotEmpty) {
+        speakWord(words[_currentIndex]['word']); // Speak the first word
+      }
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
-    // Declare snapshotData variable
     List<DocumentSnapshot> snapshotData = [];
 
     return Scaffold(
@@ -61,13 +70,19 @@ class _FlashCardPageState extends State<FlashCardPage> {
           SizedBox(width: 15),
           PopupMenuButton<String>(
             icon: const Icon(Icons.settings, color: Colors.white, size: 30),
-            itemBuilder: (BuildContext context) =>
-            <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+               PopupMenuItem<String>(
                 value: 'auto',
                 child: ListTile(
                   leading: Icon(Icons.auto_mode),
                   title: Text('Auto'),
+                  trailing: Switch(
+                      value: autoSpeak,
+                      onChanged: (value) {
+                        setState(() {
+                          autoSpeak = !autoSpeak;
+                        });
+                      }),
                 ),
               ),
               const PopupMenuItem<String>(
@@ -98,8 +113,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
               } else if (choice == 'shuffle') {
                 // _showFolderTab(context);
               } else if (choice == 'switchLanguage') {
-              } else if (choice == 'learnStar') {
-              }
+              } else if (choice == 'learnStar') {}
             },
           ),
         ],
@@ -118,9 +132,11 @@ class _FlashCardPageState extends State<FlashCardPage> {
                     onTap: () {
                       setState(() {
                         wordStatuses[_currentIndex] = "unLearned";
-                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, "unLearned");
+                        updateWordStatus(widget.topicId,
+                            snapshotData[_currentIndex].id, "unLearned");
                         countunLearned++;
-                        _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
+                        _currentIndex =
+                            (_currentIndex + 1) % widget.numberOfWords;
                       });
                     },
                     child: Row(
@@ -129,7 +145,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
                           width: 40,
                           height: 40,
                           child: Center(
-                              child: Text('${countunLearned}', style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),)),
+                              child: Text(
+                            '${countunLearned}',
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold),
+                          )),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -139,8 +161,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        Text("Unlearned",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),)
+                        Text(
+                          "Unlearned",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red),
+                        )
                       ],
                     ),
                   ),
@@ -149,18 +176,29 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       setState(() {
                         wordStatuses[_currentIndex] = "Learned";
                         countLearned++;
-                        _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
+                        _currentIndex =
+                            (_currentIndex + 1) % widget.numberOfWords;
                       });
                     },
                     child: Row(
                       children: [
                         Text("Learned",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green)),
                         const SizedBox(width: 5),
                         Container(
                           width: 40,
                           height: 40,
-                          child: Center(child: Text('${countLearned}', style: TextStyle(fontSize: 20, color: Colors.green, fontWeight: FontWeight.bold),)),
+                          child: Center(
+                              child: Text(
+                            '${countLearned}',
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold),
+                          )),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -180,7 +218,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
               height: 500, // Adjust the height as needed
               child: FutureBuilder(
                 future: fetchAllWords(),
-                builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                builder:
+                    (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -194,7 +233,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       onIndexChanged: (index) {
                         setState(() {
                           _currentIndex = index;
-                          speakWord(words[index]['word']);
+                          if (autoSpeak) {
+                            speakWord(words[index]['word']);
+                          }
                         });
                       },
                       pagination: const SwiperPagination(
