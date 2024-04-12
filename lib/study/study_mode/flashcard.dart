@@ -27,4 +27,5 @@ class _FlashCardState extends State<FlashCard> {
       ),
     );
   }
+
 }

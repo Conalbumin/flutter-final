@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int countunLearned = 0;
   bool autoSpeak = true;
   late List<DocumentSnapshot> snapshotData;
+  late SwiperController _swiperController;
+  Timer? _timer;
+  bool autoplay = true;
+  GlobalKey _menuKey = GlobalKey();
 
   void shuffleWords() {
     setState(() {
@@ -76,9 +82,24 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
+  void startAutoPlay() {
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      if (_swiperController.index < (widget.numberOfWords - 1)) {
+        print(_swiperController.index);
+        print(widget.numberOfWords - 1);
+        _swiperController.next();
+        _swiperController.index++;
+      } else {
+        _timer?.cancel(); // Stop auto-play if reached the last word
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _swiperController = SwiperController();
+    startAutoPlay();
     fetchWords(widget.topicId).then((words) {
       setState(() {
         snapshotData = words;
@@ -88,6 +109,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
       });
     });
     wordStatuses = List.filled(widget.numberOfWords, "");
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _swiperController.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,6 +132,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
         actions: [
           const SizedBox(width: 15),
           PopupMenuButton<String>(
+            key: _menuKey,
             icon: const Icon(Icons.settings, color: Colors.white, size: 30),
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               PopupMenuItem<String>(
@@ -112,13 +141,22 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   leading: const Icon(Icons.auto_mode),
                   title: const Text('Auto'),
                   trailing: Switch(
-                      value: autoSpeak,
-                      onChanged: (value) {
-                        setState(() {
-                          autoSpeak = !autoSpeak;
-                          Navigator.of(context).pop();
-                        });
-                      }),
+                    value: autoplay,
+                    activeColor: Colors.blue,
+                    onChanged: (value) {
+                      setState(() {
+                        autoplay = value; // Update the autoSpeak value
+                        if (autoplay) {
+                          startAutoPlay(); // Start auto-play if autoSpeak is true
+                        } else {
+                          _timer?.cancel(); // Stop auto-play if autoSpeak is false
+                        }
+                        Navigator.of(context).pop();
+                        (_menuKey.currentState as dynamic).showButtonMenu();
+
+                      });
+                    },
+                  ),
                 ),
               ),
               const PopupMenuItem<String>(
@@ -257,6 +295,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                     // Assign snapshot data to local variable
                     snapshotData = words;
                     return Swiper(
+                      controller: _swiperController,
                       index: _currentIndex,
                       onIndexChanged: (index) {
                         setState(() {
