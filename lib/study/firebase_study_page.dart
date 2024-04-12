@@ -179,6 +179,7 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
   }
 }
 
+
 Future<List<DocumentSnapshot>> fetchTopics(String folderId) async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance

@@ -24,7 +24,6 @@ class TopicItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("object");
         Navigator.push(
           context,
           MaterialPageRoute(
