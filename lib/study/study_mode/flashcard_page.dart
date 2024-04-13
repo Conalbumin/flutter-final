@@ -23,7 +23,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int _currentIndex = 0;
   late List<String> wordStatuses;
   int countLearned = 0;
-  int countunLearned = 0;
+  int countUnlearned = 0;
   bool autoSpeak = true;
   late List<DocumentSnapshot> snapshotData;
   late SwiperController _swiperController;
@@ -39,7 +39,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
         print("after ${snapshotData}");
         _currentIndex = 0;
         countLearned = 0;
-        countunLearned = 0;
+        countUnlearned = 0;
       }
     });
   }
@@ -51,7 +51,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   void _checkFinishStudy() {
-    if (countLearned + countunLearned == widget.numberOfWords) {
+    if (countLearned + countUnlearned == widget.numberOfWords) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -79,8 +79,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
         wordStatuses[_currentIndex] = "Learned";
         countLearned++;
       } else {
-        wordStatuses[_currentIndex] = "unLearned";
-        countunLearned++;
+        wordStatuses[_currentIndex] = "Unlearned";
+        countUnlearned++;
       }
       _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
       _checkFinishStudy();
@@ -208,8 +208,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _updateLearnedStatus(false); // Mark as unlearned
-                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'unLearned');
+                        _updateLearnedStatus(false); // Mark as Unlearned
+                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'Unlearned');
                       });
                     },
                     child: Row(
@@ -226,7 +226,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                           ),
                           child: Center(
                               child: Text(
-                            '$countunLearned',
+                            '$countUnlearned',
                             style: const TextStyle(
                                 fontSize: 20,
                                 color: Colors.red,

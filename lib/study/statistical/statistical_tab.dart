@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quizlet_final_flutter/study/statistical/statistical.dart';
 
 import '../topic/topic.dart'; // Import Firebase Auth
 
@@ -15,20 +16,16 @@ class StatisticalTab extends StatelessWidget {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         }
-
         if (userSnapshot.hasError) {
           return Text('Error: ${userSnapshot.error}');
         }
-
         if (userSnapshot.data == null) {
-          // If no user is signed in
           return const Center(
             child: Text('No user signed in.'),
           );
         }
 
-        String currentUserId = userSnapshot.data!.uid; // Get the current user's ID
-
+        String currentUserId = userSnapshot.data!.uid;
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('topics')
@@ -57,7 +54,7 @@ class StatisticalTab extends StatelessWidget {
                 bool isPrivate = document['isPrivate'];
                 String userId = document['createdBy'];
 
-                return TopicItem(
+                return StatisticalItem(
                   topicId: topicId,
                   topicName: topicName,
                   text: text,

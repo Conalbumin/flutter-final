@@ -24,14 +24,14 @@ class AddWordPage extends StatefulWidget {
 class AddWordPageState extends State<AddWordPage> {
   late String word;
   late String definition;
-  late String status = 'unLearned';
+  late String status = 'Unlearned';
 
   @override
   void initState() {
     super.initState();
     word = widget.initialWord ?? '';
     definition = widget.initialDefinition ?? '';
-    status = 'unLearned';
+    status = 'Unlearned';
   }
 
   String getWord() {
@@ -43,7 +43,7 @@ class AddWordPageState extends State<AddWordPage> {
   }
 
   String getStatus() {
-    status = 'unLearned';
+    status = 'Unlearned';
     return status;
   }
 
