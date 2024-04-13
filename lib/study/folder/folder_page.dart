@@ -43,9 +43,9 @@ class FolderPage extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Remove Topic'),
+                    title: const Text('Remove Folder'),
                     content: const Text(
-                      'Are you sure you want to remove this topic?',
+                      'Are you sure you want to remove this folder?',
                     ),
                     actions: <Widget>[
                       TextButton(
@@ -57,8 +57,6 @@ class FolderPage extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           deleteFolder(context, folderId);
-                          // Here you can add the logic to remove the topic
-                          // Once the topic is removed, you might want to navigate back or perform any other action
                           Navigator.of(context).pop(); // Close the dialog
                         },
                         child: const Text('Remove'),
@@ -142,7 +140,7 @@ class FolderPage extends StatelessWidget {
                     String text = document['text'];
                     int numberOfWords = document['numberOfWords'];
                     bool isPrivate = document['isPrivate'];
-                    String userId = document['userId'];
+                    String userId = document['createdBy'];
 
                     return TopicItem(
                       topicId: topicId,

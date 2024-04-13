@@ -125,10 +125,12 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .collection('topics')
         .doc(topicId);
     batch.set(topicRef, {
-      'topicId': topicId,
+      // 'topicId': topicId,
       'name': topicData['name'],
       'text': topicData['text'],
       'numberOfWords': topicData['numberOfWords'],
+      'isPrivate': topicData['isPrivate'],
+      'createdBy': topicData['createdBy']
     });
 
     // Add topic words to the folder
@@ -178,7 +180,6 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
     rethrow;
   }
 }
-
 
 Future<List<DocumentSnapshot>> fetchTopics(String folderId) async {
   try {
@@ -274,23 +275,67 @@ Future<void> updateWordStatus(String topicId, String wordId, String newStatus) a
   }
 }
 
-
 void deleteFolder(BuildContext context, String folderId) {
   try {
+    // Delete all topics within the folder and their associated words
     FirebaseFirestore.instance
         .collection('folders')
         .doc(folderId)
-        .delete()
-        .then((_) {
-      print('Folder deleted successfully');
-      Navigator.of(context).pop();
+        .collection('topics')
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((topicDoc) {
+        // Delete all words associated with the topic
+        FirebaseFirestore.instance
+            .collection('topics')
+            .doc(topicDoc.id)
+            .collection('words')
+            .get()
+            .then((wordsSnapshot) {
+          wordsSnapshot.docs.forEach((wordDoc) {
+            wordDoc.reference.delete();
+          });
+        }).catchError((error) {
+          print('Error fetching words for deletion: $error');
+        });
+
+        // Delete the topic document
+        topicDoc.reference.delete();
+      });
+
+      // Delete the topics collection within the folder
+      FirebaseFirestore.instance
+          .collection('folders')
+          .doc(folderId)
+          .collection('topics')
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      }).catchError((error) {
+        print('Error deleting topics collection: $error');
+      });
+
+      // Delete the folder itself
+      FirebaseFirestore.instance
+          .collection('folders')
+          .doc(folderId)
+          .delete()
+          .then((_) {
+        print('Folder and related topics deleted successfully');
+        Navigator.of(context).pop();
+      }).catchError((error) {
+        print('Error deleting folder: $error');
+      });
     }).catchError((error) {
-      print('Error deleting folder: $error');
+      print('Error fetching topics for deletion: $error');
     });
   } catch (e) {
     print('Error: $e');
   }
 }
+
 
 void deleteTopic(BuildContext context, String topicId) {
   try {
@@ -330,21 +375,22 @@ void deleteTopic(BuildContext context, String topicId) {
   }
 }
 
-
 void deleteTopicInFolder(
     BuildContext context, String topicId, String folderId) {
   try {
-    FirebaseFirestore.instance
+    // Fetch the reference of the topic in the folder's collection
+    DocumentReference topicRef = FirebaseFirestore.instance
         .collection('folders')
         .doc(folderId)
         .collection('topics')
-        .doc(topicId)
-        .delete()
-        .then((_) {
-      print('Topic deleted successfully');
+        .doc(topicId);
+
+    // Delete the reference of the topic from the folder
+    topicRef.delete().then((_) {
+      print('Topic removed from folder successfully');
       Navigator.of(context).pop();
     }).catchError((error) {
-      print('Error deleting topic: $error');
+      print('Error removing topic from folder: $error');
     });
   } catch (e) {
     print('Error: $e');

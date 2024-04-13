@@ -314,7 +314,6 @@ class _TopicPageState extends State<TopicPage> {
             ),
             TextButton(
               onPressed: () {
-                print("topicId ${topicId}");
                 deleteTopic(context, topicId);
                 Navigator.of(context).pop();
               },

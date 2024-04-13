@@ -34,14 +34,19 @@ class _FlashCardPageState extends State<FlashCardPage> {
   void shuffleWords() {
     setState(() {
       if (snapshotData.isNotEmpty) {
-        snapshotData.shuffle();
+        print("before ${snapshotData}");
+        snapshotData.toList().shuffle();
+        print("after ${snapshotData}");
         _currentIndex = 0;
         countLearned = 0;
         countunLearned = 0;
-        if (autoSpeak) {
-          speak(snapshotData[_currentIndex]['word']);
-        }
       }
+    });
+  }
+
+  void handleShuffleWords() {
+    setState(() {
+      shuffleWords(); // Call the shuffle function here
     });
   }
 
@@ -153,17 +158,17 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         }
                         Navigator.of(context).pop();
                         (_menuKey.currentState as dynamic).showButtonMenu();
-
                       });
                     },
                   ),
                 ),
               ),
-              const PopupMenuItem<String>(
+               PopupMenuItem<String>(
                 value: 'shuffle',
                 child: ListTile(
                   leading: Icon(Icons.shuffle),
                   title: Text('Shuffle words'),
+                  onTap: handleShuffleWords,
                 ),
               ),
               const PopupMenuItem<String>(

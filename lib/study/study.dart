@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/study/statistical/statistical_tab.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_tab.dart';
 
 import 'folder/folder_tab.dart'; // Import your Firebase functions here
@@ -15,7 +16,7 @@ class _StudyPageState extends State<StudyPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: null,
         body: Column(
@@ -38,6 +39,10 @@ class _StudyPageState extends State<StudyPage> {
                   Tab(
                     icon: Icon(Icons.folder),
                     text: "Folder",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.bar_chart),
+                    text: "Statistical",
                   )
                 ],
               ),
@@ -47,6 +52,7 @@ class _StudyPageState extends State<StudyPage> {
                 children: [
                   TopicTab(),
                   FolderTab(),
+                  StatisticalTab()
                 ],
               ),
             ),
