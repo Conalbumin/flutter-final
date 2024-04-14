@@ -33,6 +33,7 @@ class StatisticalPage extends StatefulWidget {
 class _StatisticalPageState extends State<StatisticalPage> {
   int learnedCount = 0;
   int unlearnedCount = 0;
+  int masteredCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +66,8 @@ class _StatisticalPageState extends State<StatisticalPage> {
               height: 600,
               child: FutureBuilder(
                 future: fetchWords(widget.topicId),
-                builder: (context,
-                    AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                builder:
+                    (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -74,13 +75,16 @@ class _StatisticalPageState extends State<StatisticalPage> {
                   } else {
                     List<DocumentSnapshot> words = snapshot.data!;
                     learnedCount = 0;
-                    unlearnedCount = 0; // Reset counts before updating
+                    unlearnedCount = 0;
+                    masteredCount = 0;
                     for (var wordSnapshot in words) {
                       String status = wordSnapshot['status'];
                       if (status == 'Learned') {
                         learnedCount++;
-                      } else {
+                      } else if (status == 'Unlearned') {
                         unlearnedCount++;
+                      } else {
+                        masteredCount++;
                       }
                     }
                     return Column(
@@ -93,20 +97,25 @@ class _StatisticalPageState extends State<StatisticalPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Learned: $learnedCount',
-                                style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green
-                                ),
-                              ),
-                              Text(
                                 'Unlearned: $unlearnedCount',
                                 style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.red
-                                ),
+                                    color: Colors.red),
+                              ),
+                              Text(
+                                'Learned: $learnedCount',
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                              ),
+                              Text(
+                                'Mastered: $masteredCount',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[700]),
                               ),
                             ],
                           ),
@@ -140,5 +149,3 @@ class _StatisticalPageState extends State<StatisticalPage> {
     );
   }
 }
-
-

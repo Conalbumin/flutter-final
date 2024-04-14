@@ -24,6 +24,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   late List<String> wordStatuses;
   int countLearned = 0;
   int countUnlearned = 0;
+  int countMastered = 0;
   bool autoSpeak = true;
   late List<DocumentSnapshot> snapshotData;
   late SwiperController _swiperController;
@@ -73,19 +74,24 @@ class _FlashCardPageState extends State<FlashCardPage> {
     }
   }
 
-  void _updateLearnedStatus(bool learned) {
+  void _updateLearnedStatus(String status) {
     setState(() {
-      if (learned) {
-        wordStatuses[_currentIndex] = "Learned";
-        countLearned++;
-      } else {
-        wordStatuses[_currentIndex] = "Unlearned";
-        countUnlearned++;
+      switch (status) {
+        case 'Learned':
+          countLearned++;
+          break;
+        case 'Unlearned':
+          countUnlearned++;
+          break;
+        case 'Mastered':
+          countMastered++;
+          break;
       }
       _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
       _checkFinishStudy();
     });
   }
+
 
   void startAutoPlay() {
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
@@ -208,7 +214,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _updateLearnedStatus(false); // Mark as Unlearned
+                        _updateLearnedStatus('Unlearned'); // Mark as Unlearned
                         updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'Unlearned');
                       });
                     },
@@ -247,7 +253,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _updateLearnedStatus(true); // Mark as learned
+                        _updateLearnedStatus('Learned'); // Mark as learned
                         updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'Learned');
                       });
                     },
