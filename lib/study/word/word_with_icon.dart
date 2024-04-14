@@ -88,10 +88,7 @@ class _WordWithIconState extends State<WordWithIcon> {
                   onTap: () {
                     setState(() {
                       isFavorited = !isFavorited;
-                      print(isFavorited);
                       updateWordIsFavorited(widget.topicId, widget.wordId, isFavorited);
-                      print(isFavorited);
-
                     });
                   },
                   child: Icon(

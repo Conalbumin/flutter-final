@@ -38,13 +38,23 @@ class _TopicPageState extends State<TopicPage> {
   late List<DocumentSnapshot> words;
   late String _topicName;
   late String _text;
+  bool showAllWords = true;
+  List<DocumentSnapshot> favoritedWords = [];
 
   @override
   void initState() {
     super.initState();
     _topicName = widget.topicName;
     _text = widget.text;
-    fetchWords(widget.topicId);
+    fetchWords(widget.topicId).then((value) {
+      setState(() {
+        words = value;
+        favoritedWords =
+            words.where((word) => word['isFavorited'] == true).toList();
+        print('All Words: ${words.length}');
+        print('Favorited Words: ${favoritedWords.length}');
+      });
+    });
   }
 
   @override
@@ -236,6 +246,81 @@ class _TopicPageState extends State<TopicPage> {
               ),
             ),
             const SizedBox(height: 20),
+            Center(
+              child: Container(
+                width: 350,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 2.0,
+                  ),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: const Border(
+                            right: BorderSide(
+                              color: Colors.grey,
+                              width: 2.0,
+                            ),
+                          ),
+                          color: showAllWords ? Colors.indigo.withOpacity(0.1) : Colors.transparent,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showAllWords = true;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              'All',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: showAllWords ? Colors.indigo : Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        color: !showAllWords ? Colors.indigo.withOpacity(0.1) : Colors.transparent,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showAllWords = false;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              'Favorited',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: !showAllWords ? Colors.indigo : Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             FutureBuilder(
               future: fetchWords(widget.topicId),
               builder:
@@ -246,25 +331,47 @@ class _TopicPageState extends State<TopicPage> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   List<DocumentSnapshot> words = snapshot.data!;
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: words.length,
-                    itemBuilder: (context, index) {
-                      String word = words[index]['word'];
-                      String definition = words[index]['definition'];
-                      String status = words[index]['status'];
-                      bool isFavorited = words[index]['isFavorited'];
-                      return WordWithIcon(
-                        definition: definition,
-                        word: word,
-                        wordId: words[index].id,
-                        topicId: widget.topicId,
-                        status: status,
-                        isFavorited: isFavorited.toString() ?? '',
-                      );
-                    },
-                  );
+                  return showAllWords
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: words.length,
+                          itemBuilder: (context, index) {
+                            String word = words[index]['word'];
+                            String definition = words[index]['definition'];
+                            String status = words[index]['status'];
+                            bool isFavorited = words[index]['isFavorited'];
+                            return WordWithIcon(
+                              definition: definition,
+                              word: word,
+                              wordId: words[index].id,
+                              topicId: widget.topicId,
+                              status: status,
+                              isFavorited: isFavorited.toString() ?? '',
+                            );
+                          },
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: favoritedWords.length,
+                          itemBuilder: (context, index) {
+                            String word = favoritedWords[index]['word'];
+                            String definition =
+                                favoritedWords[index]['definition'];
+                            String status = favoritedWords[index]['status'];
+                            bool isFavorited =
+                                favoritedWords[index]['isFavorited'];
+                            return WordWithIcon(
+                              definition: definition,
+                              word: word,
+                              wordId: favoritedWords[index].id,
+                              topicId: widget.topicId,
+                              status: status,
+                              isFavorited: isFavorited.toString() ?? '',
+                            );
+                          },
+                        );
                 }
               },
             ),
