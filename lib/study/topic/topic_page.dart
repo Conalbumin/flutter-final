@@ -8,6 +8,7 @@ import '../study_mode/quiz.dart';
 import '../study_mode/flashcard.dart';
 import '../study_mode/type.dart';
 import '../word/add_word_in_topic.dart';
+import '../word/word_with_icon.dart';
 import 'edit_topic_page.dart';
 import 'package:card_swiper/card_swiper.dart';
 
@@ -245,13 +246,13 @@ class _TopicPageState extends State<TopicPage> {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
                       String status = words[index]['status'];
-                      return WordItem(
+                      return WordWithIcon(
                         definition: definition,
                         word: word,
                         wordId: words[index].id,
                         topicId: widget.topicId,
                         status: status,
-                      ).card(context);
+                      );
                     },
                   );
                 }

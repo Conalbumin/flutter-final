@@ -23,103 +23,6 @@ class WordItem extends StatefulWidget {
 
   @override
   State<WordItem> createState() => _WordItemState();
-
-  Widget card(BuildContext context) {
-    return Card(
-      color: Colors.indigo[900],
-      elevation: 5,
-      margin: const EdgeInsets.all(15),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  word,
-                  style: const TextStyle(fontSize: 35, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-                Text(
-                  definition,
-                  style: const TextStyle(fontSize: 35, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    speak(word);
-                    print("volume_down_rounded icon clicked");
-                  },
-                  child: const Icon(
-                    Icons.volume_down_rounded,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    showDeleteConfirmationDialog(context, topicId, wordId);
-                    print("delete icon clicked");
-                  },
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                    size: 35,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    print("star icon clicked");
-                  },
-                  child: const Icon(
-                    Icons.star_border_purple500_outlined,
-                    color: Colors.white,
-                    size: 35,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void showDeleteConfirmationDialog(
-      BuildContext context, String topicId, String wordId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Remove word'),
-          content: const Text('Are you sure you want to remove this word?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                deleteWord(context, topicId, wordId);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Remove'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
 class _WordItemState extends State<WordItem> {
@@ -129,7 +32,6 @@ class _WordItemState extends State<WordItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Handle onTap if needed
       },
       child: FlipCard(
         controller: flip,
