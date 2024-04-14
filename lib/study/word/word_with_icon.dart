@@ -7,6 +7,7 @@ class WordWithIcon extends StatefulWidget {
   final String word;
   final String definition;
   final String status;
+  final String isFavorited;
   final String wordId;
   final String topicId;
 
@@ -16,14 +17,21 @@ class WordWithIcon extends StatefulWidget {
       required this.definition,
       required this.status,
       required this.wordId,
-      required this.topicId});
+      required this.topicId,
+      required this.isFavorited});
 
   @override
   State<WordWithIcon> createState() => _WordWithIconState();
 }
 
 class _WordWithIconState extends State<WordWithIcon> {
-  bool isFavorited = false;
+  late bool isFavorited;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorited = widget.isFavorited == 'true';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +74,8 @@ class _WordWithIconState extends State<WordWithIcon> {
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
-                    showDeleteConfirmationDialog(context, widget.topicId, widget.wordId);
+                    showDeleteConfirmationDialog(
+                        context, widget.topicId, widget.wordId);
                   },
                   child: const Icon(
                     Icons.delete,
@@ -79,10 +88,16 @@ class _WordWithIconState extends State<WordWithIcon> {
                   onTap: () {
                     setState(() {
                       isFavorited = !isFavorited;
+                      print(isFavorited);
+                      updateWordIsFavorited(widget.topicId, widget.wordId, isFavorited);
+                      print(isFavorited);
+
                     });
                   },
                   child: Icon(
-                    isFavorited ? Icons.star : Icons.star_border_purple500_outlined,
+                    isFavorited
+                        ? Icons.star
+                        : Icons.star_border_purple500_outlined,
                     color: Colors.white,
                     size: 35,
                   ),

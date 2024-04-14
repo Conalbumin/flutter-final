@@ -9,6 +9,7 @@ class WordItem extends StatefulWidget {
   final String word;
   final String definition;
   final String status;
+  final String isFavorited;
   final String wordId;
   final String topicId;
 
@@ -19,6 +20,7 @@ class WordItem extends StatefulWidget {
     required this.wordId,
     required this.topicId,
     required this.status,
+    required this.isFavorited,
   }) : super(key: key);
 
   @override
@@ -31,8 +33,7 @@ class _WordItemState extends State<WordItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-      },
+      onTap: () {},
       child: FlipCard(
         controller: flip,
         onTapFlipping: true,

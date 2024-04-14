@@ -40,6 +40,7 @@ Future<void> addWord(
 
     for (var wordData in wordsData) {
       String status = wordData['status'] ?? 'unLearned';
+      bool isFavorited = false;
 
       await FirebaseFirestore.instance
           .collection('topics')
@@ -49,6 +50,7 @@ Future<void> addWord(
         'word': wordData['word'],
         'definition': wordData['definition'],
         'status': status,
+        'isFavorited': isFavorited
       });
     }
 
@@ -80,6 +82,7 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
 
     for (var wordData in wordsData) {
       String status = wordData['status'] ?? 'unLearned';
+      bool isFavorited = false;
 
       await FirebaseFirestore.instance
           .collection('topics')
@@ -88,7 +91,8 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
           .add({
         'word': wordData['word'],
         'definition': wordData['definition'],
-        'status': status
+        'status': status,
+        'isFavorited': isFavorited
       });
     }
 
@@ -240,10 +244,7 @@ Future<void> updateWords(
     String topicId, List<Map<String, String>> wordsData) async {
   try {
     for (var wordData in wordsData) {
-      // Get the document ID of the word
-      String wordId =
-          wordData['id'] ?? ''; // Assuming 'id' is the key for the document ID
-      // Update the document with the new data
+      String wordId = wordData['id'] ?? '';
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -252,7 +253,8 @@ Future<void> updateWords(
           .set({
         'word': wordData['word'],
         'definition': wordData['definition'],
-        'status': wordData['status']
+        'status': wordData['status'],
+        'isFavorited': wordData['isFavorited']
       });
     }
     print('Words updated successfully');
@@ -261,7 +263,8 @@ Future<void> updateWords(
   }
 }
 
-Future<void> updateWordStatus(String topicId, String wordId, String newStatus) async {
+Future<void> updateWordStatus(
+    String topicId, String wordId, String newStatus) async {
   try {
     await FirebaseFirestore.instance
         .collection('topics')
@@ -269,6 +272,21 @@ Future<void> updateWordStatus(String topicId, String wordId, String newStatus) a
         .collection('words')
         .doc(wordId)
         .update({'status': newStatus});
+    print('Word status updated successfully');
+  } catch (e) {
+    print('Error updating word status: $e');
+  }
+}
+
+Future<void> updateWordIsFavorited(
+    String topicId, String wordId, bool newIsFavorited) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .doc(wordId)
+        .update({'isFavorited': newIsFavorited});
     print('Word status updated successfully');
   } catch (e) {
     print('Error updating word status: $e');
@@ -336,7 +354,6 @@ void deleteFolder(BuildContext context, String folderId) {
   }
 }
 
-
 void deleteTopic(BuildContext context, String topicId) {
   try {
     // Create a batch to perform multiple delete operations atomically
@@ -344,7 +361,7 @@ void deleteTopic(BuildContext context, String topicId) {
 
     // Delete the topic document
     DocumentReference topicRef =
-    FirebaseFirestore.instance.collection('topics').doc(topicId);
+        FirebaseFirestore.instance.collection('topics').doc(topicId);
     batch.delete(topicRef);
 
     // Delete all words associated with the topic
@@ -366,7 +383,6 @@ void deleteTopic(BuildContext context, String topicId) {
         print('Error committing batch delete: $error');
       });
       Navigator.of(context).pop();
-
     }).catchError((error) {
       print('Error fetching words for deletion: $error');
     });

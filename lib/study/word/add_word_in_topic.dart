@@ -12,7 +12,6 @@ class AddWordInTopic extends StatefulWidget {
   _AddWordInTopicState createState() => _AddWordInTopicState();
 }
 
-
 class _AddWordInTopicState extends State<AddWordInTopic> {
   final _formKey = GlobalKey<FormState>();
 
@@ -72,7 +71,13 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
             String? word = wordPageState.getWord();
             String? definition = wordPageState.getDefinition();
             String? status = wordPageState.getStatus();
-            wordsData.add({'word': word, 'definition': definition, 'status': status});
+            bool? isFavorited = wordPageState.getIsFavorited();
+            wordsData.add({
+              'word': word,
+              'definition': definition,
+              'status': status,
+              'isFavorited': isFavorited.toString() ?? ''
+            });
           }
         }
       }

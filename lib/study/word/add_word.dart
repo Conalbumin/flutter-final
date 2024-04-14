@@ -4,12 +4,14 @@ class AddWordPage extends StatefulWidget {
   final String? initialWord;
   final String? initialDefinition;
   final String? initialStatus;
+  final bool? initialIsFavorited;
 
   const AddWordPage({
     Key? key,
     this.initialWord,
     this.initialDefinition,
     this.initialStatus,
+    this.initialIsFavorited,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class AddWordPageState extends State<AddWordPage> {
   late String word;
   late String definition;
   late String status = 'Unlearned';
+  late bool isFavorited = false;
 
   @override
   void initState() {
@@ -32,6 +35,7 @@ class AddWordPageState extends State<AddWordPage> {
     word = widget.initialWord ?? '';
     definition = widget.initialDefinition ?? '';
     status = 'Unlearned';
+    isFavorited = false;
   }
 
   String getWord() {
@@ -45,6 +49,11 @@ class AddWordPageState extends State<AddWordPage> {
   String getStatus() {
     status = 'Unlearned';
     return status;
+  }
+
+  bool getIsFavorited() {
+    isFavorited = false;
+    return isFavorited;
   }
 
   @override

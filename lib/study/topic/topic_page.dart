@@ -26,7 +26,8 @@ class TopicPage extends StatefulWidget {
     required this.topicName,
     required this.numberOfWords,
     required this.text,
-    required this.isPrivate, required this.userId,
+    required this.isPrivate,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -76,8 +77,7 @@ class _TopicPageState extends State<TopicPage> {
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
-            itemBuilder: (BuildContext context) =>
-            <PopupMenuEntry<String>>[
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'edit',
                 child: ListTile(
@@ -116,11 +116,13 @@ class _TopicPageState extends State<TopicPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddWordInTopic(topicId: widget.topicId),
+                    builder: (context) =>
+                        AddWordInTopic(topicId: widget.topicId),
                   ),
                 );
               } else if (choice == 'setPrivate') {
-                setPrivateTopic(widget.topicId, !widget.isPrivate); // Toggle isPrivate
+                setPrivateTopic(
+                    widget.topicId, !widget.isPrivate); // Toggle isPrivate
               }
             },
           ),
@@ -157,13 +159,15 @@ class _TopicPageState extends State<TopicPage> {
                         String word = words[index]['word'];
                         String definition = words[index]['definition'];
                         String status = words[index]['status'];
-                        return WordItem(
+                        bool isFavorited = words[index]['isFavorited'];
+                        return WordWithIcon(
                           definition: definition,
                           word: word,
                           wordId: words[index].id,
                           topicId: widget.topicId,
                           status: status,
-                        ); // Pass context here
+                          isFavorited: isFavorited.toString() ?? '',
+                        );
                       },
                     );
                   }
@@ -201,9 +205,13 @@ class _TopicPageState extends State<TopicPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FlashCardPage(topicId: widget.topicId, numberOfWords: widget.numberOfWords,),
+                          builder: (context) => FlashCardPage(
+                            topicId: widget.topicId,
+                            numberOfWords: widget.numberOfWords,
+                          ),
                         ),
-                      );                    },
+                      );
+                    },
                     child: const FlashCard(),
                   ),
                   const SizedBox(height: 10),
@@ -246,12 +254,14 @@ class _TopicPageState extends State<TopicPage> {
                       String word = words[index]['word'];
                       String definition = words[index]['definition'];
                       String status = words[index]['status'];
+                      bool isFavorited = words[index]['isFavorited'];
                       return WordWithIcon(
                         definition: definition,
                         word: word,
                         wordId: words[index].id,
                         topicId: widget.topicId,
                         status: status,
+                        isFavorited: isFavorited.toString() ?? '',
                       );
                     },
                   );
@@ -281,16 +291,17 @@ class _TopicPageState extends State<TopicPage> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            EditTopicPage(
-              initialTopicName: _topicName,
-              initialDescription: _text,
-              topicId: widget.topicId,
-            ),
+        builder: (context) => EditTopicPage(
+          initialTopicName: _topicName,
+          initialDescription: _text,
+          topicId: widget.topicId,
+        ),
       ),
     );
 
-    if (result != null && result['topicName'] != null && result['description'] != null) {
+    if (result != null &&
+        result['topicName'] != null &&
+        result['description'] != null) {
       setState(() {
         _topicName = result['topicName'];
         _text = result['description'];

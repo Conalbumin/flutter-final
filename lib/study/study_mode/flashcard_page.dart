@@ -330,12 +330,15 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         String word = words[index]['word'];
                         String definition = words[index]['definition'];
                         String status = words[index]['status'];
+                        bool isFavorited = words[index]['isFavorited'];
+
                         return WordItem(
                           definition: definition,
                           word: word,
                           wordId: words[index].id,
                           topicId: widget.topicId,
                           status: status,
+                          isFavorited: isFavorited.toString() ?? '',
                         );
                       },
                     );
