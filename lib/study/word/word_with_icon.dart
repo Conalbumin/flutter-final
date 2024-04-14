@@ -44,20 +44,23 @@ class _WordWithIconState extends State<WordWithIcon> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.word,
-                  style: const TextStyle(fontSize: 35, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-                Text(
-                  widget.definition,
-                  style: const TextStyle(fontSize: 35, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-              ],
+            Flexible(
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.word,
+                    style: const TextStyle(fontSize: 35, color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
+                  Text(
+                    widget.definition,
+                    style: const TextStyle(fontSize: 35, color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ),
             ),
             Row(
               children: [

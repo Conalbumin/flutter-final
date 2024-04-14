@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../firebase_study_page.dart';
 import '../folder/add_topic_to_folder.dart';
@@ -211,7 +212,6 @@ class _TopicPageState extends State<TopicPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      print('FlashCard tapped');
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -227,9 +227,19 @@ class _TopicPageState extends State<TopicPage> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
-                      // Handle onTap for Quiz
-                      print('Quiz tapped');
-                      // Add navigation or other actions as needed
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuizPage(
+                            topicId: widget.topicId,
+                            topicName: widget.topicName,
+                            numberOfWords: widget.numberOfWords,
+                            text: widget.text,
+                            isPrivate: widget.isPrivate,
+                            userId: widget.userId,
+                          ),
+                        ),
+                      );
                     },
                     child: const Quiz(),
                   ),
@@ -269,7 +279,9 @@ class _TopicPageState extends State<TopicPage> {
                               width: 2.0,
                             ),
                           ),
-                          color: showAllWords ? Colors.indigo.withOpacity(0.1) : Colors.transparent,
+                          color: showAllWords
+                              ? Colors.indigo.withOpacity(0.1)
+                              : Colors.transparent,
                         ),
                         child: GestureDetector(
                           onTap: () {
@@ -283,7 +295,8 @@ class _TopicPageState extends State<TopicPage> {
                               'All',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: showAllWords ? Colors.indigo : Colors.black,
+                                color:
+                                    showAllWords ? Colors.indigo : Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                               ),
@@ -294,7 +307,9 @@ class _TopicPageState extends State<TopicPage> {
                     ),
                     Expanded(
                       child: Container(
-                        color: !showAllWords ? Colors.indigo.withOpacity(0.1) : Colors.transparent,
+                        color: !showAllWords
+                            ? Colors.indigo.withOpacity(0.1)
+                            : Colors.transparent,
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -307,7 +322,9 @@ class _TopicPageState extends State<TopicPage> {
                               'Favorited',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: !showAllWords ? Colors.indigo : Colors.black,
+                                color: !showAllWords
+                                    ? Colors.indigo
+                                    : Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                               ),
