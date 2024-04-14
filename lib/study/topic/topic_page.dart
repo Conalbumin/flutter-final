@@ -170,7 +170,7 @@ class _TopicPageState extends State<TopicPage> {
                         String definition = words[index]['definition'];
                         String status = words[index]['status'];
                         bool isFavorited = words[index]['isFavorited'];
-                        return WordWithIcon(
+                        return WordItem(
                           definition: definition,
                           word: word,
                           wordId: words[index].id,
