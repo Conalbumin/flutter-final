@@ -7,18 +7,15 @@ class QuizPage extends StatefulWidget {
   final String topicId;
   final String topicName;
   final int numberOfWords;
-  final String text;
-  final bool isPrivate;
-  final String userId;
+  final int numberOfQuestions;
 
-  const QuizPage(
-      {super.key,
-      required this.topicId,
-      required this.topicName,
-      required this.numberOfWords,
-      required this.text,
-      required this.isPrivate,
-      required this.userId});
+  const QuizPage({
+    Key? key,
+    required this.topicId,
+    required this.topicName,
+    required this.numberOfQuestions,
+    required this.numberOfWords,
+  }) : super(key: key);
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -28,11 +25,126 @@ class _QuizPageState extends State<QuizPage> {
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
   late Future<List<DocumentSnapshot>> wordsFuture;
+  List<DocumentSnapshot> questions = [];
+  List<List<String>> options = [];
+  List<List<bool>> optionSelected = [];
+  List<String> correctAnswers = [];
+  List<String> selectedAnswers = [];
+  String correctAns = '';
+
+  void fetchQuestions() async {
+    try {
+      List<DocumentSnapshot> words = await fetchWords(widget.topicId);
+
+      List<DocumentSnapshot> selectedQuestions =
+      words.sublist(0, widget.numberOfQuestions);
+
+      selectedQuestions.forEach((question) {
+        String correctAnswer = question['definition'];
+
+        List<String> allOptions = [correctAnswer];
+
+        // Shuffle all the words
+        List<DocumentSnapshot> shuffledWords = List.from(words)..shuffle();
+
+        // Select unique options different from the correct answer
+        shuffledWords.forEach((word) {
+          if (allOptions.length < widget.numberOfQuestions) {
+            String option = word['definition'];
+            if (option != correctAnswer && !allOptions.contains(option)) {
+              allOptions.add(option);
+            }
+          }
+        });
+
+        // Shuffle the options for randomness
+        allOptions.shuffle();
+
+        List<bool> selected = List.generate(allOptions.length,
+                (index) => false); // Initialize all options as not selected
+        setState(() {
+          questions.add(question);
+          options.add(allOptions);
+          correctAnswers.add(correctAnswer);
+          selectedAnswers.add('');
+          optionSelected.add(selected);
+        });
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  void checkAnswer(String selectedOption, int questionIndex) {
+    String correctAnswer = correctAnswers[questionIndex];
+    bool isCorrect = selectedOption == correctAnswer;
+    setState(() {
+      correctAns = correctAnswer;
+      selectedAnswers[questionIndex] = selectedOption;
+      optionSelected[questionIndex] = List.generate(
+        optionSelected[questionIndex].length,
+            (index) => options[questionIndex][index] == selectedOption,
+      );
+    });
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isCorrect ? 'Correct!' : 'Incorrect!'),
+          content: Text(isCorrect
+              ? 'You chose the correct answer.'
+              : 'The correct answer is: $correctAnswer'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                // Move to the next question if available
+                if (_currentIndex < widget.numberOfQuestions - 1) {
+                  setState(() {
+                    _currentIndex++;
+                  });
+                } else {
+                  // If there are no more questions, you can handle it here
+                  // For example, show a dialog indicating the end of the quiz
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Quiz Completed!'),
+                        content: Text('You have finished all questions.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              // You can navigate to another page or perform any action here
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Ensure that the widget tree is rebuilt after updating _currentIndex
+    setState(() {});
+  }
+
 
   @override
   void initState() {
     super.initState();
     wordsFuture = fetchWords(widget.topicId);
+    fetchQuestions();
   }
 
   @override
@@ -71,7 +183,7 @@ class _QuizPageState extends State<QuizPage> {
           future: wordsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator(); // Show a loading indicator while fetching data
+              return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
@@ -91,11 +203,22 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Answer(
-                    definition: words[_currentIndex]['definition'] ?? '',
-                    topicId: '',
-                    wordId: '',
-                  ), // Pass the definition to the Answer widget
+                  ...(options[_currentIndex] ?? []).asMap().entries.map((entry) {
+                    int index = entry.key;
+                    String option = entry.value;
+                    bool isSelected = optionSelected[_currentIndex][index];
+                    String correct = correctAns;
+                    return GestureDetector(
+                      onTap: () => checkAnswer(option, _currentIndex),
+                      child: Answer(
+                        topicId: widget.topicId,
+                        wordId: '',
+                        definition: option,
+                        isSelected: isSelected,
+                        correct: correct,
+                      ),
+                    );
+                  }).toList(),
                 ],
               );
             }

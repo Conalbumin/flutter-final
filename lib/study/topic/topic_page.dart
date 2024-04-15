@@ -234,9 +234,7 @@ class _TopicPageState extends State<TopicPage> {
                             topicId: widget.topicId,
                             topicName: widget.topicName,
                             numberOfWords: widget.numberOfWords,
-                            text: widget.text,
-                            isPrivate: widget.isPrivate,
-                            userId: widget.userId,
+                            numberOfQuestions: words.length,
                           ),
                         ),
                       );
