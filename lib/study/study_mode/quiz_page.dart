@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
-import 'answer.dart'; // Import the Answer widget
+import 'answer.dart';
 
 class QuizPage extends StatefulWidget {
   final String topicId;
@@ -29,37 +29,39 @@ class _QuizPageState extends State<QuizPage> {
   List<List<String>> options = [];
   List<List<bool>> optionSelected = [];
   List<String> correctAnswers = [];
+  int numberOfCorrectAns = 0;
   List<String> selectedAnswers = [];
   String correctAns = '';
+  bool showDefinition = false;
 
   void fetchQuestions() async {
     try {
       List<DocumentSnapshot> words = await fetchWords(widget.topicId);
-
       List<DocumentSnapshot> selectedQuestions =
       words.sublist(0, widget.numberOfQuestions);
 
       selectedQuestions.forEach((question) {
-        String correctAnswer = question['definition'];
+        String correctAnswer = showDefinition
+            ? question['word']
+            : question['definition'];
 
         List<String> allOptions = [correctAnswer];
 
-        // Shuffle all the words
         List<DocumentSnapshot> shuffledWords = List.from(words)..shuffle();
 
-        // Select unique options different from the correct answer
         shuffledWords.forEach((word) {
-          if (allOptions.length < widget.numberOfQuestions) {
-            String option = word['definition'];
+          if (allOptions.length < 4) {
+            String option = showDefinition
+                ? word['word']
+                : word['definition'];
             if (option != correctAnswer && !allOptions.contains(option)) {
               allOptions.add(option);
             }
           }
         });
 
-        // Shuffle the options for randomness
         allOptions.shuffle();
-
+        print(allOptions);
         List<bool> selected = List.generate(allOptions.length,
                 (index) => false); // Initialize all options as not selected
         setState(() {
@@ -80,6 +82,7 @@ class _QuizPageState extends State<QuizPage> {
     bool isCorrect = selectedOption == correctAnswer;
     setState(() {
       correctAns = correctAnswer;
+      numberOfCorrectAns++;
       selectedAnswers[questionIndex] = selectedOption;
       optionSelected[questionIndex] = List.generate(
         optionSelected[questionIndex].length,
@@ -99,28 +102,23 @@ class _QuizPageState extends State<QuizPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-
-                // Move to the next question if available
-                if (_currentIndex < widget.numberOfQuestions - 1) {
+                if (_currentIndex <= widget.numberOfQuestions - 1) {
                   setState(() {
                     _currentIndex++;
                   });
                 } else {
-                  // If there are no more questions, you can handle it here
-                  // For example, show a dialog indicating the end of the quiz
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Quiz Completed!'),
-                        content: Text('You have finished all questions.'),
+                        title: const Text('Quiz Completed!'),
+                        content: const Text('You have finished all questions.'),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
-                              // You can navigate to another page or perform any action here
                             },
-                            child: Text('OK'),
+                            child: const Text('OK'),
                           ),
                         ],
                       );
@@ -128,17 +126,14 @@ class _QuizPageState extends State<QuizPage> {
                   );
                 }
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
       },
     );
-
-    // Ensure that the widget tree is rebuilt after updating _currentIndex
     setState(() {});
   }
-
 
   @override
   void initState() {
@@ -153,7 +148,12 @@ class _QuizPageState extends State<QuizPage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Center(
-          child: Text(
+          child: _currentIndex >= widget.numberOfQuestions
+              ? const Text(
+            'Result',
+            style: TextStyle(color: Colors.white, fontSize: 30),
+          )
+              : Text(
             "${_currentIndex + 1}/${widget.numberOfWords}",
             style: const TextStyle(color: Colors.white, fontSize: 30),
           ),
@@ -161,20 +161,27 @@ class _QuizPageState extends State<QuizPage> {
         actions: [
           const SizedBox(width: 15),
           PopupMenuButton<String>(
-              key: _menuKey,
-              icon: const Icon(Icons.settings, color: Colors.white, size: 30),
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'switchLanguage',
-                      child: ListTile(
-                        leading: Icon(Icons.switch_camera),
-                        title: Text('Switch language'),
-                      ),
-                    ),
-                  ],
-              onSelected: (String choice) {
-                if (choice == 'switchLanguage') {}
-              }),
+            key: _menuKey,
+            icon: const Icon(Icons.settings, color: Colors.white, size: 30),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'switchLanguage',
+                child: ListTile(
+                  leading: Icon(Icons.switch_camera),
+                  title: Text('Switch language'),
+                ),
+              ),
+            ],
+            onSelected: (String choice) {
+              if (choice == 'switchLanguage') {
+                setState(() {
+                  print(showDefinition);
+                  showDefinition = !showDefinition;
+                  fetchQuestions();
+                });
+              }
+            },
+          ),
         ],
       ),
       body: Container(
@@ -189,36 +196,105 @@ class _QuizPageState extends State<QuizPage> {
             } else {
               List<DocumentSnapshot> words = snapshot.data ?? [];
               if (words.isEmpty) {
-                return Text('No words found for this topic.');
+                return const Text('No words found for this topic.');
+              }
+              if (_currentIndex >= widget.numberOfQuestions) {
+                int correctCount = 0;
+                for (int i = 0; i < selectedAnswers.length; i++) {
+                  if (selectedAnswers[i] == correctAnswers[i]) {
+                    correctCount++;
+                  }
+                }
+                int incorrectCount = widget.numberOfQuestions - correctCount;
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Quiz Completed!',
+                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Total Score: $correctCount / ${widget.numberOfQuestions}',
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Questions answered correctly:',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Column(
+                        children: selectedAnswers.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          String answer = entry.value;
+                          bool isCorrect = answer == correctAnswers[index];
+                          return ListTile(
+                            title: Text(
+                              'Question: ${words[index]['word']}',
+                              style: TextStyle(
+                                color: isCorrect ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
+                              style: TextStyle(
+                                color: isCorrect ? Colors.green : Colors.red,
+                                  fontSize: 20
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                );
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      words[_currentIndex]['word'] ?? '',
-                      style: TextStyle(fontSize: 30),
-                      textAlign: TextAlign.center,
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          showDefinition ? words[_currentIndex]['definition'] : words[_currentIndex]['word'],
+                          style: const TextStyle(fontSize: 30),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        // Add blank space here if needed
+                      ],
                     ),
                   ),
-                  SizedBox(height: 20),
-                  ...(options[_currentIndex] ?? []).asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String option = entry.value;
-                    bool isSelected = optionSelected[_currentIndex][index];
-                    String correct = correctAns;
-                    return GestureDetector(
-                      onTap: () => checkAnswer(option, _currentIndex),
-                      child: Answer(
-                        topicId: widget.topicId,
-                        wordId: '',
-                        definition: option,
-                        isSelected: isSelected,
-                        correct: correct,
-                      ),
-                    );
-                  }).toList(),
+                  Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      ...options[_currentIndex].asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String option = entry.value;
+                        bool isSelected = optionSelected[_currentIndex][index];
+                        String correct = correctAns;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: GestureDetector(
+                            onTap: () => checkAnswer(option, _currentIndex),
+                            child: Answer(
+                              topicId: widget.topicId,
+                              word: words[_currentIndex]['word'],
+                              definition: option,
+                              isSelected: isSelected,
+                              correct: correct,
+                              showDefinition: showDefinition,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ],
               );
             }

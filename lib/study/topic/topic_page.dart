@@ -52,8 +52,6 @@ class _TopicPageState extends State<TopicPage> {
         words = value;
         favoritedWords =
             words.where((word) => word['isFavorited'] == true).toList();
-        print('All Words: ${words.length}');
-        print('Favorited Words: ${favoritedWords.length}');
       });
     });
   }
@@ -244,9 +242,7 @@ class _TopicPageState extends State<TopicPage> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
-                      // Handle onTap for Type
-                      print('Type tapped');
-                      // Add navigation or other actions as needed
+
                     },
                     child: const Type(),
                   ),
@@ -278,7 +274,7 @@ class _TopicPageState extends State<TopicPage> {
                             ),
                           ),
                           color: showAllWords
-                              ? Colors.indigo.withOpacity(0.1)
+                              ? Colors.indigo.withOpacity(0.3)
                               : Colors.transparent,
                         ),
                         child: GestureDetector(
@@ -306,7 +302,7 @@ class _TopicPageState extends State<TopicPage> {
                     Expanded(
                       child: Container(
                         color: !showAllWords
-                            ? Colors.indigo.withOpacity(0.1)
+                            ? Colors.indigo.withOpacity(0.3)
                             : Colors.transparent,
                         child: GestureDetector(
                           onTap: () {

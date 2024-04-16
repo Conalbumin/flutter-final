@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 
 class Answer extends StatefulWidget {
   final String topicId;
-  final String wordId;
+  final String word;
   final String definition;
   final bool isSelected;
   final String correct;
+  final bool showDefinition;
 
   Answer({
     Key? key,
     required this.topicId,
-    required this.wordId,
+    required this.word,
     required this.definition,
     required this.isSelected,
     required this.correct,
+    required this.showDefinition,
   }) : super(key: key);
 
   @override
@@ -21,29 +23,38 @@ class Answer extends StatefulWidget {
 }
 
 class _AnswerState extends State<Answer> {
+  bool _needsRebuild = false;
+
+  @override
+  void didUpdateWidget(Answer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if showDefinition changed (value comparison)
+    if (oldWidget.showDefinition != widget.showDefinition) {
+      _needsRebuild = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Color borderColor = Colors.grey;
+    Color borderColor = Colors.grey.shade400;
     if (widget.isSelected && widget.definition == widget.correct) {
-      borderColor = Colors.green;
-    } else if (widget.isSelected &&
-        widget.definition != widget.correct) {
-      borderColor = Colors
-          .red;
+      borderColor = Colors.green.shade800;
+    } else if (widget.isSelected && widget.definition != widget.correct) {
+      borderColor = Colors.red;
     }
 
     return FractionallySizedBox(
       widthFactor: 1,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.blue[100],
-          border: Border.all(color: borderColor, width: 3),
+          color: Color.fromARGB(255, 0, 191, 255),
+          border: Border.all(color: borderColor, width: 4),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            widget.definition,
+            widget.showDefinition ? widget.word : widget.definition,
             style: const TextStyle(
               fontSize: 20,
             ),

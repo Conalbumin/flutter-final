@@ -11,14 +11,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 10),
-        SizedBox(
-          width: 390,
+        Container(
+          width: double.infinity,
           child: SearchAnchor(
             builder: (BuildContext context, SearchController controller) {
               return SearchBar(
@@ -52,7 +51,6 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 10),
         Expanded(
-          // Use Expanded to ensure that StreamBuilder takes up all available space
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('topics').snapshots(),
             builder: (context, snapshot) {
@@ -95,3 +93,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
