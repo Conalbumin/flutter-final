@@ -33,12 +33,15 @@ class _QuizPageState extends State<QuizPage> {
   List<String> selectedAnswers = [];
   String correctAns = '';
   bool showDefinition = false;
+  late List<DocumentSnapshot> words;
 
   void fetchQuestions() async {
     try {
       List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
       words.sublist(0, widget.numberOfQuestions);
+
+      List<List<String>> newOptions = []; // New list to hold options
 
       selectedQuestions.forEach((question) {
         String correctAnswer = showDefinition
@@ -51,9 +54,7 @@ class _QuizPageState extends State<QuizPage> {
 
         shuffledWords.forEach((word) {
           if (allOptions.length < 4) {
-            String option = showDefinition
-                ? word['word']
-                : word['definition'];
+            String option = showDefinition ? word['word'] : word['definition'];
             if (option != correctAnswer && !allOptions.contains(option)) {
               allOptions.add(option);
             }
@@ -61,12 +62,23 @@ class _QuizPageState extends State<QuizPage> {
         });
 
         allOptions.shuffle();
-        print(allOptions);
-        List<bool> selected = List.generate(allOptions.length,
-                (index) => false); // Initialize all options as not selected
-        setState(() {
+        newOptions.add(allOptions); // Add options for current question
+      });
+
+      setState(() {
+        questions.clear();
+        options = newOptions; // Update options with newOptions
+        correctAnswers.clear();
+        selectedAnswers.clear();
+        optionSelected.clear();
+
+        selectedQuestions.forEach((question) {
+          String correctAnswer = showDefinition
+              ? question['word']
+              : question['definition'];
+          List<bool> selected = List.generate(
+              options[questions.length].length, (index) => false);
           questions.add(question);
-          options.add(allOptions);
           correctAnswers.add(correctAnswer);
           selectedAnswers.add('');
           optionSelected.add(selected);
@@ -143,6 +155,11 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -175,10 +192,10 @@ class _QuizPageState extends State<QuizPage> {
             onSelected: (String choice) {
               if (choice == 'switchLanguage') {
                 setState(() {
-                  print(showDefinition);
                   showDefinition = !showDefinition;
                   fetchQuestions();
                 });
+                // buildQuizOptions(options[_currentIndex], optionSelected[_currentIndex], correctAns, words);
               }
             },
           ),
@@ -194,7 +211,7 @@ class _QuizPageState extends State<QuizPage> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              List<DocumentSnapshot> words = snapshot.data ?? [];
+              words = snapshot.data ?? [];
               if (words.isEmpty) {
                 return const Text('No words found for this topic.');
               }
@@ -273,26 +290,7 @@ class _QuizPageState extends State<QuizPage> {
                   Column(
                     children: [
                       const SizedBox(height: 20),
-                      ...options[_currentIndex].asMap().entries.map((entry) {
-                        int index = entry.key;
-                        String option = entry.value;
-                        bool isSelected = optionSelected[_currentIndex][index];
-                        String correct = correctAns;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: GestureDetector(
-                            onTap: () => checkAnswer(option, _currentIndex),
-                            child: Answer(
-                              topicId: widget.topicId,
-                              word: words[_currentIndex]['word'],
-                              definition: option,
-                              isSelected: isSelected,
-                              correct: correct,
-                              showDefinition: showDefinition,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      buildQuizOptions(options[_currentIndex], optionSelected[_currentIndex], correctAns, words),
                     ],
                   ),
                 ],
@@ -301,6 +299,30 @@ class _QuizPageState extends State<QuizPage> {
           },
         ),
       ),
+    );
+  }
+
+  Widget buildQuizOptions(List<String> options, List<bool> optionSelected, String correctAns, List<DocumentSnapshot> words) {
+    return Column(
+      children: options.asMap().entries.map((entry) {
+        int index = entry.key;
+        String option = entry.value;
+        bool isSelected = optionSelected[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: GestureDetector(
+            onTap: () => checkAnswer(option, _currentIndex),
+            child: Answer(
+              topicId: widget.topicId,
+              word: words[index]['word'],
+              definition: option,
+              isSelected: isSelected,
+              correct: correctAns,
+              showDefinition: showDefinition,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
