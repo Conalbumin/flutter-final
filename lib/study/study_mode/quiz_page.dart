@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import '../word/text_to_speech.dart';
 import 'answer.dart';
 
 class QuizPage extends StatefulWidget {
@@ -67,7 +68,7 @@ class _QuizPageState extends State<QuizPage> {
 
       setState(() {
         questions.clear();
-        options = newOptions; // Update options with newOptions
+        options = newOptions;
         correctAnswers.clear();
         selectedAnswers.clear();
         optionSelected.clear();
@@ -194,6 +195,8 @@ class _QuizPageState extends State<QuizPage> {
                 setState(() {
                   showDefinition = !showDefinition;
                   fetchQuestions();
+                  // print(selectedAnswers);
+
                 });
                 // buildQuizOptions(options[_currentIndex], optionSelected[_currentIndex], correctAns, words);
               }
@@ -217,10 +220,23 @@ class _QuizPageState extends State<QuizPage> {
               }
               if (_currentIndex >= widget.numberOfQuestions) {
                 int correctCount = 0;
+                String feedback = '';
+                Color feedbackColor = Colors.black;
                 for (int i = 0; i < selectedAnswers.length; i++) {
                   if (selectedAnswers[i] == correctAnswers[i]) {
                     correctCount++;
                   }
+                }
+                double percentage = (correctCount / widget.numberOfQuestions) * 100;
+                if (percentage > 80) {
+                  feedback = 'Excellent';
+                  feedbackColor = Colors.green.shade600;
+                } else if (percentage < 50) {
+                  feedback = 'Practice more';
+                  feedbackColor = Colors.red;
+                } else {
+                  feedback = 'Good job';
+                  feedbackColor = Colors.lightGreen.shade400;
                 }
                 int incorrectCount = widget.numberOfQuestions - correctCount;
                 return SingleChildScrollView(
@@ -236,6 +252,11 @@ class _QuizPageState extends State<QuizPage> {
                       Text(
                         'Total Score: $correctCount / ${widget.numberOfQuestions}',
                         style: const TextStyle(fontSize: 25),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Feedback: $feedback',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: feedbackColor),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -277,13 +298,18 @@ class _QuizPageState extends State<QuizPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        if (!showDefinition)
+                          IconButton(
+                            icon: Icon(Icons.volume_up, size: 30,),
+                            onPressed: () {
+                              String word = showDefinition ? words[_currentIndex]['definition'] : words[_currentIndex]['word'];
+                              speak(word);                            },
+                          ),
                         Text(
                           showDefinition ? words[_currentIndex]['definition'] : words[_currentIndex]['word'],
                           style: const TextStyle(fontSize: 30),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 20),
-                        // Add blank space here if needed
                       ],
                     ),
                   ),
@@ -314,8 +340,8 @@ class _QuizPageState extends State<QuizPage> {
             onTap: () => checkAnswer(option, _currentIndex),
             child: Answer(
               topicId: widget.topicId,
-              word: words[index]['word'],
-              definition: option,
+              word: showDefinition ? option : words[index]['word'],
+              definition: showDefinition ? words[index]['definition'] : option,
               isSelected: isSelected,
               correct: correctAns,
               showDefinition: showDefinition,

@@ -37,9 +37,9 @@ class _AnswerState extends State<Answer> {
   @override
   Widget build(BuildContext context) {
     Color borderColor = Colors.grey.shade400;
-    if (widget.isSelected && widget.definition == widget.correct) {
+    if (widget.isSelected && widget.definition == widget.correct || widget.isSelected && widget.word == widget.correct) {
       borderColor = Colors.green.shade800;
-    } else if (widget.isSelected && widget.definition != widget.correct) {
+    } else if (widget.isSelected && widget.definition != widget.correct || widget.isSelected && widget.word != widget.correct) {
       borderColor = Colors.red;
     }
 
