@@ -1,107 +1,66 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
-import '../word/text_to_speech.dart';
-import 'answer.dart';
 
-class QuizPage extends StatefulWidget {
+import '../firebase_study_page.dart';
+
+class TypingPage extends StatefulWidget {
   final String topicId;
   final String topicName;
   final int numberOfWords;
   final int numberOfQuestions;
 
-  const QuizPage({
-    Key? key,
-    required this.topicId,
-    required this.topicName,
-    required this.numberOfQuestions,
-    required this.numberOfWords,
-  }) : super(key: key);
+  const TypingPage(
+      {super.key,
+      required this.topicId,
+      required this.topicName,
+      required this.numberOfWords,
+      required this.numberOfQuestions});
 
   @override
-  State<QuizPage> createState() => _QuizPageState();
+  State<TypingPage> createState() => _TypingPageState();
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _TypingPageState extends State<TypingPage> {
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
   late Future<List<DocumentSnapshot>> wordsFuture;
   List<DocumentSnapshot> questions = [];
-  List<List<String>> options = [];
-  List<List<bool>> optionSelected = [];
+  FocusNode _textFocus = FocusNode();
   List<String> correctAnswers = [];
   int numberOfCorrectAns = 0;
-  List<String> selectedAnswers = [];
+  List<String> userAnswers = [];
   String correctAns = '';
   bool showDefinition = false;
   late List<DocumentSnapshot> words;
-  bool hasSpoken = false;
+  String userInput = '';
 
-  void fetchQuestions() async {
+  void fetchAnswers() async {
     try {
       List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
           words.sublist(0, widget.numberOfQuestions);
 
-      List<List<String>> newOptions = []; // New list to hold options
-
       selectedQuestions.forEach((question) {
         String correctAnswer =
             showDefinition ? question['word'] : question['definition'];
 
-        List<String> allOptions = [correctAnswer];
-
-        List<DocumentSnapshot> shuffledWords = List.from(words)..shuffle();
-
-        shuffledWords.forEach((word) {
-          if (allOptions.length < 4) {
-            String option = showDefinition ? word['word'] : word['definition'];
-            if (option != correctAnswer && !allOptions.contains(option)) {
-              allOptions.add(option);
-            }
-          }
-        });
-
-        allOptions.shuffle();
-        newOptions.add(allOptions); // Add options for current question
-      });
-
-      setState(() {
-        questions.clear();
-        options = newOptions;
-        correctAnswers.clear();
-        selectedAnswers.clear();
-        optionSelected.clear();
-
-        selectedQuestions.forEach((question) {
-          String correctAnswer =
-              showDefinition ? question['word'] : question['definition'];
-          List<bool> selected =
-              List.generate(options[questions.length].length, (index) => false);
-          questions.add(question);
-          correctAnswers.add(correctAnswer);
-          selectedAnswers.add('');
-          optionSelected.add(selected);
-        });
+        correctAnswers.add(correctAnswer);
+        print(correctAnswers);
       });
     } catch (error) {
       throw error;
     }
   }
 
-  void checkAnswer(String selectedOption, int questionIndex) {
+  void checkAnswer(String answer, int questionIndex) {
     String correctAnswer = correctAnswers[questionIndex];
-    bool isCorrect = selectedOption == correctAnswer;
+    bool isCorrect = answer == correctAnswer;
     setState(() {
-      correctAns = correctAnswer;
       numberOfCorrectAns++;
-      selectedAnswers[questionIndex] = selectedOption;
-      optionSelected[questionIndex] = List.generate(
-        optionSelected[questionIndex].length,
-        (index) => options[questionIndex][index] == selectedOption,
-      );
+      userInput = '';
     });
 
+    _textFocus.unfocus();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -144,14 +103,13 @@ class _QuizPageState extends State<QuizPage> {
         );
       },
     );
-    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     wordsFuture = fetchWords(widget.topicId);
-    fetchQuestions();
+    fetchAnswers();
   }
 
   @override
@@ -188,7 +146,7 @@ class _QuizPageState extends State<QuizPage> {
               if (choice == 'switchLanguage') {
                 setState(() {
                   showDefinition = !showDefinition;
-                  fetchQuestions();
+                  fetchAnswers();
                 });
               }
             },
@@ -213,8 +171,8 @@ class _QuizPageState extends State<QuizPage> {
                 int correctCount = 0;
                 String feedback = '';
                 Color feedbackColor = Colors.black;
-                for (int i = 0; i < selectedAnswers.length; i++) {
-                  if (selectedAnswers[i] == correctAnswers[i]) {
+                for (int i = 0; i < correctAnswers.length; i++) {
+                  if (userAnswers[i] == correctAnswers[i]) {
                     correctCount++;
                   }
                 }
@@ -260,7 +218,7 @@ class _QuizPageState extends State<QuizPage> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Column(
-                        children: selectedAnswers.asMap().entries.map((entry) {
+                        children: correctAnswers.asMap().entries.map((entry) {
                           int index = entry.key;
                           String answer = entry.value;
                           bool isCorrect = answer == correctAnswers[index];
@@ -280,15 +238,10 @@ class _QuizPageState extends State<QuizPage> {
                             ),
                           );
                         }).toList(),
-                      ),
+                      )
                     ],
                   ),
                 );
-              }
-              if (!hasSpoken) {
-                String wordToSpeak = words[_currentIndex]['word'];
-                speak(wordToSpeak);
-                hasSpoken = true;
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -297,68 +250,59 @@ class _QuizPageState extends State<QuizPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (!showDefinition)
-                          IconButton(
-                            icon: const Icon(
-                              Icons.volume_up,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              String word = showDefinition
-                                  ? words[_currentIndex]['definition']
-                                  : words[_currentIndex]['word'];
-                              speak(word);
-                            },
-                          ),
                         Text(
                           showDefinition
                               ? words[_currentIndex]['definition']
                               : words[_currentIndex]['word'],
                           style: const TextStyle(fontSize: 30),
                           textAlign: TextAlign.center,
-                        ),
+                        )
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      buildQuizOptions(options[_currentIndex],
-                          optionSelected[_currentIndex], correctAns, words),
-                    ],
-                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            key: UniqueKey(),
+                            focusNode: _textFocus,
+                            onChanged: (value) {
+                              userInput = value;
+                              userAnswers.add(userInput);
+                            },
+                            decoration: const InputDecoration(
+                              hintText: 'Type your answer here...',
+                              labelText: 'Answer',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            checkAnswer(userInput, _currentIndex);
+                            print(userAnswers);
+                            print(correctAnswers);
+                          },
+                          child: const Icon(Icons.navigate_next, size: 50),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blue,
+                            minimumSize: const Size(10, 60),
+                            elevation: 5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               );
             }
           },
         ),
       ),
-    );
-  }
-
-
-  Widget buildQuizOptions(List<String> options, List<bool> optionSelected,
-      String correctAns, List<DocumentSnapshot> words) {
-    return Column(
-      children: options.asMap().entries.map((entry) {
-        int index = entry.key;
-        String option = entry.value;
-        bool isSelected = optionSelected[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: GestureDetector(
-            onTap: () => checkAnswer(option, _currentIndex),
-            child: Answer(
-              topicId: widget.topicId,
-              word: showDefinition ? option : words[index]['word'],
-              definition: showDefinition ? words[index]['definition'] : option,
-              isSelected: isSelected,
-              correct: correctAns,
-              showDefinition: showDefinition,
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
+import 'package:quizlet_final_flutter/study/study_mode/typing_page.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../firebase_study_page.dart';
 import '../folder/add_topic_to_folder.dart';
@@ -242,7 +243,17 @@ class _TopicPageState extends State<TopicPage> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
-
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TypingPage(
+                            topicId: widget.topicId,
+                            topicName: widget.topicName,
+                            numberOfWords: widget.numberOfWords,
+                            numberOfQuestions: words.length,
+                          ),
+                        ),
+                      );
                     },
                     child: const Type(),
                   ),
