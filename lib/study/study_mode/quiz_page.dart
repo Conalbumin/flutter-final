@@ -35,19 +35,19 @@ class _QuizPageState extends State<QuizPage> {
   String correctAns = '';
   bool showDefinition = false;
   late List<DocumentSnapshot> words;
+  bool hasSpoken = false;
 
   void fetchQuestions() async {
     try {
       List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
-      words.sublist(0, widget.numberOfQuestions);
+          words.sublist(0, widget.numberOfQuestions);
 
       List<List<String>> newOptions = []; // New list to hold options
 
       selectedQuestions.forEach((question) {
-        String correctAnswer = showDefinition
-            ? question['word']
-            : question['definition'];
+        String correctAnswer =
+            showDefinition ? question['word'] : question['definition'];
 
         List<String> allOptions = [correctAnswer];
 
@@ -74,11 +74,10 @@ class _QuizPageState extends State<QuizPage> {
         optionSelected.clear();
 
         selectedQuestions.forEach((question) {
-          String correctAnswer = showDefinition
-              ? question['word']
-              : question['definition'];
-          List<bool> selected = List.generate(
-              options[questions.length].length, (index) => false);
+          String correctAnswer =
+              showDefinition ? question['word'] : question['definition'];
+          List<bool> selected =
+              List.generate(options[questions.length].length, (index) => false);
           questions.add(question);
           correctAnswers.add(correctAnswer);
           selectedAnswers.add('');
@@ -99,7 +98,7 @@ class _QuizPageState extends State<QuizPage> {
       selectedAnswers[questionIndex] = selectedOption;
       optionSelected[questionIndex] = List.generate(
         optionSelected[questionIndex].length,
-            (index) => options[questionIndex][index] == selectedOption,
+        (index) => options[questionIndex][index] == selectedOption,
       );
     });
 
@@ -156,11 +155,6 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -168,13 +162,13 @@ class _QuizPageState extends State<QuizPage> {
         title: Center(
           child: _currentIndex >= widget.numberOfQuestions
               ? const Text(
-            'Result',
-            style: TextStyle(color: Colors.white, fontSize: 30),
-          )
+                  'Result',
+                  style: TextStyle(color: Colors.white, fontSize: 30),
+                )
               : Text(
-            "${_currentIndex + 1}/${widget.numberOfWords}",
-            style: const TextStyle(color: Colors.white, fontSize: 30),
-          ),
+                  "${_currentIndex + 1}/${widget.numberOfWords}",
+                  style: const TextStyle(color: Colors.white, fontSize: 30),
+                ),
         ),
         actions: [
           const SizedBox(width: 15),
@@ -195,10 +189,7 @@ class _QuizPageState extends State<QuizPage> {
                 setState(() {
                   showDefinition = !showDefinition;
                   fetchQuestions();
-                  // print(selectedAnswers);
-
                 });
-                // buildQuizOptions(options[_currentIndex], optionSelected[_currentIndex], correctAns, words);
               }
             },
           ),
@@ -227,7 +218,8 @@ class _QuizPageState extends State<QuizPage> {
                     correctCount++;
                   }
                 }
-                double percentage = (correctCount / widget.numberOfQuestions) * 100;
+                double percentage =
+                    (correctCount / widget.numberOfQuestions) * 100;
                 if (percentage > 80) {
                   feedback = 'Excellent';
                   feedbackColor = Colors.green.shade600;
@@ -246,7 +238,8 @@ class _QuizPageState extends State<QuizPage> {
                     children: [
                       const Text(
                         'Quiz Completed!',
-                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
@@ -256,7 +249,10 @@ class _QuizPageState extends State<QuizPage> {
                       const SizedBox(height: 20),
                       Text(
                         'Feedback: $feedback',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: feedbackColor),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: feedbackColor),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -272,17 +268,15 @@ class _QuizPageState extends State<QuizPage> {
                             title: Text(
                               'Question: ${words[index]['word']}',
                               style: TextStyle(
-                                color: isCorrect ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22
-                              ),
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22),
                             ),
                             subtitle: Text(
                               'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
                               style: TextStyle(
-                                color: isCorrect ? Colors.green : Colors.red,
-                                  fontSize: 20
-                              ),
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontSize: 20),
                             ),
                           );
                         }).toList(),
@@ -290,6 +284,12 @@ class _QuizPageState extends State<QuizPage> {
                     ],
                   ),
                 );
+              }
+              if (!hasSpoken) {
+                // Speak the word only if it hasn't been spoken yet
+                String wordToSpeak = words[_currentIndex]['word'];
+                speak(wordToSpeak);
+                hasSpoken = true;
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -300,13 +300,21 @@ class _QuizPageState extends State<QuizPage> {
                       children: [
                         if (!showDefinition)
                           IconButton(
-                            icon: Icon(Icons.volume_up, size: 30,),
+                            icon: Icon(
+                              Icons.volume_up,
+                              size: 30,
+                            ),
                             onPressed: () {
-                              String word = showDefinition ? words[_currentIndex]['definition'] : words[_currentIndex]['word'];
-                              speak(word);                            },
+                              String word = showDefinition
+                                  ? words[_currentIndex]['definition']
+                                  : words[_currentIndex]['word'];
+                              speak(word);
+                            },
                           ),
                         Text(
-                          showDefinition ? words[_currentIndex]['definition'] : words[_currentIndex]['word'],
+                          showDefinition
+                              ? words[_currentIndex]['definition']
+                              : words[_currentIndex]['word'],
                           style: const TextStyle(fontSize: 30),
                           textAlign: TextAlign.center,
                         ),
@@ -316,7 +324,8 @@ class _QuizPageState extends State<QuizPage> {
                   Column(
                     children: [
                       const SizedBox(height: 20),
-                      buildQuizOptions(options[_currentIndex], optionSelected[_currentIndex], correctAns, words),
+                      buildQuizOptions(options[_currentIndex],
+                          optionSelected[_currentIndex], correctAns, words),
                     ],
                   ),
                 ],
@@ -328,7 +337,8 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  Widget buildQuizOptions(List<String> options, List<bool> optionSelected, String correctAns, List<DocumentSnapshot> words) {
+  Widget buildQuizOptions(List<String> options, List<bool> optionSelected,
+      String correctAns, List<DocumentSnapshot> words) {
     return Column(
       children: options.asMap().entries.map((entry) {
         int index = entry.key;
