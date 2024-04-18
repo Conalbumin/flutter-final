@@ -84,6 +84,7 @@ class _QuizPageState extends State<QuizPage> {
           optionSelected.add(selected);
         });
       });
+      print(selectedAnswers);
     } catch (error) {
       throw error;
     }
@@ -335,7 +336,6 @@ class _QuizPageState extends State<QuizPage> {
       ),
     );
   }
-
 
   Widget buildQuizOptions(List<String> options, List<bool> optionSelected,
       String correctAns, List<DocumentSnapshot> words) {

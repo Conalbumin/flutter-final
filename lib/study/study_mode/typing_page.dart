@@ -43,10 +43,9 @@ class _TypingPageState extends State<TypingPage> {
       selectedQuestions.forEach((question) {
         String correctAnswer =
             showDefinition ? question['word'] : question['definition'];
-
-        correctAnswers.add(correctAnswer);
-        print(correctAnswers);
+        correctAnswers.add(correctAnswer.toLowerCase());
       });
+
     } catch (error) {
       throw error;
     }
@@ -54,8 +53,10 @@ class _TypingPageState extends State<TypingPage> {
 
   void checkAnswer(String answer, int questionIndex) {
     String correctAnswer = correctAnswers[questionIndex];
-    bool isCorrect = answer == correctAnswer;
+    bool isCorrect = answer.toLowerCase() == correctAnswer;
+
     setState(() {
+      userAnswers.add(userInput);
       numberOfCorrectAns++;
       userInput = '';
     });
@@ -171,7 +172,7 @@ class _TypingPageState extends State<TypingPage> {
                 int correctCount = 0;
                 String feedback = '';
                 Color feedbackColor = Colors.black;
-                for (int i = 0; i < correctAnswers.length; i++) {
+                for (int i = 0; i < widget.numberOfQuestions; i++) {
                   if (userAnswers[i] == correctAnswers[i]) {
                     correctCount++;
                   }
@@ -188,7 +189,6 @@ class _TypingPageState extends State<TypingPage> {
                   feedback = 'Good job';
                   feedbackColor = Colors.lightGreen.shade400;
                 }
-                int incorrectCount = widget.numberOfQuestions - correctCount;
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -218,10 +218,11 @@ class _TypingPageState extends State<TypingPage> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Column(
-                        children: correctAnswers.asMap().entries.map((entry) {
+                        children: userAnswers.asMap().entries.map((entry) {
                           int index = entry.key;
                           String answer = entry.value;
-                          bool isCorrect = answer == correctAnswers[index];
+                          print('answer ${answer}');
+                          bool isCorrect = answer.toLowerCase() == userAnswers[index];
                           return ListTile(
                             title: Text(
                               'Question: ${words[index]['word']}',
@@ -231,7 +232,7 @@ class _TypingPageState extends State<TypingPage> {
                                   fontSize: 22),
                             ),
                             subtitle: Text(
-                              'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
+                              'Your Answer: $answer\nCorrect Answer: ${userAnswers[index]}',
                               style: TextStyle(
                                   color: isCorrect ? Colors.green : Colors.red,
                                   fontSize: 20),
@@ -270,7 +271,6 @@ class _TypingPageState extends State<TypingPage> {
                             focusNode: _textFocus,
                             onChanged: (value) {
                               userInput = value;
-                              userAnswers.add(userInput);
                             },
                             decoration: const InputDecoration(
                               hintText: 'Type your answer here...',
@@ -283,8 +283,6 @@ class _TypingPageState extends State<TypingPage> {
                         ElevatedButton(
                           onPressed: () {
                             checkAnswer(userInput, _currentIndex);
-                            print(userAnswers);
-                            print(correctAnswers);
                           },
                           child: const Icon(Icons.navigate_next, size: 50),
                           style: ElevatedButton.styleFrom(
