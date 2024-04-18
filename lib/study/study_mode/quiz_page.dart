@@ -84,7 +84,6 @@ class _QuizPageState extends State<QuizPage> {
           optionSelected.add(selected);
         });
       });
-      print(selectedAnswers);
     } catch (error) {
       throw error;
     }

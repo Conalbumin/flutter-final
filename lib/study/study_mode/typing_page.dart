@@ -26,9 +26,11 @@ class _TypingPageState extends State<TypingPage> {
   late Future<List<DocumentSnapshot>> wordsFuture;
   List<DocumentSnapshot> questions = [];
   FocusNode _textFocus = FocusNode();
+  List<String> correctAnswersInCode = [];
   List<String> correctAnswers = [];
   int numberOfCorrectAns = 0;
   List<String> userAnswers = [];
+  List<String> userAnswersInCode = [];
   String correctAns = '';
   bool showDefinition = false;
   late List<DocumentSnapshot> words;
@@ -43,7 +45,8 @@ class _TypingPageState extends State<TypingPage> {
       selectedQuestions.forEach((question) {
         String correctAnswer =
             showDefinition ? question['word'] : question['definition'];
-        correctAnswers.add(correctAnswer.toLowerCase());
+        correctAnswers.add(correctAnswer);
+        correctAnswersInCode.add(correctAnswer.toLowerCase());
       });
 
     } catch (error) {
@@ -52,11 +55,12 @@ class _TypingPageState extends State<TypingPage> {
   }
 
   void checkAnswer(String answer, int questionIndex) {
-    String correctAnswer = correctAnswers[questionIndex];
+    String correctAnswer = correctAnswersInCode[questionIndex];
     bool isCorrect = answer.toLowerCase() == correctAnswer;
 
     setState(() {
       userAnswers.add(userInput);
+      userAnswersInCode.add(userInput.toLowerCase());
       numberOfCorrectAns++;
       userInput = '';
     });
@@ -173,7 +177,7 @@ class _TypingPageState extends State<TypingPage> {
                 String feedback = '';
                 Color feedbackColor = Colors.black;
                 for (int i = 0; i < widget.numberOfQuestions; i++) {
-                  if (userAnswers[i] == correctAnswers[i]) {
+                  if (userAnswersInCode[i] == correctAnswersInCode[i]) {
                     correctCount++;
                   }
                 }
@@ -221,8 +225,7 @@ class _TypingPageState extends State<TypingPage> {
                         children: userAnswers.asMap().entries.map((entry) {
                           int index = entry.key;
                           String answer = entry.value;
-                          print('answer ${answer}');
-                          bool isCorrect = answer.toLowerCase() == userAnswers[index];
+                          bool isCorrect = answer.toLowerCase() == correctAnswers[index].toLowerCase();
                           return ListTile(
                             title: Text(
                               'Question: ${words[index]['word']}',
@@ -232,7 +235,7 @@ class _TypingPageState extends State<TypingPage> {
                                   fontSize: 22),
                             ),
                             subtitle: Text(
-                              'Your Answer: $answer\nCorrect Answer: ${userAnswers[index]}',
+                              'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
                               style: TextStyle(
                                   color: isCorrect ? Colors.green : Colors.red,
                                   fontSize: 20),
