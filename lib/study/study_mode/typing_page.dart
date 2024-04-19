@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../firebase_study_page.dart';
+import '../word/text_to_speech.dart';
 
 class TypingPage extends StatefulWidget {
   final String topicId;
@@ -24,17 +25,40 @@ class _TypingPageState extends State<TypingPage> {
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
   late Future<List<DocumentSnapshot>> wordsFuture;
-  List<DocumentSnapshot> questions = [];
   FocusNode _textFocus = FocusNode();
   List<String> correctAnswersInCode = [];
   List<String> correctAnswers = [];
+  List<String> newCorrectAnswers = [];
+  List<String> newCorrectAnswersInCode = [];
   int numberOfCorrectAns = 0;
   List<String> userAnswers = [];
   List<String> userAnswersInCode = [];
-  String correctAns = '';
   bool showDefinition = false;
   late List<DocumentSnapshot> words;
   String userInput = '';
+  bool hasSpoken = false;
+
+  void shuffleWords() {
+    setState(() {
+      List<int> indices = List<int>.generate(words.length, (index) => index);
+      indices.shuffle();
+      List<DocumentSnapshot> shuffledWords = List<DocumentSnapshot>.from(words);
+      List<String> shuffledCorrectAnswers = List<String>.from(correctAnswers);
+      List<String> shuffledCorrectAnswersInCode = List<String>.from(correctAnswersInCode);
+
+      words.clear();
+      indices.forEach((index) {
+        words.add(shuffledWords[index]);
+      });
+
+      correctAnswers.clear();
+      correctAnswersInCode.clear();
+      indices.forEach((index) {
+        correctAnswers.add(shuffledCorrectAnswers[index]);
+        correctAnswersInCode.add(shuffledCorrectAnswersInCode[index]);
+      });
+    });
+  }
 
   void fetchAnswers() async {
     try {
@@ -47,6 +71,13 @@ class _TypingPageState extends State<TypingPage> {
             showDefinition ? question['word'] : question['definition'];
         correctAnswers.add(correctAnswer);
         correctAnswersInCode.add(correctAnswer.toLowerCase());
+        newCorrectAnswers.add(correctAnswer);
+        newCorrectAnswersInCode.add(correctAnswer.toLowerCase());
+      });
+
+      setState(() {
+        correctAnswers = newCorrectAnswers;
+        correctAnswersInCode = newCorrectAnswersInCode;
       });
 
     } catch (error) {
@@ -146,6 +177,13 @@ class _TypingPageState extends State<TypingPage> {
                   title: Text('Switch language'),
                 ),
               ),
+              PopupMenuItem<String>(
+                value: 'shuffle',
+                child: ListTile(
+                  leading: Icon(Icons.shuffle),
+                  title: Text('Shuffle words'),
+                ),
+              ),
             ],
             onSelected: (String choice) {
               if (choice == 'switchLanguage') {
@@ -153,6 +191,8 @@ class _TypingPageState extends State<TypingPage> {
                   showDefinition = !showDefinition;
                   fetchAnswers();
                 });
+              } else if (choice == 'shuffle') {
+                shuffleWords();
               }
             },
           ),
@@ -225,11 +265,13 @@ class _TypingPageState extends State<TypingPage> {
                         children: userAnswers.asMap().entries.map((entry) {
                           int index = entry.key;
                           String answer = entry.value;
-                          bool isCorrect = answer.toLowerCase() == correctAnswers[index].toLowerCase();
+                          bool isCorrect = answer.toLowerCase() ==
+                              correctAnswers[index].toLowerCase();
                           return ListTile(
                             title: Text(
-                              'Question: ${words[index]['word']}',
-                              style: TextStyle(
+                              showDefinition
+                                  ?  'Question: ${words[index]['definition']}'
+                                  :  'Question: ${words[index]['word']}',                              style: TextStyle(
                                   color: isCorrect ? Colors.green : Colors.red,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 22),
@@ -247,6 +289,11 @@ class _TypingPageState extends State<TypingPage> {
                   ),
                 );
               }
+              if (!hasSpoken) {
+                String wordToSpeak = words[_currentIndex]['word'];
+                speak(wordToSpeak);
+                hasSpoken = true;
+              }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -254,6 +301,19 @@ class _TypingPageState extends State<TypingPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        if (!showDefinition)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.volume_up,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              String word = showDefinition
+                                  ? words[_currentIndex]['definition']
+                                  : words[_currentIndex]['word'];
+                              speak(word);
+                            },
+                          ),
                         Text(
                           showDefinition
                               ? words[_currentIndex]['definition']

@@ -37,13 +37,34 @@ class _QuizPageState extends State<QuizPage> {
   late List<DocumentSnapshot> words;
   bool hasSpoken = false;
 
+  void shuffleQuestionsAndOptions() {
+    setState(() {
+      List<int> indices = List<int>.generate(words.length, (index) => index);
+      indices.shuffle();
+      List<DocumentSnapshot> shuffledWords = List<DocumentSnapshot>.from(words);
+      List<List<String>> shuffledOptions = List<List<String>>.from(options);
+      List<String> shuffledCorrectAnswers = List<String>.from(correctAnswers);
+
+      words.clear();
+      options.clear();
+      correctAnswers.clear();
+
+      indices.forEach((index) {
+        words.add(shuffledWords[index]);
+        options.add(shuffledOptions[index]);
+        correctAnswers.add(shuffledCorrectAnswers[index]);
+      });
+    });
+  }
+
+
   void fetchQuestions() async {
     try {
       List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
           words.sublist(0, widget.numberOfQuestions);
 
-      List<List<String>> newOptions = []; // New list to hold options
+      List<List<String>> newOptions = [];
 
       selectedQuestions.forEach((question) {
         String correctAnswer =
@@ -63,7 +84,7 @@ class _QuizPageState extends State<QuizPage> {
         });
 
         allOptions.shuffle();
-        newOptions.add(allOptions); // Add options for current question
+        newOptions.add(allOptions);
       });
 
       setState(() {
@@ -183,6 +204,13 @@ class _QuizPageState extends State<QuizPage> {
                   title: Text('Switch language'),
                 ),
               ),
+              const PopupMenuItem<String>(
+                value: 'shuffle',
+                child: ListTile(
+                  leading: Icon(Icons.shuffle),
+                  title: Text('Shuffle words'),
+                ),
+              ),
             ],
             onSelected: (String choice) {
               if (choice == 'switchLanguage') {
@@ -190,6 +218,8 @@ class _QuizPageState extends State<QuizPage> {
                   showDefinition = !showDefinition;
                   fetchQuestions();
                 });
+              } else if (choice == 'shuffle') {
+                shuffleQuestionsAndOptions();
               }
             },
           ),
@@ -266,7 +296,9 @@ class _QuizPageState extends State<QuizPage> {
                           bool isCorrect = answer == correctAnswers[index];
                           return ListTile(
                             title: Text(
-                              'Question: ${words[index]['word']}',
+                              showDefinition
+                                  ?  'Question: ${words[index]['definition']}'
+                                  :  'Question: ${words[index]['word']}',
                               style: TextStyle(
                                   color: isCorrect ? Colors.green : Colors.red,
                                   fontWeight: FontWeight.bold,

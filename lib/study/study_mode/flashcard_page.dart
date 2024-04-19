@@ -22,32 +22,24 @@ class FlashCardPage extends StatefulWidget {
 class _FlashCardPageState extends State<FlashCardPage> {
   int _currentIndex = 0;
   late List<String> wordStatuses;
+  List<DocumentSnapshot> words = [];
   int countLearned = 0;
   int countUnlearned = 0;
   int countMastered = 0;
   bool autoSpeak = true;
-  late List<DocumentSnapshot> snapshotData;
   late SwiperController _swiperController;
   Timer? _timer;
-  bool autoplay = true;
+  bool autoplay = false;
   GlobalKey _menuKey = GlobalKey();
 
-  void shuffleWords() {
+  void shuffleWords(List<DocumentSnapshot> words) {
     setState(() {
-      if (snapshotData.isNotEmpty) {
-        print("before ${snapshotData}");
-        snapshotData.toList().shuffle();
-        print("after ${snapshotData}");
-        _currentIndex = 0;
-        countLearned = 0;
-        countUnlearned = 0;
+      words.shuffle();
+      _currentIndex = 0;
+      if (autoSpeak) {
+        speak(words[_currentIndex]['word']);
       }
-    });
-  }
-
-  void handleShuffleWords() {
-    setState(() {
-      shuffleWords(); // Call the shuffle function here
+      this.words = words;
     });
   }
 
@@ -57,15 +49,15 @@ class _FlashCardPageState extends State<FlashCardPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Congratulations!'),
-            content: Text('You have finished studying this topic.'),
+            title: const Text('Congratulations!'),
+            content: const Text('You have finished studying this topic.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -92,12 +84,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
-
   void startAutoPlay() {
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_swiperController.index < (widget.numberOfWords - 1)) {
-        print(_swiperController.index);
-        print(widget.numberOfWords - 1);
         _swiperController.next();
         _swiperController.index++;
       } else {
@@ -110,10 +99,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
   void initState() {
     super.initState();
     _swiperController = SwiperController();
-    startAutoPlay();
-    fetchWords(widget.topicId).then((words) {
+    // startAutoPlay();
+    fetchWords(widget.topicId).then((List<DocumentSnapshot> fetchedWords) {
       setState(() {
-        snapshotData = words;
+        words = fetchedWords;
         if (words.isNotEmpty) {
           speak(words[_currentIndex]['word']);
         }
@@ -156,11 +145,11 @@ class _FlashCardPageState extends State<FlashCardPage> {
                     activeColor: Colors.blue,
                     onChanged: (value) {
                       setState(() {
-                        autoplay = value; // Update the autoSpeak value
+                        autoplay = value;
                         if (autoplay) {
-                          startAutoPlay(); // Start auto-play if autoSpeak is true
+                          startAutoPlay();
                         } else {
-                          _timer?.cancel(); // Stop auto-play if autoSpeak is false
+                          _timer?.cancel();
                         }
                         Navigator.of(context).pop();
                         (_menuKey.currentState as dynamic).showButtonMenu();
@@ -169,12 +158,11 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   ),
                 ),
               ),
-               PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'shuffle',
                 child: ListTile(
                   leading: Icon(Icons.shuffle),
                   title: Text('Shuffle words'),
-                  onTap: handleShuffleWords,
                 ),
               ),
               const PopupMenuItem<String>(
@@ -194,7 +182,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
             ],
             onSelected: (String choice) {
               if (choice == 'shuffle') {
-                shuffleWords();
+                shuffleWords(List.from(words));
               } else if (choice == 'switchLanguage') {
               } else if (choice == 'learnStar') {}
             },
@@ -214,8 +202,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _updateLearnedStatus('Unlearned'); // Mark as Unlearned
-                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'Unlearned');
+                        _updateLearnedStatus('Unlearned');
+                        updateWordStatus(widget.topicId,
+                            words[_currentIndex].id, 'Unlearned');
                       });
                     },
                     child: Row(
@@ -253,8 +242,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        _updateLearnedStatus('Learned'); // Mark as learned
-                        updateWordStatus(widget.topicId, snapshotData[_currentIndex].id, 'Learned');
+                        _updateLearnedStatus('Learned');
+                        updateWordStatus(
+                            widget.topicId, words[_currentIndex].id, 'Learned');
                       });
                     },
                     child: Row(
@@ -294,7 +284,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
             SizedBox(
               height: 500, // Adjust the height as needed
               child: FutureBuilder(
-                future: fetchWords(widget.topicId),
+                future: Future.value(words),
                 builder:
                     (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -302,10 +292,12 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
-                    List<DocumentSnapshot> words = snapshot.data!;
-                    // Assign snapshot data to local variable
-                    snapshotData = words;
+                    words = snapshot.data!;
+                    words.forEach((word) {
+                      print(word.data());
+                    });
                     return Swiper(
+                      key: UniqueKey(),
                       controller: _swiperController,
                       index: _currentIndex,
                       onIndexChanged: (index) {
