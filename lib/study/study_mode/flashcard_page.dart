@@ -27,9 +27,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int countUnlearned = 0;
   int countMastered = 0;
   bool autoSpeak = true;
+  bool showDefinition = false;
   late SwiperController _swiperController;
   Timer? _timer;
-  bool autoplay = false;
+  bool autoplay = true;
   GlobalKey _menuKey = GlobalKey();
 
   void shuffleWords(List<DocumentSnapshot> words) {
@@ -90,7 +91,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
         _swiperController.next();
         _swiperController.index++;
       } else {
-        _timer?.cancel(); // Stop auto-play if reached the last word
+        _timer?.cancel();
       }
     });
   }
@@ -99,7 +100,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   void initState() {
     super.initState();
     _swiperController = SwiperController();
-    // startAutoPlay();
+    startAutoPlay();
     fetchWords(widget.topicId).then((List<DocumentSnapshot> fetchedWords) {
       setState(() {
         words = fetchedWords;
@@ -184,6 +185,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
               if (choice == 'shuffle') {
                 shuffleWords(List.from(words));
               } else if (choice == 'switchLanguage') {
+                setState(() {
+                  showDefinition = !showDefinition;
+                });
               } else if (choice == 'learnStar') {}
             },
           ),
@@ -303,7 +307,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       onIndexChanged: (index) {
                         setState(() {
                           _currentIndex = index;
-                          if (autoSpeak) {
+                          if (autoSpeak && !showDefinition) {
                             speak(words[index]['word']);
                           }
                         });
@@ -325,13 +329,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         bool isFavorited = words[index]['isFavorited'];
 
                         return WordItem(
-                          definition: definition,
-                          word: word,
-                          wordId: words[index].id,
-                          topicId: widget.topicId,
-                          status: status,
-                          isFavorited: isFavorited.toString() ?? '',
-                        );
+                            definition: definition,
+                            word: word,
+                            wordId: words[index].id,
+                            topicId: widget.topicId,
+                            status: status,
+                            isFavorited: isFavorited.toString() ?? '',
+                            showDefinition: showDefinition);
                       },
                     );
                   }

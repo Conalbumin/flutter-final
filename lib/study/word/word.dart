@@ -12,6 +12,7 @@ class WordItem extends StatefulWidget {
   final String isFavorited;
   final String wordId;
   final String topicId;
+  final bool showDefinition;
 
   const WordItem({
     Key? key,
@@ -21,6 +22,7 @@ class WordItem extends StatefulWidget {
     required this.topicId,
     required this.status,
     required this.isFavorited,
+    required this.showDefinition,
   }) : super(key: key);
 
   @override
@@ -38,8 +40,8 @@ class _WordItemState extends State<WordItem> {
         controller: flip,
         onTapFlipping: true,
         rotateSide: RotateSide.bottom,
-        frontWidget: _buildFront(),
-        backWidget: _buildBack(),
+        frontWidget: widget.showDefinition ? _buildBack() :_buildFront(),
+        backWidget: widget.showDefinition ? _buildFront() :_buildBack(),
       ),
     );
   }

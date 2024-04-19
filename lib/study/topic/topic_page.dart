@@ -177,6 +177,7 @@ class _TopicPageState extends State<TopicPage> {
                           topicId: widget.topicId,
                           status: status,
                           isFavorited: isFavorited.toString() ?? '',
+                          showDefinition: false,
                         );
                       },
                     );
