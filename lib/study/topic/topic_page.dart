@@ -59,17 +59,18 @@ class _TopicPageState extends State<TopicPage> {
   void updateFavWordsList() {
     setState(() {
       words = [];
-      favoritedWords = words.where((word) => word['isFavorited'] == true).toList();
+      favoritedWords =
+          words.where((word) => word['isFavorited'] == true).toList();
     });
 
     fetchWords(widget.topicId).then((value) {
       setState(() {
         words = value;
-        favoritedWords = words.where((word) => word['isFavorited'] == true).toList();
+        favoritedWords =
+            words.where((word) => word['isFavorited'] == true).toList();
       });
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -145,8 +146,7 @@ class _TopicPageState extends State<TopicPage> {
                   ),
                 );
               } else if (choice == 'setPrivate') {
-                setPrivateTopic(
-                    widget.topicId, !widget.isPrivate);
+                setPrivateTopic(widget.topicId, !widget.isPrivate);
               }
             },
           ),
@@ -230,9 +230,9 @@ class _TopicPageState extends State<TopicPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => FlashCardPage(
-                            topicId: widget.topicId,
-                            numberOfWords: widget.numberOfWords,
-                          ),
+                              topicId: widget.topicId,
+                              numberOfWords: widget.numberOfWords,
+                              showAllWords: showAllWords),
                         ),
                       );
                     },

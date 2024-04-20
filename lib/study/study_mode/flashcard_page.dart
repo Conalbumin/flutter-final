@@ -10,9 +10,13 @@ import '../word/word.dart';
 class FlashCardPage extends StatefulWidget {
   final String topicId;
   final int numberOfWords;
+  final bool showAllWords;
 
   const FlashCardPage(
-      {Key? key, required this.topicId, required this.numberOfWords})
+      {Key? key,
+      required this.topicId,
+      required this.numberOfWords,
+      required this.showAllWords})
       : super(key: key);
 
   @override
@@ -45,7 +49,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   void _checkFinishStudy() {
-    if (countLearned + countUnlearned == widget.numberOfWords) {
+    if (countLearned + countUnlearned == words.length) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -80,7 +84,11 @@ class _FlashCardPageState extends State<FlashCardPage> {
           countMastered++;
           break;
       }
-      _currentIndex = (_currentIndex + 1) % widget.numberOfWords;
+      if (widget.showAllWords) {
+        _currentIndex = (_currentIndex + 1) % words.length;
+      } else {
+        _currentIndex = (_currentIndex + 1) % words.length;
+      }
       _checkFinishStudy();
     });
   }
@@ -103,7 +111,14 @@ class _FlashCardPageState extends State<FlashCardPage> {
     startAutoPlay();
     fetchWords(widget.topicId).then((List<DocumentSnapshot> fetchedWords) {
       setState(() {
-        words = fetchedWords;
+        if (widget.showAllWords) {
+          words = fetchedWords;
+        } else {
+          words = fetchedWords
+              .where((word) => word['isFavorited'] == true)
+              .toList();
+        }
+
         if (words.isNotEmpty) {
           speak(words[_currentIndex]['word']);
         }
@@ -126,7 +141,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
         backgroundColor: Colors.blue,
         title: Center(
           child: Text(
-            "${_currentIndex + 1}/${widget.numberOfWords}",
+            "${_currentIndex + 1}/${words.length}",
             style: const TextStyle(color: Colors.white, fontSize: 30),
           ),
         ),
@@ -286,7 +301,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
             ),
             const SizedBox(height: 20),
             SizedBox(
-              height: 500, // Adjust the height as needed
+              height: 500,
               child: FutureBuilder(
                 future: Future.value(words),
                 builder:
@@ -296,10 +311,14 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
-                    words = snapshot.data!;
-                    words.forEach((word) {
-                      print(word.data());
-                    });
+                    words = snapshot.data ?? [];
+                    if (words.isEmpty) {
+                      return const Center(child: Text('No words available.'));
+                    }
+                    _currentIndex = _currentIndex.clamp(0, words.length - 1);
+                    if (autoSpeak && !showDefinition) {
+                      speak(words[_currentIndex]['word']);
+                    }
                     return Swiper(
                       key: UniqueKey(),
                       controller: _swiperController,
