@@ -51,11 +51,25 @@ class _TopicPageState extends State<TopicPage> {
     fetchWords(widget.topicId).then((value) {
       setState(() {
         words = value;
-        favoritedWords =
-            words.where((word) => word['isFavorited'] == true).toList();
+        updateFavWordsList();
       });
     });
   }
+
+  void updateFavWordsList() {
+    setState(() {
+      words = [];
+      favoritedWords = words.where((word) => word['isFavorited'] == true).toList();
+    });
+
+    fetchWords(widget.topicId).then((value) {
+      setState(() {
+        words = value;
+        favoritedWords = words.where((word) => word['isFavorited'] == true).toList();
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +146,7 @@ class _TopicPageState extends State<TopicPage> {
                 );
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(
-                    widget.topicId, !widget.isPrivate); // Toggle isPrivate
+                    widget.topicId, !widget.isPrivate);
               }
             },
           ),
@@ -293,6 +307,7 @@ class _TopicPageState extends State<TopicPage> {
                           onTap: () {
                             setState(() {
                               showAllWords = true;
+                              updateFavWordsList();
                             });
                           },
                           child: Padding(
@@ -320,6 +335,7 @@ class _TopicPageState extends State<TopicPage> {
                           onTap: () {
                             setState(() {
                               showAllWords = false;
+                              updateFavWordsList();
                             });
                           },
                           child: Padding(
