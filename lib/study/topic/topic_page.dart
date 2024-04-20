@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'package:quizlet_final_flutter/study/study_mode/typing_page.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
+import '../csv.dart';
 import '../firebase_study_page.dart';
 import '../folder/add_topic_to_folder.dart';
 import '../study_mode/flashcard_page.dart';
@@ -130,6 +131,13 @@ class _TopicPageState extends State<TopicPage> {
                   leading: Icon(Icons.private_connectivity),
                   title: Text('Set private'),
                 ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'exportCsv',
+                child: ListTile(
+                  leading: Icon(Icons.import_export),
+                  title: Text('Export topic'),
+                ),
               )
             ],
             onSelected: (String choice) {
@@ -147,6 +155,9 @@ class _TopicPageState extends State<TopicPage> {
                 );
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(widget.topicId, !widget.isPrivate);
+              } else {
+                List<Map<String, dynamic>> wordData = convertDocumentSnapshotsToMapList(words);
+                exportTopicToCSV(wordData, widget.topicName, context);
               }
             },
           ),
