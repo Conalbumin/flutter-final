@@ -5,34 +5,54 @@ import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-Future<List<List<dynamic>>> readCsv(String filePath) async {
-  final input = File(filePath).openRead();
-  return await input
-      .transform(utf8.decoder)
-      .transform(const CsvToListConverter())
-      .toList();
-}
+import 'firebase_study_page.dart';
 
-Future<void> writeCsv(String filePath, List<List<dynamic>> rows) async {
-  final csv = const ListToCsvConverter().convert(rows);
-  await File(filePath).writeAsString(csv);
-}
+void pickAndProcessCsvFile(String topicId) async {
+  try {
+    // Step 1: Pick a CSV file
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
 
-void importCsvFile() async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['csv'],
-  );
+    if (result == null) {
+      return;
+    }
 
-  if (result != null) {
-    File file = File(result.files.single.path!);
+    // Step 2: Read the file content
+    String? filePath = result.files.single.path;
+    if (filePath == null) {
+      print('File path is null');
+      return;
+    }
+
+    File file = File(filePath);
     String fileContent = await file.readAsString();
-    // Now you can process the CSV file content
-    // For example, you can parse the CSV data and use it in your app
+
+    // Step 3: Parse CSV content
     List<List<dynamic>> csvData = CsvToListConverter().convert(fileContent);
-    // Do something with csvData
-  } else {
-    // User canceled the picker
+
+    // Step 4: Extract data
+    String topicName = csvData[0][0]; // Assuming the topic name is in the first row, first column
+    String description = csvData[0][1]; // Assuming the description is in the first row, second column
+
+    // Extracting words
+    List<Map<String, String>> words = [];
+    for (int i = 1; i < csvData.length; i++) {
+      // Assuming each row contains a word and its definition
+      String word = csvData[i][0];
+      String definition = csvData[i][1];
+      // Add word and definition to the list of words
+      words.add({'word': word, 'definition': definition});
+    }
+
+    addWord(topicId, words);
+
+    print('Topic Name: $topicName');
+    print('Description: $description');
+    print('Words: $words');
+  } catch (e) {
+    print('Error picking/processing CSV file: $e');
   }
 }
 

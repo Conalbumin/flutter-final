@@ -93,14 +93,6 @@ class _MainAppState extends State<MainApp> {
                   },
                   child: const Text('Create New Folder'),
                 ),
-                const Padding(padding: EdgeInsets.all(8.0)),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    importCsvFile();
-                  },
-                  child: const Text('Import Topic by CSV'),
-                ),
               ],
             ),
           ),

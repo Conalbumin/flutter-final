@@ -138,6 +138,13 @@ class _TopicPageState extends State<TopicPage> {
                   leading: Icon(Icons.import_export),
                   title: Text('Export topic'),
                 ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'importCsv',
+                child: ListTile(
+                  leading: Icon(Icons.import_contacts),
+                  title: Text('Import topic'),
+                ),
               )
             ],
             onSelected: (String choice) {
@@ -155,10 +162,12 @@ class _TopicPageState extends State<TopicPage> {
                 );
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(widget.topicId, !widget.isPrivate);
-              } else {
+              } else if (choice == 'exportCsv'){
                 List<Map<String, dynamic>> wordData = convertDocumentSnapshotsToMapList(words);
                 exportTopicToCSV(wordData, widget.topicName, context);
-              }
+              } else {
+                pickAndProcessCsvFile(widget.topicId);
+            }
             },
           ),
         ],
