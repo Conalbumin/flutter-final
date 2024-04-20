@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text.dart';
+import 'package:quizlet_final_flutter/study/csv.dart';
 import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import 'study/study.dart';
 import 'setting/setting.dart';
@@ -91,6 +92,14 @@ class _MainAppState extends State<MainApp> {
                     _showNewFolderDialog(context);
                   },
                   child: const Text('Create New Folder'),
+                ),
+                const Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    importCsvFile();
+                  },
+                  child: const Text('Import Topic by CSV'),
                 ),
               ],
             ),
