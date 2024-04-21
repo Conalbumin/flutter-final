@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/folder/add_topic_in_folder.dart';
 import 'package:quizlet_final_flutter/study/folder/remove_topic_in_folder.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_tab.dart';
 import '../firebase_study_page.dart';
@@ -34,7 +35,7 @@ class FolderPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.delete,
+              Icons.folder_delete,
               color: Colors.white,
               size: 35,
             ),
@@ -79,7 +80,7 @@ class FolderPage extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(
-              Icons.more_vert,
+              Icons.delete,
               color: Colors.white,
               size: 35,
             ),
@@ -90,7 +91,9 @@ class FolderPage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _addTopicToFolder(context);
+        },
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -183,6 +186,19 @@ class FolderPage extends StatelessWidget {
           folderId: folderId,
           onSelectTopic: (topicId) {
             deleteTopicInFolder(context, topicId, folderId);
+          },
+        );
+      },
+    );
+  }
+
+  void _addTopicToFolder(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return AddTopicFromFolder(
+          onSelectTopic: (topicId) {
+            addTopicToFolder(topicId, folderId);
           },
         );
       },

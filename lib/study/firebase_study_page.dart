@@ -404,7 +404,6 @@ void deleteTopicInFolder(
     // Delete the reference of the topic from the folder
     topicRef.delete().then((_) {
       print('Topic removed from folder successfully');
-      Navigator.of(context).pop();
     }).catchError((error) {
       print('Error removing topic from folder: $error');
     });
