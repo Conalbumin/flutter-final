@@ -41,6 +41,24 @@ class _TypingPageState extends State<TypingPage> {
   String userInput = '';
   bool hasSpoken = false;
 
+  void updateCorrectAnswers() {
+    List<String> newCorrectAnswers = [];
+    List<String> newCorrectAnswersInCode = [];
+
+    words.forEach((question) {
+      String correctAnswer = showDefinition ? question['word'] : question['definition'];
+      newCorrectAnswers.add(correctAnswer);
+      newCorrectAnswersInCode.add(correctAnswer.toLowerCase());
+    });
+
+    setState(() {
+      correctAnswers = newCorrectAnswers;
+      correctAnswersInCode = newCorrectAnswersInCode;
+    });
+    print(correctAnswers);
+
+  }
+
   void shuffleWords() {
     setState(() {
       List<int> indices = List<int>.generate(words.length, (index) => index);
@@ -106,7 +124,7 @@ class _TypingPageState extends State<TypingPage> {
         return AlertDialog(
           title: Text(isCorrect ? 'Correct!' : 'Incorrect!'),
           content: Text(isCorrect
-              ? 'You chose the correct answer.'
+              ? 'You answer correctly.'
               : 'The correct answer is: $correctAnswer'),
           actions: [
             TextButton(
@@ -142,9 +160,7 @@ class _TypingPageState extends State<TypingPage> {
         );
       },
     );
-
     widget.onType(userAnswers);
-
   }
 
   @override
@@ -195,7 +211,7 @@ class _TypingPageState extends State<TypingPage> {
               if (choice == 'switchLanguage') {
                 setState(() {
                   showDefinition = !showDefinition;
-                  fetchAnswers();
+                  updateCorrectAnswers();
                 });
               } else if (choice == 'shuffle') {
                 shuffleWords();

@@ -12,6 +12,7 @@ class WordWithIcon extends StatefulWidget {
   final String isFavorited;
   final String wordId;
   final String topicId;
+  final void Function(String wordId) handleWordDeleted;
 
   const WordWithIcon(
       {super.key,
@@ -20,7 +21,8 @@ class WordWithIcon extends StatefulWidget {
       required this.status,
       required this.wordId,
       required this.topicId,
-      required this.isFavorited});
+      required this.isFavorited,
+      required this.handleWordDeleted});
 
   @override
   State<WordWithIcon> createState() => _WordWithIconState();
@@ -93,7 +95,8 @@ class _WordWithIconState extends State<WordWithIcon> {
                   onTap: () {
                     setState(() {
                       isFavorited = !isFavorited;
-                      updateWordIsFavorited(widget.topicId, widget.wordId, isFavorited);
+                      updateWordIsFavorited(
+                          widget.topicId, widget.wordId, isFavorited);
                     });
                   },
                   child: Icon(
@@ -130,6 +133,9 @@ class _WordWithIconState extends State<WordWithIcon> {
             TextButton(
               onPressed: () {
                 deleteWord(context, topicId, wordId);
+                if (widget.handleWordDeleted != null) {
+                  widget.handleWordDeleted!(wordId); // Gọi hàm callback ở đây khi từ được xóa
+                }
                 Navigator.of(context).pop();
               },
               child: const Text('Remove'),

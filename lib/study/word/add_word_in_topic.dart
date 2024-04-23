@@ -83,6 +83,7 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
         }
       }
       addWord(widget.topicId, wordsData);
+      wordPages.clear();
       Navigator.of(context).pop();
     }
   }

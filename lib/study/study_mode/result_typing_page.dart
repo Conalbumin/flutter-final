@@ -5,10 +5,12 @@ Widget buildTypingResult(int correctCount, int numberOfQuestions,
     List<String> userAnswers, List<String> correctAnswers,
     List<DocumentSnapshot> words, bool showDefinition) {
   String getFeedback(int correctCount) {
+    double percentage =
+        (correctCount / numberOfQuestions) * 100;
     String feedback = '';
-    if (correctCount > 80) {
+    if (percentage > 80) {
       feedback = 'Excellent';
-    } else if (correctCount < 50) {
+    } else if (percentage < 50) {
       feedback = 'Practice more';
     } else {
       feedback = 'Good job';
@@ -17,9 +19,11 @@ Widget buildTypingResult(int correctCount, int numberOfQuestions,
   }
 
   Color getFeedbackColor(int correctCount) {
-    if (correctCount > 80) {
+    double percentage =
+        (correctCount / numberOfQuestions) * 100;
+    if (percentage > 80) {
       return Colors.green.shade600;
-    } else if (correctCount < 50) {
+    } else if (percentage < 50) {
       return Colors.red;
     } else {
       return Colors.lightGreen.shade400;

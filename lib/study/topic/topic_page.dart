@@ -26,6 +26,7 @@ class TopicPage extends StatefulWidget {
   final String text;
   final bool isPrivate;
   final String userId;
+  final Function() refreshCallback;
 
   const TopicPage({
     Key? key,
@@ -34,7 +35,7 @@ class TopicPage extends StatefulWidget {
     required this.numberOfWords,
     required this.text,
     required this.isPrivate,
-    required this.userId,
+    required this.userId, required this.refreshCallback,
   }) : super(key: key);
 
   @override
@@ -43,6 +44,7 @@ class TopicPage extends StatefulWidget {
 
 class _TopicPageState extends State<TopicPage> {
   late List<DocumentSnapshot> words;
+  late int _numberOfWords;
   late String _topicName;
   late String _text;
   bool showAllWords = true;
@@ -53,6 +55,7 @@ class _TopicPageState extends State<TopicPage> {
     super.initState();
     _topicName = widget.topicName;
     _text = widget.text;
+    _numberOfWords = widget.numberOfWords;
     fetchWords(widget.topicId).then((value) {
       setState(() {
         words = value;
@@ -63,17 +66,26 @@ class _TopicPageState extends State<TopicPage> {
 
   void updateFavWordsList() {
     setState(() {
-      words = [];
       favoritedWords =
           words.where((word) => word['isFavorited'] == true).toList();
     });
+  }
 
+  void refreshWords() {
     fetchWords(widget.topicId).then((value) {
       setState(() {
         words = value;
-        favoritedWords =
-            words.where((word) => word['isFavorited'] == true).toList();
+        updateFavWordsList();
       });
+    });
+    widget.refreshCallback();
+  }
+
+  void handleWordDeleted(String wordId) {
+    setState(() {
+      words.removeWhere((word) => word.id == wordId);
+      favoritedWords.removeWhere((word) => word.id == wordId);
+      _numberOfWords--;
     });
   }
 
@@ -86,7 +98,7 @@ class _TopicPageState extends State<TopicPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(_topicName, style: appBarStyle),
-            Text('Number of Words: ${widget.numberOfWords}',
+            Text('Number of Words: $_numberOfWords',
                 style: const TextStyle(color: Colors.white, fontSize: 15)),
           ],
         ),
@@ -153,13 +165,17 @@ class _TopicPageState extends State<TopicPage> {
               } else if (choice == 'addToFolder') {
                 _showFolderTab(context);
               } else if (choice == 'addWordInTopic') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AddWordInTopic(topicId: widget.topicId),
-                  ),
-                );
+                setState(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AddWordInTopic(topicId: widget.topicId),
+                    ),
+                  );
+                  _numberOfWords++;
+                  refreshWords();
+                });
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(widget.topicId, !widget.isPrivate);
               } else if (choice == 'exportCsv') {
@@ -280,14 +296,13 @@ class _TopicPageState extends State<TopicPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => TypingPage(
-                            topicId: widget.topicId,
-                            topicName: widget.topicName,
-                            numberOfWords: widget.numberOfWords,
-                            numberOfQuestions: words.length,
+                              topicId: widget.topicId,
+                              topicName: widget.topicName,
+                              numberOfWords: widget.numberOfWords,
+                              numberOfQuestions: words.length,
                               onType: (answers) {
                                 // Handle typed answers here
-                              }
-                          ),
+                              }),
                         ),
                       );
                     },
@@ -391,6 +406,9 @@ class _TopicPageState extends State<TopicPage> {
                               topicId: widget.topicId,
                               status: status,
                               isFavorited: isFavorited.toString() ?? '',
+                              handleWordDeleted: (wordId) {
+                                handleWordDeleted(wordId);
+                              },
                             );
                           },
                         )
@@ -412,7 +430,9 @@ class _TopicPageState extends State<TopicPage> {
                               topicId: widget.topicId,
                               status: status,
                               isFavorited: isFavorited.toString() ?? '',
-                            );
+                              handleWordDeleted: (wordId) {
+                                handleWordDeleted(wordId);
+                              },                            );
                           },
                         );
                 }

@@ -32,7 +32,7 @@ class TopicItem extends StatelessWidget {
                 topicName: topicName,
                 numberOfWords: numberOfWords,
                 text: text,
-                isPrivate: isPrivate, userId: userId,),
+                isPrivate: isPrivate, userId: userId, refreshCallback: () {  },),
           ),
         );
       },

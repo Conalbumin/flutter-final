@@ -95,8 +95,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   void startAutoPlay() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (_swiperController.index < (widget.numberOfWords - 1)) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (_swiperController.index < (words.length - 1)) {
         _swiperController.next();
         _swiperController.index++;
       } else {
