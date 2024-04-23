@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
 import '../firebase_study/update.dart';
+import '../word/word_data_for_edit.dart';
 import 'edit_word_dialog.dart';
 
 List<Widget> wordPages = [];
@@ -25,26 +26,24 @@ class EditTopicPage extends StatefulWidget {
 
 class _EditTopicPageState extends State<EditTopicPage> {
   final _formKey = GlobalKey<FormState>();
-  late String topicId;
   late String _topicName;
   late String _description;
-  late List<Map<String, String>> wordsData = [];
+  late List<WordData> wordsData = [];
 
   @override
   void initState() {
     super.initState();
     _topicName = widget.initialTopicName;
     _description = widget.initialDescription;
-    topicId = widget.topicId;
-    _fetchCurrentWords(topicId);
+    _fetchCurrentWords(widget.topicId);
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      updateTopic(topicId, _topicName, _description).then((_) {
-        updateWords(topicId, wordsData).then((_) {
-          // Pop with data to update the TopicPage
-          Navigator.pop(context, {'topicName': _topicName, 'description': _description});
+      updateTopic(widget.topicId, _topicName, _description).then((_) {
+        updateWords(widget.topicId, wordsData).then((_) {
+          Navigator.pop(
+              context, {'topicName': _topicName, 'description': _description});
         }).catchError((error) {
           print('Error updating words: $error');
         });
@@ -61,19 +60,24 @@ class _EditTopicPageState extends State<EditTopicPage> {
         String wordId = snapshot.id; // Get the document ID
         String initialWord = snapshot['word'];
         String initialDefinition = snapshot['definition'];
-        return {
-          'id': wordId, // Include the document ID in the data
-          'word': initialWord,
-          'definition': initialDefinition,
-        };
+        bool isFavorited = snapshot['isFavorited'] ?? false; // Add this line
+        String status = snapshot['status'] ?? ''; // Add this line
+        return WordData(
+          id: wordId,
+          word: initialWord,
+          definition: initialDefinition,
+          isFavorited: isFavorited,
+          status: status,
+        );
       }).toList();
+      print(wordsData);
 
       setState(() {
         wordPages = wordsData.map((data) {
           return Card(
             child: ListTile(
-              title: Text(data['word'] ?? ''),
-              subtitle: Text(data['definition'] ?? ''),
+              title: Text(data.word),
+              subtitle: Text(data.definition),
             ),
           );
         }).toList();
@@ -84,14 +88,13 @@ class _EditTopicPageState extends State<EditTopicPage> {
       });
     } catch (e) {
       print('Error fetching current words: $e');
-      // Handle error
     }
   }
 
   void _editWord(int index) async {
-    Map<String, String> wordData = wordsData[index];
-    String editedWord = wordData['word'] ?? '';
-    String editedDefinition = wordData['definition'] ?? '';
+    WordData wordData = wordsData[index]; // Changed to WordData
+    String editedWord = wordData.word;
+    String editedDefinition = wordData.definition;
 
     showDialog(
       context: context,
@@ -102,14 +105,19 @@ class _EditTopicPageState extends State<EditTopicPage> {
           onSave: (String newWord, String newDefinition) {
             setState(() {
               // Update the word data in the list
-              wordsData[index]['word'] = newWord;
-              wordsData[index]['definition'] = newDefinition;
-              // Update the UI
+              wordsData[index] = WordData(
+                id: wordData.id,
+                word: newWord,
+                definition: newDefinition,
+                isFavorited: wordData.isFavorited,
+                status: wordData.status,
+              );
+
               wordPages = wordsData.map((data) {
                 return Card(
                   child: ListTile(
-                    title: Text(data['word'] ?? ''),
-                    subtitle: Text(data['definition'] ?? ''),
+                    title: Text(data.word),
+                    subtitle: Text(data.definition),
                   ),
                 );
               }).toList();
@@ -121,80 +129,79 @@ class _EditTopicPageState extends State<EditTopicPage> {
   }
 
   @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: Text(
-            'Edit Topic',
-            style: appBarStyle,
-          ),
-          actions: [
-            const SizedBox(width: 10),
-            IconButton(
-              icon: const Icon(Icons.check, color: Colors.white, size: 40),
-              onPressed: _submitForm,
-            ),
-            const SizedBox(width: 10),
-          ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: Text(
+          'Edit Topic',
+          style: appBarStyle,
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  initialValue: _topicName,
-                  decoration: const InputDecoration(labelText: 'Topic Name'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a topic name';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      _topicName = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  initialValue: _description,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a description';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      _description = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 32),
-                ...wordsData.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  Map<String, String> data = entry.value;
-                  return GestureDetector(
-                    onTap: () => _editWord(index),
-                    child: Card(
-                      child: ListTile(
-                        title: Text(data['word'] ?? ''),
-                        subtitle: Text(data['definition'] ?? ''),
-                      ),
+        actions: [
+          const SizedBox(width: 10),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.white, size: 40),
+            onPressed: _submitForm,
+          ),
+          const SizedBox(width: 10),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                initialValue: _topicName,
+                decoration: const InputDecoration(labelText: 'Topic Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a topic name';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _topicName = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                initialValue: _description,
+                decoration: const InputDecoration(labelText: 'Description'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _description = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 32),
+              ...wordsData.asMap().entries.map((entry) {
+                int index = entry.key;
+                WordData data = entry.value;
+                return GestureDetector(
+                  onTap: () => _editWord(index),
+                  child: Card(
+                    child: ListTile(
+                      title: Text(data.word),
+                      subtitle: Text(data.definition),
                     ),
-                  );
-                }).toList(),
-
-              ],
-            ),
+                  ),
+                );
+              }).toList(),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
   }
+}

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../word/word_data_for_edit.dart';
+
 Future<void> updateTopic(
     String topicId, String newTopicName, String newDescription) async {
   try {
@@ -31,21 +33,20 @@ Future<void> updateFolder(
   }
 }
 
-Future<void> updateWords(
-    String topicId, List<Map<String, String>> wordsData) async {
+Future<void> updateWords(String topicId, List<WordData> wordsData) async {
   try {
     for (var wordData in wordsData) {
-      String wordId = wordData['id'] ?? '';
+      String wordId = wordData.id; // Access id directly
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
           .collection('words')
           .doc(wordId)
           .set({
-        'word': wordData['word'],
-        'definition': wordData['definition'],
-        'status': wordData['status'],
-        'isFavorited': wordData['isFavorited']
+        'word': wordData.word,
+        'definition': wordData.definition,
+        'status': wordData.status,
+        'isFavorited': wordData.isFavorited,
       });
     }
     print('Words updated successfully');
@@ -53,6 +54,7 @@ Future<void> updateWords(
     print('Error updating words: $e');
   }
 }
+
 
 Future<void> updateWordStatus(
     String topicId, String wordId, String newStatus) async {
