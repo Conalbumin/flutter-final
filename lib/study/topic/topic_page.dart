@@ -71,14 +71,15 @@ class _TopicPageState extends State<TopicPage> {
     });
   }
 
-  void refreshWords() {
-    fetchWords(widget.topicId).then((value) {
-      setState(() {
-        words = value;
-        updateFavWordsList();
+  void handleWordAdded(String topicId) {
+    setState(() {
+      fetchWords(topicId).then((value) {
+        setState(() {
+          words = value;
+          updateFavWordsList();
+        });
       });
     });
-    widget.refreshCallback();
   }
 
   void handleWordDeleted(String wordId) {
@@ -170,11 +171,13 @@ class _TopicPageState extends State<TopicPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          AddWordInTopic(topicId: widget.topicId),
+                          AddWordInTopic(topicId: widget.topicId,
+                            handleWordAdded: (topicId) {
+                              handleWordAdded(topicId);
+                            },),
                     ),
                   );
                   _numberOfWords++;
-                  refreshWords();
                 });
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(widget.topicId, !widget.isPrivate);

@@ -6,8 +6,9 @@ import '../word/word_pages.dart';
 
 class AddWordInTopic extends StatefulWidget {
   final String topicId;
+  final void Function(String topicId) handleWordAdded;
 
-  const AddWordInTopic({Key? key, required this.topicId}) : super(key: key);
+  const AddWordInTopic({Key? key, required this.topicId, required this.handleWordAdded}) : super(key: key);
 
   @override
   _AddWordInTopicState createState() => _AddWordInTopicState();
@@ -83,7 +84,8 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
         }
       }
       addWord(widget.topicId, wordsData);
-      wordPages.clear();
+      widget.handleWordAdded(widget.topicId);
+          wordPages.clear();
       Navigator.of(context).pop();
     }
   }

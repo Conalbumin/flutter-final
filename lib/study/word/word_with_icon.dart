@@ -133,9 +133,7 @@ class _WordWithIconState extends State<WordWithIcon> {
             TextButton(
               onPressed: () {
                 deleteWord(context, topicId, wordId);
-                if (widget.handleWordDeleted != null) {
-                  widget.handleWordDeleted!(wordId); // Gọi hàm callback ở đây khi từ được xóa
-                }
+                widget.handleWordDeleted(wordId);
                 Navigator.of(context).pop();
               },
               child: const Text('Remove'),
