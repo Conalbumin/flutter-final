@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/modal/flip_side.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
 import 'package:quizlet_final_flutter/study/word/text_to_speech.dart';
+
+import '../../constant/text_style.dart';
 
 class WordItem extends StatefulWidget {
   final String word;
@@ -73,7 +74,7 @@ class _WordItemState extends State<WordItem> {
             Center(
               child: Text(
                 widget.word,
-                style: const TextStyle(fontSize: 35, color: Colors.white),
+                style: wordStyle,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -96,7 +97,7 @@ class _WordItemState extends State<WordItem> {
             Center(
               child: Text(
                 widget.definition,
-                style: const TextStyle(fontSize: 35, color: Colors.white),
+                style: wordStyle,
                 textAlign: TextAlign.center,
               ),
             ),

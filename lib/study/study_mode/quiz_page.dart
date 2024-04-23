@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import 'package:quizlet_final_flutter/study/study_mode/result_quiz_page.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/fetch.dart';
 import '../word/text_to_speech.dart';
 import 'answer.dart';
 
@@ -9,6 +11,7 @@ class QuizPage extends StatefulWidget {
   final String topicName;
   final int numberOfWords;
   final int numberOfQuestions;
+  final Function(List<String>) onSelectAnswer;
 
   const QuizPage({
     Key? key,
@@ -16,6 +19,7 @@ class QuizPage extends StatefulWidget {
     required this.topicName,
     required this.numberOfQuestions,
     required this.numberOfWords,
+    required this.onSelectAnswer,
   }) : super(key: key);
 
   @override
@@ -56,7 +60,6 @@ class _QuizPageState extends State<QuizPage> {
       });
     });
   }
-
 
   void fetchQuestions() async {
     try {
@@ -166,6 +169,8 @@ class _QuizPageState extends State<QuizPage> {
       },
     );
     setState(() {});
+    // Call the onSelectAnswer callback with the selected answers
+    widget.onSelectAnswer(selectedAnswers);
   }
 
   @override
@@ -182,13 +187,13 @@ class _QuizPageState extends State<QuizPage> {
         backgroundColor: Colors.blue,
         title: Center(
           child: _currentIndex >= widget.numberOfQuestions
-              ? const Text(
+              ? Text(
                   'Result',
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+                  style: appBarStyle,
                 )
               : Text(
                   "${_currentIndex + 1}/${widget.numberOfWords}",
-                  style: const TextStyle(color: Colors.white, fontSize: 30),
+                  style: appBarStyle,
                 ),
         ),
         actions: [
@@ -241,81 +246,13 @@ class _QuizPageState extends State<QuizPage> {
               }
               if (_currentIndex >= widget.numberOfQuestions) {
                 int correctCount = 0;
-                String feedback = '';
-                Color feedbackColor = Colors.black;
                 for (int i = 0; i < selectedAnswers.length; i++) {
                   if (selectedAnswers[i] == correctAnswers[i]) {
                     correctCount++;
                   }
                 }
-                double percentage =
-                    (correctCount / widget.numberOfQuestions) * 100;
-                if (percentage > 80) {
-                  feedback = 'Excellent';
-                  feedbackColor = Colors.green.shade600;
-                } else if (percentage < 50) {
-                  feedback = 'Practice more';
-                  feedbackColor = Colors.red;
-                } else {
-                  feedback = 'Good job';
-                  feedbackColor = Colors.lightGreen.shade400;
-                }
-                int incorrectCount = widget.numberOfQuestions - correctCount;
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Quiz Completed!',
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Total Score: $correctCount / ${widget.numberOfQuestions}',
-                        style: const TextStyle(fontSize: 25),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Feedback: $feedback',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: feedbackColor),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Questions answered correctly:',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Column(
-                        children: selectedAnswers.asMap().entries.map((entry) {
-                          int index = entry.key;
-                          String answer = entry.value;
-                          bool isCorrect = answer == correctAnswers[index];
-                          return ListTile(
-                            title: Text(
-                              showDefinition
-                                  ?  'Question: ${words[index]['definition']}'
-                                  :  'Question: ${words[index]['word']}',
-                              style: TextStyle(
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22),
-                            ),
-                            subtitle: Text(
-                              'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
-                              style: TextStyle(
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  fontSize: 20),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                );
+                return buildQuizResult(correctCount, widget.numberOfQuestions,
+                    selectedAnswers, correctAnswers, words, showDefinition);
               }
               if (!hasSpoken) {
                 String wordToSpeak = words[_currentIndex]['word'];

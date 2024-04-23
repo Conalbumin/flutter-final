@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:quizlet_final_flutter/constant/text_style.dart';
+import '../constant/color.dart';
 import '../constant/style.dart';
 import 'firebase_setting_page.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,29 +44,20 @@ class _SettingPageState extends State<SettingPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                        CircleAvatar(
-                        radius: 50,
-                        backgroundImage: _avatarURL != null
-                            ? NetworkImage(_avatarURL!)
-                            : _user?.photoURL != null
-                            ? NetworkImage(_user!.photoURL!)
-                            : const AssetImage('assets/default_avatar.png') as ImageProvider,
-                      ),
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: _avatarURL != null
+                                ? NetworkImage(_avatarURL!)
+                                : _user?.photoURL != null
+                                    ? NetworkImage(_user!.photoURL!)
+                                    : const AssetImage(
+                                            'assets/default_avatar.png')
+                                        as ImageProvider,
+                          ),
                           const SizedBox(height: 20),
-                          Text(
-                            _user?.displayName ?? '',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                          Text(_user?.displayName ?? '', style: normalText),
                           const SizedBox(height: 10),
-                          Text(
-                            _user?.email ?? '',
-                            style:
-                                TextStyle(fontSize: 18, color: Colors.grey[300]),
-                          ),
+                          Text(_user?.email ?? '', style: normalSubText),
                         ],
                       ),
                     ),
@@ -83,18 +76,16 @@ class _SettingPageState extends State<SettingPage> {
                     child: Container(
                       decoration: CustomCardDecoration.cardDecoration,
                       padding: const EdgeInsets.all(16.0),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.drive_file_rename_outline,
+                          const Icon(Icons.drive_file_rename_outline,
                               color: Colors.white),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              'Change username',
-                              style: TextStyle(fontSize: 20, color: Colors.white),
-                            ),
+                            child:
+                                Text('Change username', style: normalSubText),
                           ),
-                          Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          const Icon(Icons.arrow_forward_ios, color: Colors.white),
                         ],
                       ),
                     ),
@@ -113,17 +104,14 @@ class _SettingPageState extends State<SettingPage> {
                     child: Container(
                       decoration: CustomCardDecoration.cardDecoration,
                       padding: const EdgeInsets.all(16.0),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.image, color: Colors.white),
-                          SizedBox(width: 10),
+                          const Icon(Icons.image, color: Colors.white),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              'Change avatar',
-                              style: TextStyle(fontSize: 20, color: Colors.white),
-                            ),
+                            child: Text('Change avatar', style: normalSubText),
                           ),
-                          Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          const Icon(Icons.arrow_forward_ios, color: Colors.white),
                         ],
                       ),
                     ),
@@ -142,17 +130,16 @@ class _SettingPageState extends State<SettingPage> {
                     child: Container(
                       decoration: CustomCardDecoration.cardDecoration,
                       padding: const EdgeInsets.all(16.0),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.lock, color: Colors.white),
-                          SizedBox(width: 10),
+                          const Icon(Icons.lock, color: Colors.white),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              'Change password',
-                              style: TextStyle(fontSize: 20, color: Colors.white),
-                            ),
+                            child:
+                                Text('Change password', style: normalSubText),
                           ),
-                          Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          const Icon(Icons.arrow_forward_ios,
+                              color: Colors.white),
                         ],
                       ),
                     ),
@@ -166,7 +153,7 @@ class _SettingPageState extends State<SettingPage> {
       floatingActionButton: Container(
         margin: const EdgeInsets.only(bottom: 50),
         child: FloatingActionButton(
-          backgroundColor: Colors.blue,
+          backgroundColor: button,
           onPressed: () {
             logout();
           },
@@ -185,11 +172,14 @@ class _SettingPageState extends State<SettingPage> {
     User? user = auth.currentUser;
     if (user != null) {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-      DocumentSnapshot userSnapshot = await firestore.collection('users').doc(user.uid).get();
+      DocumentSnapshot userSnapshot =
+          await firestore.collection('users').doc(user.uid).get();
       setState(() {
         _user = user;
-        Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
-        _avatarURL = userData?['avatarURL']; // Retrieve avatar URL from Firestore
+        Map<String, dynamic>? userData =
+            userSnapshot.data() as Map<String, dynamic>?;
+        _avatarURL =
+            userData?['avatarURL']; // Retrieve avatar URL from Firestore
       });
     }
   }
@@ -249,7 +239,8 @@ class _SettingPageState extends State<SettingPage> {
   void changeAvatar() async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         String imagePath = pickedFile.path;
@@ -321,7 +312,7 @@ class _SettingPageState extends State<SettingPage> {
 
   void showToast(String message) {
     Fluttertoast.showToast(
-        msg: message,
+      msg: message,
     );
   }
 }

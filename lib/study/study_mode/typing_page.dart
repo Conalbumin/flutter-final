@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../firebase_study_page.dart';
+import 'package:quizlet_final_flutter/study/study_mode/result_typing_page.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/fetch.dart';
 import '../word/text_to_speech.dart';
 
 class TypingPage extends StatefulWidget {
@@ -9,13 +10,15 @@ class TypingPage extends StatefulWidget {
   final String topicName;
   final int numberOfWords;
   final int numberOfQuestions;
+  final Function(List<String>) onType;
 
   const TypingPage(
       {super.key,
       required this.topicId,
       required this.topicName,
       required this.numberOfWords,
-      required this.numberOfQuestions});
+      required this.numberOfQuestions,
+      required this.onType});
 
   @override
   State<TypingPage> createState() => _TypingPageState();
@@ -44,7 +47,8 @@ class _TypingPageState extends State<TypingPage> {
       indices.shuffle();
       List<DocumentSnapshot> shuffledWords = List<DocumentSnapshot>.from(words);
       List<String> shuffledCorrectAnswers = List<String>.from(correctAnswers);
-      List<String> shuffledCorrectAnswersInCode = List<String>.from(correctAnswersInCode);
+      List<String> shuffledCorrectAnswersInCode =
+          List<String>.from(correctAnswersInCode);
 
       words.clear();
       indices.forEach((index) {
@@ -79,7 +83,6 @@ class _TypingPageState extends State<TypingPage> {
         correctAnswers = newCorrectAnswers;
         correctAnswersInCode = newCorrectAnswersInCode;
       });
-
     } catch (error) {
       throw error;
     }
@@ -139,6 +142,9 @@ class _TypingPageState extends State<TypingPage> {
         );
       },
     );
+
+    widget.onType(userAnswers);
+
   }
 
   @override
@@ -155,13 +161,13 @@ class _TypingPageState extends State<TypingPage> {
         backgroundColor: Colors.blue,
         title: Center(
           child: _currentIndex >= widget.numberOfQuestions
-              ? const Text(
+              ? Text(
                   'Result',
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+                  style: appBarStyle,
                 )
               : Text(
                   "${_currentIndex + 1}/${widget.numberOfWords}",
-                  style: const TextStyle(color: Colors.white, fontSize: 30),
+                  style: appBarStyle,
                 ),
         ),
         actions: [
@@ -177,7 +183,7 @@ class _TypingPageState extends State<TypingPage> {
                   title: Text('Switch language'),
                 ),
               ),
-              PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'shuffle',
                 child: ListTile(
                   leading: Icon(Icons.shuffle),
@@ -214,80 +220,13 @@ class _TypingPageState extends State<TypingPage> {
               }
               if (_currentIndex >= widget.numberOfQuestions) {
                 int correctCount = 0;
-                String feedback = '';
-                Color feedbackColor = Colors.black;
                 for (int i = 0; i < widget.numberOfQuestions; i++) {
                   if (userAnswersInCode[i] == correctAnswersInCode[i]) {
                     correctCount++;
                   }
                 }
-                double percentage =
-                    (correctCount / widget.numberOfQuestions) * 100;
-                if (percentage > 80) {
-                  feedback = 'Excellent';
-                  feedbackColor = Colors.green.shade600;
-                } else if (percentage < 50) {
-                  feedback = 'Practice more';
-                  feedbackColor = Colors.red;
-                } else {
-                  feedback = 'Good job';
-                  feedbackColor = Colors.lightGreen.shade400;
-                }
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Quiz Completed!',
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Total Score: $correctCount / ${widget.numberOfQuestions}',
-                        style: const TextStyle(fontSize: 25),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Feedback: $feedback',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: feedbackColor),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Questions answered correctly:',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Column(
-                        children: userAnswers.asMap().entries.map((entry) {
-                          int index = entry.key;
-                          String answer = entry.value;
-                          bool isCorrect = answer.toLowerCase() ==
-                              correctAnswers[index].toLowerCase();
-                          return ListTile(
-                            title: Text(
-                              showDefinition
-                                  ?  'Question: ${words[index]['definition']}'
-                                  :  'Question: ${words[index]['word']}',                              style: TextStyle(
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22),
-                            ),
-                            subtitle: Text(
-                              'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
-                              style: TextStyle(
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  fontSize: 20),
-                            ),
-                          );
-                        }).toList(),
-                      )
-                    ],
-                  ),
-                );
+                return buildTypingResult(correctCount, widget.numberOfQuestions,
+                    userAnswers, correctAnswers, words, showDefinition);
               }
               if (!hasSpoken) {
                 String wordToSpeak = words[_currentIndex]['word'];

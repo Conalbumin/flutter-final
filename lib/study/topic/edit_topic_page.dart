@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
-
+import '../../constant/text_style.dart';
+import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 import 'edit_word_dialog.dart';
 
 List<Widget> wordPages = [];
@@ -119,16 +120,14 @@ class _EditTopicPageState extends State<EditTopicPage> {
     );
   }
 
-
-
   @override
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue,
-          title: const Text(
+          title: Text(
             'Edit Topic',
-            style: TextStyle(color: Colors.white),
+            style: appBarStyle,
           ),
           actions: [
             const SizedBox(width: 10),

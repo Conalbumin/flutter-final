@@ -3,8 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'package:quizlet_final_flutter/study/study_mode/typing_page.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
+import '../../constant/text_style.dart';
 import '../csv.dart';
-import '../firebase_study_page.dart';
+import '../firebase_study/add.dart';
+import '../firebase_study/delete.dart';
+import '../firebase_study/fetch.dart';
+import '../firebase_study/related_func.dart';
 import '../folder/add_topic_to_folder.dart';
 import '../study_mode/flashcard_page.dart';
 import '../study_mode/quiz.dart';
@@ -81,11 +85,7 @@ class _TopicPageState extends State<TopicPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_topicName,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25)),
+            Text(_topicName, style: appBarStyle),
             Text('Number of Words: ${widget.numberOfWords}',
                 style: const TextStyle(color: Colors.white, fontSize: 15)),
           ],
@@ -162,12 +162,13 @@ class _TopicPageState extends State<TopicPage> {
                 );
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(widget.topicId, !widget.isPrivate);
-              } else if (choice == 'exportCsv'){
-                List<Map<String, dynamic>> wordData = convertDocumentSnapshotsToMapList(words);
+              } else if (choice == 'exportCsv') {
+                List<Map<String, dynamic>> wordData =
+                    convertDocumentSnapshotsToMapList(words);
                 exportTopicToCSV(wordData, widget.topicName, context);
               } else {
                 pickAndProcessCsvFile(widget.topicId);
-            }
+              }
             },
           ),
         ],
@@ -177,7 +178,7 @@ class _TopicPageState extends State<TopicPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 200, // Adjust the height as needed
+              height: 200,
               child: FutureBuilder(
                 future: fetchWords(widget.topicId),
                 builder:
@@ -229,13 +230,7 @@ class _TopicPageState extends State<TopicPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
-                  child: Text(
-                    "Description: $_text",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
+                  child: Text("Description: $_text", style: normalSubText),
                 ),
               ),
             ),
@@ -269,6 +264,9 @@ class _TopicPageState extends State<TopicPage> {
                             topicName: widget.topicName,
                             numberOfWords: widget.numberOfWords,
                             numberOfQuestions: words.length,
+                            onSelectAnswer: (answers) {
+                              // Handle selected answers here
+                            },
                           ),
                         ),
                       );
@@ -286,6 +284,9 @@ class _TopicPageState extends State<TopicPage> {
                             topicName: widget.topicName,
                             numberOfWords: widget.numberOfWords,
                             numberOfQuestions: words.length,
+                              onType: (answers) {
+                                // Handle typed answers here
+                              }
                           ),
                         ),
                       );
@@ -302,10 +303,10 @@ class _TopicPageState extends State<TopicPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey,
-                    width: 2.0,
+                    color: Colors.indigo,
+                    width: 3.0,
                   ),
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -313,12 +314,6 @@ class _TopicPageState extends State<TopicPage> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          border: const Border(
-                            right: BorderSide(
-                              color: Colors.grey,
-                              width: 2.0,
-                            ),
-                          ),
                           color: showAllWords
                               ? Colors.indigo.withOpacity(0.3)
                               : Colors.transparent,
@@ -331,16 +326,11 @@ class _TopicPageState extends State<TopicPage> {
                             });
                           },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
                             child: Text(
                               'All',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:
-                                    showAllWords ? Colors.indigo : Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                              style: all_FavInTopic,
                             ),
                           ),
                         ),
@@ -359,17 +349,11 @@ class _TopicPageState extends State<TopicPage> {
                             });
                           },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
                             child: Text(
                               'Favorited',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: !showAllWords
-                                    ? Colors.indigo
-                                    : Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                              style: all_FavInTopic,
                             ),
                           ),
                         ),
@@ -486,7 +470,7 @@ class _TopicPageState extends State<TopicPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Cancel'),
             ),

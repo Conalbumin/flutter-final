@@ -28,24 +28,30 @@ class StatisticalWord extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  word,
-                  style: const TextStyle(fontSize: 35, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-                Text(
-                  definition,
-                  style: const TextStyle(fontSize: 20, color: Colors.white),
-                  textAlign: TextAlign.start,
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    word,
+                    style: const TextStyle(fontSize: 25, color: Colors.white),
+                    textAlign: TextAlign.start,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 10,
+                  ),
+                  Text(
+                    definition,
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                    textAlign: TextAlign.start,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 10,
+                  ),
+                ],
+              ),
             ),
             Text(
               status,
-              style: const TextStyle(fontSize: 35, color: Colors.white),
+              style: const TextStyle(fontSize: 20, color: Colors.white),
               textAlign: TextAlign.end,
             ),
           ],

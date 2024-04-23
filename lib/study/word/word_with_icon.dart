@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/word/text_to_speech.dart';
 
-import '../firebase_study_page.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/delete.dart';
+import '../firebase_study/update.dart';
 
 class WordWithIcon extends StatefulWidget {
   final String word;
@@ -51,12 +53,12 @@ class _WordWithIconState extends State<WordWithIcon> {
                 children: [
                   Text(
                     widget.word,
-                    style: const TextStyle(fontSize: 35, color: Colors.white),
+                    style: wordStyle,
                     textAlign: TextAlign.start,
                   ),
                   Text(
                     widget.definition,
-                    style: const TextStyle(fontSize: 35, color: Colors.white),
+                    style: wordStyle,
                     textAlign: TextAlign.start,
                   ),
                 ],

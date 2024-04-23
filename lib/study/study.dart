@@ -18,7 +18,6 @@ class _StudyPageState extends State<StudyPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        // appBar: null,
         body: Column(
           children: [
             const Divider(

@@ -2,7 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text.dart';
 import 'package:quizlet_final_flutter/study/csv.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import 'package:quizlet_final_flutter/study/firebase_study/add.dart';
 import 'study/study.dart';
 import 'setting/setting.dart';
 import 'home/home.dart';

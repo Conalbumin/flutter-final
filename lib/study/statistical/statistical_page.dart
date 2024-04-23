@@ -1,12 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/statistical/statistical_word.dart';
-import '../firebase_study_page.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/statistical/statistical_word.dart';
-import '../firebase_study_page.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/fetch.dart';
 
 class StatisticalPage extends StatefulWidget {
   final String topicId;
@@ -45,11 +41,7 @@ class _StatisticalPageState extends State<StatisticalPage> {
           children: [
             Text(
               widget.topicName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-              ),
+              style: appBarStyle
             ),
             Text(
               'Number of Words: ${widget.numberOfWords}',

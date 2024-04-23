@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 import '../word/text_to_speech.dart';
-import '../firebase_study_page.dart';
 import '../word/word.dart';
 
 class FlashCardPage extends StatefulWidget {
@@ -142,7 +143,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
         title: Center(
           child: Text(
             "${_currentIndex + 1}/${words.length}",
-            style: const TextStyle(color: Colors.white, fontSize: 30),
+            style: appBarStyle,
           ),
         ),
         actions: [
@@ -188,13 +189,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
                   title: Text('Switch language'),
                 ),
               ),
-              const PopupMenuItem<String>(
-                value: 'learnStar',
-                child: ListTile(
-                  leading: Icon(Icons.star),
-                  title: Text('Learn only star word'),
-                ),
-              )
             ],
             onSelected: (String choice) {
               if (choice == 'shuffle') {
@@ -203,7 +197,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                 setState(() {
                   showDefinition = !showDefinition;
                 });
-              } else if (choice == 'learnStar') {}
+              } 
             },
           ),
         ],
@@ -251,7 +245,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                         const Text(
                           "Unlearned",
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.red),
                         )
@@ -270,7 +264,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       children: [
                         const Text("Learned",
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green)),
                         const SizedBox(width: 5),

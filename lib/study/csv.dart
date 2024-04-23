@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
-import 'firebase_study_page.dart';
+import 'package:quizlet_final_flutter/study/firebase_study/add.dart';
 
 void pickAndProcessCsvFile(String topicId) async {
   try {

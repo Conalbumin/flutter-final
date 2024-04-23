@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/study/folder/add_topic_in_folder.dart';
 import 'package:quizlet_final_flutter/study/folder/remove_topic_in_folder.dart';
-import 'package:quizlet_final_flutter/study/topic/topic_tab.dart';
-import '../firebase_study_page.dart';
+import '../../constant/color.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/add.dart';
+import '../firebase_study/delete.dart';
+import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 import '../topic/topic.dart';
 import 'edit_folder_dialog.dart';
 
@@ -26,8 +30,7 @@ class FolderPage extends StatelessWidget {
           children: [
             Text(
               folderName,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+              style: appBarStyle,
             ),
           ],
         ),
@@ -91,10 +94,11 @@ class FolderPage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: button,
         onPressed: () {
           _addTopicToFolder(context);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white,),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

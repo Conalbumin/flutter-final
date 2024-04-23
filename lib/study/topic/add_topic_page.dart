@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quizlet_final_flutter/study/firebase_study_page.dart';
+import '../../constant/text_style.dart';
+import '../firebase_study/add.dart';
 import '../word/add_word.dart';
 import '../word/word_pages.dart';
 
@@ -21,9 +22,9 @@ class _AddTopicPageState extends State<AddTopicPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: const Text(
+        title: Text(
           'Create New Topic',
-          style: TextStyle(color: Colors.white),
+          style: appBarStyle,
         ),
         actions: [
           const SizedBox(width: 10),
