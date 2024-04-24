@@ -70,7 +70,6 @@ class _EditTopicPageState extends State<EditTopicPage> {
           status: status,
         );
       }).toList();
-      print(wordsData);
 
       setState(() {
         wordPages = wordsData.map((data) {

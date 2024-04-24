@@ -180,7 +180,7 @@ class _TopicPageState extends State<TopicPage> {
                   _numberOfWords++;
                 });
               } else if (choice == 'setPrivate') {
-                setPrivateTopic(widget.topicId, !widget.isPrivate);
+                setPrivateTopic(context,widget.topicId, !widget.isPrivate);
               } else if (choice == 'exportCsv') {
                 List<Map<String, dynamic>> wordData =
                     convertDocumentSnapshotsToMapList(words);
