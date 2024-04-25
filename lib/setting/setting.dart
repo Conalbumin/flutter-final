@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constant/color.dart';
 import '../constant/style.dart';
 import 'firebase_setting_page.dart';
@@ -307,6 +308,8 @@ class _SettingPageState extends State<SettingPage> {
 
   void logout() async {
     await FirebaseAuth.instance.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', false);
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
