@@ -35,7 +35,8 @@ class TopicPage extends StatefulWidget {
     required this.numberOfWords,
     required this.text,
     required this.isPrivate,
-    required this.userId, required this.refreshCallback,
+    required this.userId,
+    required this.refreshCallback,
   }) : super(key: key);
 
   @override
@@ -170,17 +171,18 @@ class _TopicPageState extends State<TopicPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          AddWordInTopic(topicId: widget.topicId,
-                            handleWordAdded: (topicId) {
-                              handleWordAdded(topicId);
-                            },),
+                      builder: (context) => AddWordInTopic(
+                        topicId: widget.topicId,
+                        handleWordAdded: (topicId) {
+                          handleWordAdded(topicId);
+                        },
+                      ),
                     ),
                   );
                   _numberOfWords++;
                 });
               } else if (choice == 'setPrivate') {
-                setPrivateTopic(context,widget.topicId, !widget.isPrivate);
+                setPrivateTopic(context, widget.topicId, !widget.isPrivate);
               } else if (choice == 'exportCsv') {
                 List<Map<String, dynamic>> wordData =
                     convertDocumentSnapshotsToMapList(words);
@@ -208,33 +210,59 @@ class _TopicPageState extends State<TopicPage> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     List<DocumentSnapshot> words = snapshot.data!;
-                    return Swiper(
-                      pagination: const SwiperPagination(
-                        builder: DotSwiperPaginationBuilder(
-                          color: Colors.white,
-                          activeColor: Colors.indigo,
-                          activeSize: 15,
-                          size: 10,
+                    if (words.isEmpty) {
+                      return Container(
+                        color: Colors.lightBlueAccent,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Please provide at least',
+                                style: normalText,
+                              ),
+                              Text(
+                                '3 vocabulary words to start',
+                                style: normalText,
+                              ),
+                              Text(
+                                'studying',
+                                style: normalText,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: words.length,
-                      itemBuilder: (context, index) {
-                        String word = words[index]['word'];
-                        String definition = words[index]['definition'];
-                        String status = words[index]['status'];
-                        bool isFavorited = words[index]['isFavorited'];
-                        return WordItem(
-                          definition: definition,
-                          word: word,
-                          wordId: words[index].id,
-                          topicId: widget.topicId,
-                          status: status,
-                          isFavorited: isFavorited.toString() ?? '',
-                          showDefinition: false,
-                        );
-                      },
-                    );
+                      );
+                    } else {
+                      return Swiper(
+                        pagination: const SwiperPagination(
+                          builder: DotSwiperPaginationBuilder(
+                            color: Colors.white,
+                            activeColor: Colors.indigo,
+                            activeSize: 15,
+                            size: 10,
+                          ),
+                        ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: words.length,
+                        itemBuilder: (context, index) {
+                          String word = words[index]['word'];
+                          String definition = words[index]['definition'];
+                          String status = words[index]['status'];
+                          bool isFavorited = words[index]['isFavorited'];
+                          return WordItem(
+                            definition: definition,
+                            word: word,
+                            wordId: words[index].id,
+                            topicId: widget.topicId,
+                            status: status,
+                            isFavorited: isFavorited.toString() ?? '',
+                            showDefinition: false,
+                          );
+                        },
+                      );
+                    }
                   }
                 },
               ),
@@ -435,7 +463,8 @@ class _TopicPageState extends State<TopicPage> {
                               isFavorited: isFavorited.toString() ?? '',
                               handleWordDeleted: (wordId) {
                                 handleWordDeleted(wordId);
-                              },                            );
+                              },
+                            );
                           },
                         );
                 }

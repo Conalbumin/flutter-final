@@ -46,7 +46,8 @@ class _TypingPageState extends State<TypingPage> {
     List<String> newCorrectAnswersInCode = [];
 
     words.forEach((question) {
-      String correctAnswer = showDefinition ? question['word'] : question['definition'];
+      String correctAnswer =
+          showDefinition ? question['word'] : question['definition'];
       newCorrectAnswers.add(correctAnswer);
       newCorrectAnswersInCode.add(correctAnswer.toLowerCase());
     });
@@ -56,7 +57,6 @@ class _TypingPageState extends State<TypingPage> {
       correctAnswersInCode = newCorrectAnswersInCode;
     });
     print(correctAnswers);
-
   }
 
   void shuffleWords() {
@@ -177,10 +177,12 @@ class _TypingPageState extends State<TypingPage> {
         backgroundColor: Colors.blue,
         title: Center(
           child: _currentIndex >= widget.numberOfQuestions
-              ? Text(
-                  'Result',
-                  style: appBarStyle,
-                )
+              ? words.isEmpty
+                  ? null
+                  : Text(
+                      'Result',
+                      style: appBarStyle,
+                    )
               : Text(
                   "${_currentIndex + 1}/${widget.numberOfWords}",
                   style: appBarStyle,
@@ -232,7 +234,29 @@ class _TypingPageState extends State<TypingPage> {
             } else {
               words = snapshot.data ?? [];
               if (words.isEmpty) {
-                return const Text('No words found for this topic.');
+                return Container(
+                  color: Colors.lightBlueAccent,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Please provide at least',
+                          style: normalText,
+                        ),
+                        Text(
+                          '3 vocabulary words to start',
+                          style: normalText,
+                        ),
+                        Text(
+                          'studying',
+                          style: normalText,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
               if (_currentIndex >= widget.numberOfQuestions) {
                 int correctCount = 0;

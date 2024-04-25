@@ -187,10 +187,12 @@ class _QuizPageState extends State<QuizPage> {
         backgroundColor: Colors.blue,
         title: Center(
           child: _currentIndex >= widget.numberOfQuestions
-              ? Text(
-                  'Result',
-                  style: appBarStyle,
-                )
+              ? words.isEmpty
+                  ? null
+                  : Text(
+                      'Result',
+                      style: appBarStyle,
+                    )
               : Text(
                   "${_currentIndex + 1}/${widget.numberOfWords}",
                   style: appBarStyle,
@@ -242,7 +244,29 @@ class _QuizPageState extends State<QuizPage> {
             } else {
               words = snapshot.data ?? [];
               if (words.isEmpty) {
-                return const Text('No words found for this topic.');
+                return Container(
+                  color: Colors.lightBlueAccent,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Please provide at least',
+                          style: normalText,
+                        ),
+                        Text(
+                          '3 vocabulary words to start',
+                          style: normalText,
+                        ),
+                        Text(
+                          'studying',
+                          style: normalText,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
               if (_currentIndex >= widget.numberOfQuestions) {
                 int correctCount = 0;
