@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart';
 import 'package:quizlet_final_flutter/authentication/login.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 import 'form_container_widget.dart';
 
 class SignUp extends StatefulWidget {
@@ -154,12 +155,7 @@ class _SignUpState extends State<SignUp> {
         isSigningUp = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      showToast("Password do not match");
       return;
     }
 
@@ -170,10 +166,10 @@ class _SignUpState extends State<SignUp> {
     });
 
     if (user != null) {
-      print("Sign up successful!");
+      showToast("Sign up successful!");
       Navigator.pushNamed(context, "/home");
     } else {
-      print("Sign up failed!");
+      showToast("Sign up failed!");
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:quizlet_final_flutter/authentication/firebase_auth_service.dart'
 import 'package:quizlet_final_flutter/authentication/recovery.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../constant/toast.dart';
 import 'form_container_widget.dart';
 
 class Login extends StatefulWidget {
@@ -162,12 +163,13 @@ class _LoginState extends State<Login> {
     });
 
     if (user != null) {
-      print("Log in successful!");
+      showToast("Log in successful!");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('isLoggedIn', true);
       Navigator.pushNamed(context, "/home");
     } else {
-      print("Log in failed!");
+      showToast("Log in failed!");
+
     }
   }
 

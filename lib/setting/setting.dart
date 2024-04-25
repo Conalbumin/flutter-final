@@ -6,6 +6,7 @@ import 'package:quizlet_final_flutter/constant/text_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constant/color.dart';
 import '../constant/style.dart';
+import '../constant/toast.dart';
 import 'firebase_setting_page.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -261,17 +262,33 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
-  Future<String?> _showPasswordInputDialog() async {
-    TextEditingController passwordController = TextEditingController();
+  Future<Map<String, String>?> _showPasswordInputDialog() async {
+    TextEditingController oldPasswordController = TextEditingController();
+    TextEditingController newPasswordController = TextEditingController();
 
-    return showDialog<String>(
+    return showDialog<Map<String, String>>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enter New Password'),
-          content: TextField(
-            controller: passwordController,
-            onChanged: (value) {},
+          title: const Text('Change Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Old Password',
+                ),
+              ),
+              TextField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                ),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -282,7 +299,10 @@ class _SettingPageState extends State<SettingPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(passwordController.text);
+                Navigator.of(context).pop({
+                  'oldPassword': oldPasswordController.text,
+                  'newPassword': newPasswordController.text,
+                });
               },
               child: const Text('OK'),
             ),
@@ -293,10 +313,21 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   void changePassword() async {
-    String? newPassword = await _showPasswordInputDialog();
-    if (newPassword != null && newPassword.isNotEmpty) {
+    Map<String, String>? passwords = await _showPasswordInputDialog();
+    if (passwords != null && passwords['newPassword'] != null && passwords['newPassword']!.isNotEmpty) {
       try {
-        await FirebaseAuth.instance.currentUser!.updatePassword(newPassword);
+        String? oldPassword = passwords['oldPassword'];
+        if (oldPassword == null || oldPassword.isEmpty) {
+          showToast("Please enter your old password to confirm.");
+          return;
+        }
+
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: _user!.email!,
+          password: oldPassword,
+        );
+        await _user!.reauthenticateWithCredential(credential);
+        await _user!.updatePassword(passwords['newPassword']!);
         showToast("Password updated successfully.");
       } catch (e) {
         showToast("Error updating password: $e");
@@ -313,9 +344,5 @@ class _SettingPageState extends State<SettingPage> {
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
-  void showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-    );
-  }
+
 }
