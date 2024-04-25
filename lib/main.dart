@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/authentication/signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'authentication/login.dart';
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,11 +11,15 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const App());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  runApp(App(isLoggedIn: isLoggedIn));
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final bool isLoggedIn;
+
+  const App({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +36,7 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.light,
       title: 'QuizPop',
       debugShowCheckedModeBanner: false,
+      initialRoute: isLoggedIn ? '/home' : '/login',
       routes: {
         '/': (context) => const Login(),
         '/login': (context) => const Login(),
