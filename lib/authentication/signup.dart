@@ -18,12 +18,14 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _passwordConfirmController.dispose();
     super.dispose();
   }
 
@@ -66,6 +68,14 @@ class _SignUpState extends State<SignUp> {
                 FormContainerWidget(
                   controller: _passwordController,
                   hintText: "Password",
+                  isPasswordField: true,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                FormContainerWidget(
+                  controller: _passwordConfirmController,
+                  hintText: "Enter password again",
                   isPasswordField: true,
                 ),
                 const SizedBox(
@@ -130,7 +140,6 @@ class _SignUpState extends State<SignUp> {
   }
 
   void _signUp() async {
-
     setState(() {
       isSigningUp = true;
     });
@@ -138,12 +147,28 @@ class _SignUpState extends State<SignUp> {
     String username = _usernameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
+    String confirmPassword = _passwordConfirmController.text;
 
-    User? user = await _auth.signUpWithEmailAndPassword(email, password, username);
+    if (password != confirmPassword) {
+      setState(() {
+        isSigningUp = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    User? user = await _auth.signUpWithEmailAndPassword(context, email, password, username);
 
     setState(() {
       isSigningUp = false;
     });
+
     if (user != null) {
       print("Sign up successful!");
       Navigator.pushNamed(context, "/home");

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<User?> signUpWithEmailAndPassword(String email, String password, String username) async {
+  Future<User?> signUpWithEmailAndPassword(BuildContext context, String email, String password, String username) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       await addUserToFirestore(credential.user!, username); // Pass username to add to Firestore
@@ -13,6 +14,12 @@ class FirebaseAuthService {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         print("The email address is already in use");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('The email address is already in use'),
+            duration: Duration(seconds: 2),
+          ),
+        );
       } else {
         print("An error occurred: ${e.code}");
       }
