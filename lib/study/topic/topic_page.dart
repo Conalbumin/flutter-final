@@ -57,12 +57,15 @@ class _TopicPageState extends State<TopicPage> {
     _topicName = widget.topicName;
     _text = widget.text;
     _numberOfWords = widget.numberOfWords;
-    fetchWords(widget.topicId).then((value) {
-      setState(() {
-        words = value;
-        print("initState $words");
-        updateFavWordsList();
-      });
+    fetchDataAndUpdateState();
+  }
+
+  Future<void> fetchDataAndUpdateState() async {
+    List<DocumentSnapshot> fetchedWords = await fetchWords(widget.topicId);
+    setState(() {
+      words = fetchedWords;
+      print("initState $words");
+      updateFavWordsList();
     });
   }
 
@@ -74,15 +77,7 @@ class _TopicPageState extends State<TopicPage> {
   }
 
   void handleWordAdded(String topicId) {
-    setState(() {
-      fetchWords(topicId).then((value) {
-        setState(() {
-          words = value;
-          print("handleWordAdded $words");
-          updateFavWordsList();
-        });
-      });
-    });
+    fetchDataAndUpdateState();
   }
 
   void handleWordDeleted(String wordId) {
@@ -92,6 +87,7 @@ class _TopicPageState extends State<TopicPage> {
       _numberOfWords--;
     });
   }
+
 
   @override
   void dispose() {
@@ -250,16 +246,10 @@ class _TopicPageState extends State<TopicPage> {
                       );
                     } else {
                       return Swiper(
-                        pagination: const SwiperPagination(
-                          builder: DotSwiperPaginationBuilder(
-                            color: Colors.white,
-                            activeColor: Colors.indigo,
-                            activeSize: 15,
-                            size: 10,
-                          ),
-                        ),
                         scrollDirection: Axis.horizontal,
                         itemCount: words.length,
+                        loop: true,
+                        viewportFraction: 0.6,
                         itemBuilder: (context, index) {
                           String word = words[index]['word'];
                           String definition = words[index]['definition'];

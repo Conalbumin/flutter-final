@@ -8,7 +8,9 @@ class AddWordInTopic extends StatefulWidget {
   final String topicId;
   final void Function(String topicId) handleWordAdded;
 
-  const AddWordInTopic({Key? key, required this.topicId, required this.handleWordAdded}) : super(key: key);
+  const AddWordInTopic(
+      {Key? key, required this.topicId, required this.handleWordAdded})
+      : super(key: key);
 
   @override
   _AddWordInTopicState createState() => _AddWordInTopicState();
@@ -22,10 +24,7 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text(
-          'Add new Word',
-          style: appBarStyle
-        ),
+        title: Text('Add new Word', style: appBarStyle),
         actions: [
           const SizedBox(width: 10),
           IconButton(
@@ -85,7 +84,7 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
       }
       addWord(widget.topicId, wordsData);
       widget.handleWordAdded(widget.topicId);
-          wordPages.clear();
+      wordPages.clear();
       Navigator.of(context).pop();
     }
   }

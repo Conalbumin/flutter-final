@@ -4,13 +4,19 @@ import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study/add.dart';
+import 'firebase_study/fetch.dart';
 
-void pickAndProcessCsvFile(String topicId, void Function(String) handleWordAdded, Function(int) updateNumberOfWords) async {
+void pickAndProcessCsvFile(
+    String topicId,
+    void Function(String) handleWordAdded,
+    Function(int) updateNumberOfWords) async {
   try {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
+
+    FilePickerStatus.done;
 
     if (result == null) {
       return;
@@ -26,10 +32,6 @@ void pickAndProcessCsvFile(String topicId, void Function(String) handleWordAdded
     String fileContent = await file.readAsString();
 
     List<List<dynamic>> csvData = CsvToListConverter().convert(fileContent);
-    print("csvData ${csvData}");
-
-    String topicName = csvData[0][0];
-    String description = csvData[0][1];
 
     List<Map<String, String>> words = [];
     for (int i = 1; i < csvData.length; i++) {
@@ -41,7 +43,6 @@ void pickAndProcessCsvFile(String topicId, void Function(String) handleWordAdded
     addWord(topicId, words);
     handleWordAdded(topicId);
     updateNumberOfWords(words.length);
-    FilePickerStatus.done;
   } catch (e) {
     print('Error picking/processing CSV file: $e');
   }
@@ -60,8 +61,8 @@ List<Map<String, dynamic>> convertDocumentSnapshotsToMapList(
   }).toList();
 }
 
-
-Future<void> exportTopicToCSV(List<Map<String, dynamic>> words, String topicName, BuildContext context) async {
+Future<void> exportTopicToCSV(List<Map<String, dynamic>> words,
+    String topicName, BuildContext context) async {
   List<List<dynamic>> csvData = [
     ['word', 'definition', 'status', 'isFavorited']
   ];
