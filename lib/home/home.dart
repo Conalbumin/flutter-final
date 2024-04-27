@@ -81,7 +81,6 @@ class _HomePageState extends State<HomePage> {
                       isPrivate: isPrivate, userId: userId,
                     );
                   } else {
-                    // Return an empty container if the topic is private
                     return Container();
                   }
                 },

@@ -11,6 +11,15 @@ Stream<QuerySnapshot> getTopics() {
       .snapshots();
 }
 
+Stream<QuerySnapshot> getFolders() {
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseFirestore.instance
+      .collection('folders')
+      .where('createdBy', isEqualTo: userUid)
+      .snapshots();
+}
+
+
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
   String userUid = FirebaseAuth.instance.currentUser!.uid;
   return FirebaseFirestore.instance

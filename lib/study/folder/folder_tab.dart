@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/study/firebase_study/fetch.dart';
 import 'folder.dart';
 
 class FolderTab extends StatelessWidget {
@@ -8,7 +9,7 @@ class FolderTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('folders').snapshots(),
+      stream: getFolders(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
