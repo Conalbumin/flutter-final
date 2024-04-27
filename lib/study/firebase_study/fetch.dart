@@ -38,6 +38,7 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
         .doc(topicId)
         .collection('words')
         .get();
+
     return querySnapshot.docs;
   } catch (e) {
     print('Error fetching words: $e');

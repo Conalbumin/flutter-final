@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/firebase_study/add.dart';
 
-void pickAndProcessCsvFile(String topicId) async {
+void pickAndProcessCsvFile(String topicId, void Function(String) handleWordAdded, Function(int) updateNumberOfWords) async {
   try {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -39,6 +39,9 @@ void pickAndProcessCsvFile(String topicId) async {
     }
 
     addWord(topicId, words);
+    handleWordAdded(topicId);
+    updateNumberOfWords(words.length);
+    FilePickerStatus.done;
   } catch (e) {
     print('Error picking/processing CSV file: $e');
   }

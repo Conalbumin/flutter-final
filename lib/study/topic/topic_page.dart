@@ -60,6 +60,7 @@ class _TopicPageState extends State<TopicPage> {
     fetchWords(widget.topicId).then((value) {
       setState(() {
         words = value;
+        print("initState $words");
         updateFavWordsList();
       });
     });
@@ -77,6 +78,7 @@ class _TopicPageState extends State<TopicPage> {
       fetchWords(topicId).then((value) {
         setState(() {
           words = value;
+          print("handleWordAdded $words");
           updateFavWordsList();
         });
       });
@@ -89,6 +91,11 @@ class _TopicPageState extends State<TopicPage> {
       favoritedWords.removeWhere((word) => word.id == wordId);
       _numberOfWords--;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -188,7 +195,14 @@ class _TopicPageState extends State<TopicPage> {
                     convertDocumentSnapshotsToMapList(words);
                 exportTopicToCSV(wordData, widget.topicName, context);
               } else {
-                pickAndProcessCsvFile(widget.topicId);
+                setState(() {
+                  pickAndProcessCsvFile(widget.topicId, handleWordAdded,
+                      (int numberOfCsv) {
+                    setState(() {
+                      _numberOfWords += numberOfCsv;
+                    });
+                  });
+                });
               }
             },
           ),
@@ -508,6 +522,7 @@ class _TopicPageState extends State<TopicPage> {
         _topicName = result['topicName'];
         _text = result['description'];
         fetchWords(widget.topicId);
+        print(fetchWords(widget.topicId));
       });
     }
   }
