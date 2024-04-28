@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 import 'package:quizlet_final_flutter/study/firebase_study/add.dart';
 import 'firebase_study/fetch.dart';
 
@@ -43,6 +44,8 @@ void pickAndProcessCsvFile(
     addWord(topicId, words);
     handleWordAdded(topicId);
     updateNumberOfWords(words.length);
+    showToast("Imported successfully");
+    showToast("Please go back to previous page to see the change");
   } catch (e) {
     print('Error picking/processing CSV file: $e');
   }
