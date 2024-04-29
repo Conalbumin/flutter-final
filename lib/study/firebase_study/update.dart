@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-
+import 'package:quizlet_final_flutter/constant/toast.dart';
 import '../word/word_data_for_edit.dart';
 
 Future<void> updateTopic(
@@ -11,7 +9,7 @@ Future<void> updateTopic(
       'name': newTopicName,
       'text': newDescription,
     });
-    print('Topic updated successfully');
+    showToast('Topic updated successfully');
   } catch (e) {
     print('Error updating topic: $e');
   }
@@ -27,7 +25,7 @@ Future<void> updateFolder(
       'name': newFolderName,
       'text': newDescription,
     });
-    print('Folder updated successfully');
+    showToast('Folder updated successfully');
   } catch (e) {
     print('Error updating folder: $e');
   }
@@ -49,9 +47,9 @@ Future<void> updateWords(String topicId, List<WordData> wordsData) async {
         'isFavorited': wordData.isFavorited,
       });
     }
-    print('Words updated successfully');
+    showToast('Word updated successfully');
   } catch (e) {
-    print('Error updating words: $e');
+    print('Error updating word: $e');
   }
 }
 
@@ -65,9 +63,9 @@ Future<void> updateWordStatus(
         .collection('words')
         .doc(wordId)
         .update({'status': newStatus});
-    print('Word status updated successfully');
+    showToast('Word updated successfully');
   } catch (e) {
-    print('Error updating word status: $e');
+    print('Error updating word: $e');
   }
 }
 
@@ -80,8 +78,8 @@ Future<void> updateWordIsFavorited(
         .collection('words')
         .doc(wordId)
         .update({'isFavorited': newIsFavorited});
-    print('Word status updated successfully');
+    showToast('Word updated successfully');
   } catch (e) {
-    print('Error updating word status: $e');
+    print('Error updating word: $e');
   }
 }

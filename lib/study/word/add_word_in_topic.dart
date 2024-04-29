@@ -7,9 +7,13 @@ import '../word/word_pages.dart';
 class AddWordInTopic extends StatefulWidget {
   final String topicId;
   final void Function(String topicId) handleWordAdded;
+  final Function(int) updateNumberOfWords;
 
   const AddWordInTopic(
-      {Key? key, required this.topicId, required this.handleWordAdded})
+      {Key? key,
+      required this.topicId,
+      required this.handleWordAdded,
+      required this.updateNumberOfWords})
       : super(key: key);
 
   @override
@@ -83,6 +87,7 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
         }
       }
       addWord(widget.topicId, wordsData);
+      widget.updateNumberOfWords(wordsData.length);
       widget.handleWordAdded(widget.topicId);
       wordPages.clear();
       Navigator.of(context).pop();

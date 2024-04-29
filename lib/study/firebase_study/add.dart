@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 
 Future<void> addTopic(
     String topicName, String text, int numberOfWords, bool isPrivate) async {
   try {
     String userUid =
-        FirebaseAuth.instance.currentUser!.uid; // Get current user's UID
+        FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': numberOfWords,
       'isPrivate': isPrivate,
-      'createdBy': userUid, // Store user UID along with the topic
+      'createdBy': userUid,
     });
   } catch (e) {
     print('Error adding topic: $e');
@@ -22,7 +22,7 @@ Future<void> addTopic(
 Future<void> addFolder(String folderName, String text) async {
   try {
     String userUid =
-        FirebaseAuth.instance.currentUser!.uid; // Get current user's UID
+        FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection('folders').add({
       'name': folderName,
       'text': text,
@@ -39,7 +39,7 @@ Future<void> addWord(
     int totalWordsAdded = wordsData.length;
 
     for (var wordData in wordsData) {
-      String status = wordData['status'] ?? 'unLearned';
+      String status = wordData['status'] ?? 'Unlearned';
       bool isFavorited = false;
 
       await FirebaseFirestore.instance
@@ -146,6 +146,7 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
     await batch.commit();
 
     print('Topic and related data added to folder successfully');
+    showToast('Topic and related data added to folder successfully');
   } catch (e) {
     print('Error adding topic to folder: $e');
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 import 'package:quizlet_final_flutter/study/folder/add_topic_in_folder.dart';
 import 'package:quizlet_final_flutter/study/folder/remove_topic_in_folder.dart';
 import '../../constant/color.dart';
@@ -16,11 +17,10 @@ class FolderPage extends StatelessWidget {
   final String folderName;
   final String text;
 
-  const FolderPage(
-      {Key? key,
-      required this.folderId,
-      required this.folderName,
-      required this.text});
+  const FolderPage({Key? key,
+    required this.folderId,
+    required this.folderName,
+    required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +54,14 @@ class FolderPage extends StatelessWidget {
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).pop();
                         },
                         child: const Text('Cancel'),
                       ),
                       TextButton(
                         onPressed: () {
                           deleteFolder(context, folderId);
-                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).pop();
                         },
                         child: const Text('Remove'),
                       ),
@@ -207,5 +207,7 @@ class FolderPage extends StatelessWidget {
         );
       },
     );
+    showToast("Imported successfully");
+    showToast("Please go back to the previous page to see result");
   }
 }

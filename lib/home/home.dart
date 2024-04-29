@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                 return Text('Error: ${snapshot.error}');
               }
               return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
+                itemCount: snapshot.data!.docs.length > 5 ? 5 : snapshot.data!.docs.length,
                 itemBuilder: (BuildContext context, int index) {
                   DocumentSnapshot document = snapshot.data!.docs[index];
                   String topicId = document.id;

@@ -64,7 +64,6 @@ class _TopicPageState extends State<TopicPage> {
     List<DocumentSnapshot> fetchedWords = await fetchWords(widget.topicId);
     setState(() {
       words = fetchedWords;
-      print("initState $words");
       updateFavWordsList();
     });
   }
@@ -87,7 +86,6 @@ class _TopicPageState extends State<TopicPage> {
       _numberOfWords--;
     });
   }
-
 
   @override
   void dispose() {
@@ -170,20 +168,22 @@ class _TopicPageState extends State<TopicPage> {
               } else if (choice == 'addToFolder') {
                 _showFolderTab(context);
               } else if (choice == 'addWordInTopic') {
-                setState(() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddWordInTopic(
-                        topicId: widget.topicId,
-                        handleWordAdded: (topicId) {
-                          handleWordAdded(topicId);
-                        },
-                      ),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddWordInTopic(
+                      topicId: widget.topicId,
+                      handleWordAdded: (topicId) {
+                        handleWordAdded(topicId);
+                      },
+                      updateNumberOfWords: (int numberOfWordAdded) {
+                        setState(() {
+                          _numberOfWords += numberOfWordAdded;
+                        });
+                      },
                     ),
-                  );
-                  _numberOfWords++;
-                });
+                  ),
+                );
               } else if (choice == 'setPrivate') {
                 setPrivateTopic(context, widget.topicId, !widget.isPrivate);
               } else if (choice == 'exportCsv') {
@@ -512,7 +512,6 @@ class _TopicPageState extends State<TopicPage> {
         _topicName = result['topicName'];
         _text = result['description'];
         fetchWords(widget.topicId);
-        print(fetchWords(widget.topicId));
       });
     }
   }

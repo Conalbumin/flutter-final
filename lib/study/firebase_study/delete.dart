@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 
 void deleteFolder(BuildContext context, String folderId) {
   try {
-    // Delete all topics within the folder and their associated words
     FirebaseFirestore.instance
         .collection('folders')
         .doc(folderId)
         .collection('topics')
         .get()
         .then((querySnapshot) {
+      // Create a list to store all the asynchronous delete operations
+      List<Future> deleteOperations = [];
+
       querySnapshot.docs.forEach((topicDoc) {
         // Delete all words associated with the topic
-        FirebaseFirestore.instance
+        deleteOperations.add(FirebaseFirestore.instance
             .collection('topics')
             .doc(topicDoc.id)
             .collection('words')
@@ -24,14 +26,14 @@ void deleteFolder(BuildContext context, String folderId) {
           });
         }).catchError((error) {
           print('Error fetching words for deletion: $error');
-        });
+        }));
 
         // Delete the topic document
-        topicDoc.reference.delete();
+        deleteOperations.add(topicDoc.reference.delete());
       });
 
       // Delete the topics collection within the folder
-      FirebaseFirestore.instance
+      deleteOperations.add(FirebaseFirestore.instance
           .collection('folders')
           .doc(folderId)
           .collection('topics')
@@ -42,10 +44,10 @@ void deleteFolder(BuildContext context, String folderId) {
         });
       }).catchError((error) {
         print('Error deleting topics collection: $error');
-      });
+      }));
 
       // Delete the folder itself
-      FirebaseFirestore.instance
+      deleteOperations.add(FirebaseFirestore.instance
           .collection('folders')
           .doc(folderId)
           .delete()
@@ -54,6 +56,13 @@ void deleteFolder(BuildContext context, String folderId) {
         Navigator.of(context).pop();
       }).catchError((error) {
         print('Error deleting folder: $error');
+      }));
+
+      // Wait for all delete operations to complete
+      Future.wait(deleteOperations).then((_) {
+        print('All delete operations completed successfully');
+      }).catchError((error) {
+        print('Error completing delete operations: $error');
       });
     }).catchError((error) {
       print('Error fetching topics for deletion: $error');
@@ -112,7 +121,8 @@ void deleteTopicInFolder(
 
     // Delete the reference of the topic from the folder
     topicRef.delete().then((_) {
-      print('Topic removed from folder successfully');
+      showToast('Topic removed from folder successfully');
+      showToast("Please go back to the previous page to see result");
     }).catchError((error) {
       print('Error removing topic from folder: $error');
     });
