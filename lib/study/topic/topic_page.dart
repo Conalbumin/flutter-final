@@ -317,7 +317,7 @@ class _TopicPageState extends State<TopicPage> {
                             numberOfQuestions: words.length,
                             onSelectAnswer: (answers) {
                               // Handle selected answers here
-                            },
+                            }, showAllWords: showAllWords,
                           ),
                         ),
                       );
@@ -335,6 +335,7 @@ class _TopicPageState extends State<TopicPage> {
                               topicName: widget.topicName,
                               numberOfWords: widget.numberOfWords,
                               numberOfQuestions: words.length,
+                              showAllWords: showAllWords,
                               onType: (answers) {
                                 // Handle typed answers here
                               }),

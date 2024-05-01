@@ -78,7 +78,7 @@ Future<void> updateWordIsFavorited(
         .collection('words')
         .doc(wordId)
         .update({'isFavorited': newIsFavorited});
-    showToast('Word updated successfully');
+    print('Word updated successfully');
   } catch (e) {
     print('Error updating word: $e');
   }

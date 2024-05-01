@@ -11,6 +11,7 @@ class QuizPage extends StatefulWidget {
   final String topicName;
   final int numberOfWords;
   final int numberOfQuestions;
+  final bool showAllWords;
   final Function(List<String>) onSelectAnswer;
 
   const QuizPage({
@@ -20,6 +21,7 @@ class QuizPage extends StatefulWidget {
     required this.numberOfQuestions,
     required this.numberOfWords,
     required this.onSelectAnswer,
+    required this.showAllWords,
   }) : super(key: key);
 
   @override
@@ -29,7 +31,6 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
-  late Future<List<DocumentSnapshot>> wordsFuture;
   List<DocumentSnapshot> questions = [];
   List<List<String>> options = [];
   List<List<bool>> optionSelected = [];
@@ -38,7 +39,7 @@ class _QuizPageState extends State<QuizPage> {
   List<String> selectedAnswers = [];
   String correctAns = '';
   bool showDefinition = false;
-  late List<DocumentSnapshot> words;
+  List<DocumentSnapshot> words = [];
   bool hasSpoken = false;
 
   void shuffleQuestionsAndOptions() {
@@ -61,17 +62,16 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
-  void fetchQuestions() async {
+  void fetchQuestions(List<DocumentSnapshot> words) async {
     try {
-      List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
-          words.sublist(0, widget.numberOfQuestions);
+      words.sublist(0, words.length);
 
       List<List<String>> newOptions = [];
 
       selectedQuestions.forEach((question) {
         String correctAnswer =
-            showDefinition ? question['word'] : question['definition'];
+        showDefinition ? question['word'] : question['definition'];
 
         List<String> allOptions = [correctAnswer];
 
@@ -99,9 +99,9 @@ class _QuizPageState extends State<QuizPage> {
 
         selectedQuestions.forEach((question) {
           String correctAnswer =
-              showDefinition ? question['word'] : question['definition'];
+          showDefinition ? question['word'] : question['definition'];
           List<bool> selected =
-              List.generate(options[questions.length].length, (index) => false);
+          List.generate(options[questions.length].length, (index) => false);
           questions.add(question);
           correctAnswers.add(correctAnswer);
           selectedAnswers.add('');
@@ -138,7 +138,7 @@ class _QuizPageState extends State<QuizPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                if (_currentIndex <= widget.numberOfQuestions - 1) {
+                if (_currentIndex <= words.length - 1) {
                   setState(() {
                     _currentIndex++;
                   });
@@ -176,8 +176,22 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
-    wordsFuture = fetchWords(widget.topicId);
-    fetchQuestions();
+    fetchWords(widget.topicId).then((List<DocumentSnapshot> fetchedWords) {
+      setState(() {
+        if (widget.showAllWords) {
+          words = fetchedWords;
+        } else {
+          words = fetchedWords
+              .where((word) => word['isFavorited'] == true)
+              .toList();
+        }
+
+        if (words.isNotEmpty) {
+          speak(words[_currentIndex]['word']);
+        }
+      });
+      fetchQuestions(words);
+    });
   }
 
   @override
@@ -186,7 +200,7 @@ class _QuizPageState extends State<QuizPage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Center(
-          child: _currentIndex >= widget.numberOfQuestions
+          child: _currentIndex >= words.length
               ? words.isEmpty
                   ? null
                   : Text(
@@ -194,7 +208,7 @@ class _QuizPageState extends State<QuizPage> {
                       style: appBarStyle,
                     )
               : Text(
-                  "${_currentIndex + 1}/${widget.numberOfWords}",
+                  "${_currentIndex + 1}/${words.length}",
                   style: appBarStyle,
                 ),
         ),
@@ -223,7 +237,7 @@ class _QuizPageState extends State<QuizPage> {
               if (choice == 'switchLanguage') {
                 setState(() {
                   showDefinition = !showDefinition;
-                  fetchQuestions();
+                  fetchQuestions(words);
                 });
               } else if (choice == 'shuffle') {
                 shuffleQuestionsAndOptions();
@@ -235,7 +249,7 @@ class _QuizPageState extends State<QuizPage> {
       body: Container(
         padding: const EdgeInsets.all(20),
         child: FutureBuilder<List<DocumentSnapshot>>(
-          future: wordsFuture,
+          future: Future.value(words),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
@@ -268,14 +282,14 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                 );
               }
-              if (_currentIndex >= widget.numberOfQuestions) {
+              if (_currentIndex >= words.length) {
                 int correctCount = 0;
                 for (int i = 0; i < selectedAnswers.length; i++) {
                   if (selectedAnswers[i] == correctAnswers[i]) {
                     correctCount++;
                   }
                 }
-                return buildQuizResult(correctCount, widget.numberOfQuestions,
+                return buildQuizResult(correctCount, words.length,
                     selectedAnswers, correctAnswers, words, showDefinition);
               }
               if (!hasSpoken) {

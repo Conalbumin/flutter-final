@@ -10,6 +10,7 @@ class TypingPage extends StatefulWidget {
   final String topicName;
   final int numberOfWords;
   final int numberOfQuestions;
+  final bool showAllWords;
   final Function(List<String>) onType;
 
   const TypingPage(
@@ -18,7 +19,8 @@ class TypingPage extends StatefulWidget {
       required this.topicName,
       required this.numberOfWords,
       required this.numberOfQuestions,
-      required this.onType});
+      required this.onType,
+      required this.showAllWords});
 
   @override
   State<TypingPage> createState() => _TypingPageState();
@@ -27,7 +29,6 @@ class TypingPage extends StatefulWidget {
 class _TypingPageState extends State<TypingPage> {
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
-  late Future<List<DocumentSnapshot>> wordsFuture;
   FocusNode _textFocus = FocusNode();
   List<String> correctAnswersInCode = [];
   List<String> correctAnswers = [];
@@ -37,7 +38,7 @@ class _TypingPageState extends State<TypingPage> {
   List<String> userAnswers = [];
   List<String> userAnswersInCode = [];
   bool showDefinition = false;
-  late List<DocumentSnapshot> words;
+  List<DocumentSnapshot> words = [];
   String userInput = '';
   bool hasSpoken = false;
 
@@ -82,11 +83,10 @@ class _TypingPageState extends State<TypingPage> {
     });
   }
 
-  void fetchAnswers() async {
+  void fetchAnswers(List<DocumentSnapshot> words) async {
     try {
-      List<DocumentSnapshot> words = await fetchWords(widget.topicId);
       List<DocumentSnapshot> selectedQuestions =
-          words.sublist(0, widget.numberOfQuestions);
+          words.sublist(0, words.length);
 
       selectedQuestions.forEach((question) {
         String correctAnswer =
@@ -130,7 +130,7 @@ class _TypingPageState extends State<TypingPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                if (_currentIndex <= widget.numberOfQuestions - 1) {
+                if (_currentIndex <= words.length - 1) {
                   setState(() {
                     _currentIndex++;
                   });
@@ -166,8 +166,22 @@ class _TypingPageState extends State<TypingPage> {
   @override
   void initState() {
     super.initState();
-    wordsFuture = fetchWords(widget.topicId);
-    fetchAnswers();
+    fetchWords(widget.topicId).then((List<DocumentSnapshot> fetchedWords) {
+      setState(() {
+        if (widget.showAllWords) {
+          words = fetchedWords;
+        } else {
+          words = fetchedWords
+              .where((word) => word['isFavorited'] == true)
+              .toList();
+        }
+
+        if (words.isNotEmpty) {
+          speak(words[_currentIndex]['word']);
+        }
+      });
+      fetchAnswers(words);
+    });
   }
 
   @override
@@ -176,7 +190,7 @@ class _TypingPageState extends State<TypingPage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Center(
-          child: _currentIndex >= widget.numberOfQuestions
+          child: _currentIndex >= words.length
               ? words.isEmpty
                   ? null
                   : Text(
@@ -184,7 +198,7 @@ class _TypingPageState extends State<TypingPage> {
                       style: appBarStyle,
                     )
               : Text(
-                  "${_currentIndex + 1}/${widget.numberOfWords}",
+                  "${_currentIndex + 1}/${words.length}",
                   style: appBarStyle,
                 ),
         ),
@@ -225,7 +239,7 @@ class _TypingPageState extends State<TypingPage> {
       body: Container(
         padding: const EdgeInsets.all(20),
         child: FutureBuilder<List<DocumentSnapshot>>(
-          future: wordsFuture,
+          future: Future.value(words),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
@@ -258,14 +272,14 @@ class _TypingPageState extends State<TypingPage> {
                   ),
                 );
               }
-              if (_currentIndex >= widget.numberOfQuestions) {
+              if (_currentIndex >= words.length) {
                 int correctCount = 0;
-                for (int i = 0; i < widget.numberOfQuestions; i++) {
+                for (int i = 0; i < words.length; i++) {
                   if (userAnswersInCode[i] == correctAnswersInCode[i]) {
                     correctCount++;
                   }
                 }
-                return buildTypingResult(correctCount, widget.numberOfQuestions,
+                return buildTypingResult(correctCount, words.length,
                     userAnswers, correctAnswers, words, showDefinition);
               }
               if (!hasSpoken) {
