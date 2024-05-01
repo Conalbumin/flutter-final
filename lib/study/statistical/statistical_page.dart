@@ -39,10 +39,7 @@ class _StatisticalPageState extends State<StatisticalPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.topicName,
-              style: appBarStyle
-            ),
+            Text(widget.topicName, style: appBarStyle),
             Text(
               'Number of Words: ${widget.numberOfWords}',
               style: const TextStyle(color: Colors.white, fontSize: 15),
@@ -55,7 +52,7 @@ class _StatisticalPageState extends State<StatisticalPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 600,
+              height: 50,
               child: FutureBuilder(
                 future: fetchWords(widget.topicId),
                 builder:
@@ -79,62 +76,84 @@ class _StatisticalPageState extends State<StatisticalPage> {
                         masteredCount++;
                       }
                     }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Unlearned: $unlearnedCount',
-                                style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                              ),
-                              Text(
-                                'Learned: $learnedCount',
-                                style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green),
-                              ),
-                              Text(
-                                'Mastered: $masteredCount',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green[700]),
-                              ),
-                            ],
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Unlearned: $unlearnedCount',
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red),
                           ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: words.length,
-                            itemBuilder: (context, index) {
-                              String word = words[index]['word'];
-                              String definition = words[index]['definition'];
-                              String status = words[index]['status'];
-                              return StatisticalWord(
-                                word: word,
-                                definition: definition,
-                                status: status,
-                                wordId: words[index].id,
-                                topicId: widget.topicId,
-                              );
-                            },
+                          Text(
+                            'Learned: $learnedCount',
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green),
                           ),
-                        ),
-                      ],
+                          Text(
+                            'Mastered: $masteredCount',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[700]),
+                          ),
+                        ],
+                      ),
                     );
                   }
                 },
               ),
             ),
+            SizedBox(
+              height: 700,
+              child: FutureBuilder(
+                future: fetchWords(widget.topicId),
+                builder:
+                    (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    List<DocumentSnapshot> words = snapshot.data!;
+                    learnedCount = 0;
+                    unlearnedCount = 0;
+                    masteredCount = 0;
+                    for (var wordSnapshot in words) {
+                      String status = wordSnapshot['status'];
+                      if (status == 'Learned') {
+                        learnedCount++;
+                      } else if (status == 'Unlearned') {
+                        unlearnedCount++;
+                      } else {
+                        masteredCount++;
+                      }
+                    }
+                    return ListView.builder(
+                      itemCount: words.length,
+                      itemBuilder: (context, index) {
+                        String word = words[index]['word'];
+                        String definition = words[index]['definition'];
+                        String status = words[index]['status'];
+                        return StatisticalWord(
+                          word: word,
+                          definition: definition,
+                          status: status,
+                          wordId: words[index].id,
+                          topicId: widget.topicId,
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            )
           ],
         ),
       ),

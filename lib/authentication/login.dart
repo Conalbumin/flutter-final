@@ -18,7 +18,6 @@ class _LoginState extends State<Login> {
   bool obscureText = true;
   bool _isSigning = false;
   final FirebaseAuthService _auth = FirebaseAuthService();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
