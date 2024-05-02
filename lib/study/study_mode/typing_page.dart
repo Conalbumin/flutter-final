@@ -40,6 +40,7 @@ class _TypingPageState extends State<TypingPage> {
   bool showDefinition = false;
   List<DocumentSnapshot> words = [];
   String userInput = '';
+  bool autoSpeak = true;
   bool hasSpoken = false;
 
   void updateCorrectAnswers() {
@@ -133,6 +134,7 @@ class _TypingPageState extends State<TypingPage> {
                 if (_currentIndex <= words.length - 1) {
                   setState(() {
                     _currentIndex++;
+                    hasSpoken = false;
                   });
                 } else {
                   showDialog(
@@ -282,7 +284,7 @@ class _TypingPageState extends State<TypingPage> {
                 return buildTypingResult(correctCount, words.length,
                     userAnswers, correctAnswers, words, showDefinition);
               }
-              if (!hasSpoken) {
+              if (!hasSpoken && autoSpeak) {
                 String wordToSpeak = words[_currentIndex]['word'];
                 speak(wordToSpeak);
                 hasSpoken = true;

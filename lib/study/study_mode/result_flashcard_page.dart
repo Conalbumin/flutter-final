@@ -34,7 +34,7 @@ Widget buildFlashCardResult(int countLearned, int countUnlearned,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          'Quiz Completed!',
+          'Completed!',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),

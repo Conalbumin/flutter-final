@@ -40,6 +40,7 @@ class _QuizPageState extends State<QuizPage> {
   String correctAns = '';
   bool showDefinition = false;
   List<DocumentSnapshot> words = [];
+  bool autoSpeak = true;
   bool hasSpoken = false;
 
   void shuffleQuestionsAndOptions() {
@@ -141,6 +142,7 @@ class _QuizPageState extends State<QuizPage> {
                 if (_currentIndex <= words.length - 1) {
                   setState(() {
                     _currentIndex++;
+                    hasSpoken = false;
                   });
                 } else {
                   showDialog(
@@ -186,9 +188,9 @@ class _QuizPageState extends State<QuizPage> {
               .toList();
         }
 
-        if (words.isNotEmpty) {
-          speak(words[_currentIndex]['word']);
-        }
+        // if (words.isNotEmpty) {
+        //   speak(words[_currentIndex]['word']);
+        // }
       });
       fetchQuestions(words);
     });
@@ -292,7 +294,7 @@ class _QuizPageState extends State<QuizPage> {
                 return buildQuizResult(correctCount, words.length,
                     selectedAnswers, correctAnswers, words, showDefinition);
               }
-              if (!hasSpoken) {
+              if (!hasSpoken && autoSpeak) {
                 String wordToSpeak = words[_currentIndex]['word'];
                 speak(wordToSpeak);
                 hasSpoken = true;
