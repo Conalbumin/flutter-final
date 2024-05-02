@@ -63,7 +63,7 @@ Future<void> updateWordStatus(
         .collection('words')
         .doc(wordId)
         .update({'status': newStatus});
-    showToast('Word updated successfully');
+    print('Word updated successfully');
   } catch (e) {
     print('Error updating word: $e');
   }

@@ -32,3 +32,25 @@ TextStyle all_FavInTopic = const TextStyle(
   fontWeight: FontWeight.bold,
   fontSize: 20,
 );
+
+TextStyle learned = TextStyle(
+  color: Colors.green[700],
+  fontWeight: FontWeight.bold,
+  fontSize: 30,
+);
+
+// use for the other of Learned or Unlearned
+// if Learned is more than Unlearned then Learned is green and Unlearned is opposite
+// if Unlearned is more than Learned then Unlearned is red and Learned is opposite
+TextStyle opposite = TextStyle(
+  color: Colors.grey[700],
+  fontWeight: FontWeight.bold,
+  fontSize: 30,
+);
+
+TextStyle unlearned = TextStyle(
+  color: Colors.red[700],
+  fontWeight: FontWeight.bold,
+  fontSize: 30,
+);
+

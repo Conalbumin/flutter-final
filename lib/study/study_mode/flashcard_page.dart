@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:quizlet_final_flutter/study/study_mode/result_flashcard_page.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
 import '../firebase_study/update.dart';
@@ -49,29 +50,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
-  void _checkFinishStudy() {
-    if (countLearned + countUnlearned == words.length) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Congratulations!'),
-            content: const Text('You have finished studying this topic.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
   void _updateLearnedStatus(String status) {
     setState(() {
       switch (status) {
@@ -90,7 +68,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
       } else {
         _currentIndex = (_currentIndex + 1) % words.length;
       }
-      _checkFinishStudy();
     });
   }
 
@@ -141,8 +118,13 @@ class _FlashCardPageState extends State<FlashCardPage> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Center(
-          child: words.isEmpty
-              ? null
+          child: countLearned + countUnlearned == words.length
+              ? words.isEmpty
+                  ? null
+                  : Text(
+                      'Result',
+                      style: appBarStyle,
+                    )
               : Text(
                   "${_currentIndex + 1}/${words.length}",
                   style: appBarStyle,
@@ -211,98 +193,104 @@ class _FlashCardPageState extends State<FlashCardPage> {
             const SizedBox(height: 20),
             SizedBox(
               width: 380,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(height: 20),
-                    if (words.isNotEmpty) // Only render if words is not empty
-                      SizedBox(
-                        width: 380,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _updateLearnedStatus('Unlearned');
-                                  updateWordStatus(widget.topicId,
-                                      words[_currentIndex].id, 'Unlearned');
-                                });
-                              },
+              child: countLearned + countUnlearned == words.length
+                  ? null
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                          const SizedBox(height: 20),
+                          if (words
+                              .isNotEmpty) // Only render if words is not empty
+                            SizedBox(
+                              width: 380,
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 3,
-                                      ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _updateLearnedStatus('Unlearned');
+                                        updateWordStatus(
+                                            widget.topicId,
+                                            words[_currentIndex].id,
+                                            'Unlearned');
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.red,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: Center(
+                                              child: Text(
+                                            '$countUnlearned',
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        const Text(
+                                          "Unlearned",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red),
+                                        )
+                                      ],
                                     ),
-                                    child: Center(
-                                        child: Text(
-                                      '$countUnlearned',
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.bold),
-                                    )),
                                   ),
-                                  const SizedBox(width: 5),
-                                  const Text(
-                                    "Unlearned",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red),
-                                  )
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _updateLearnedStatus('Learned');
+                                        updateWordStatus(widget.topicId,
+                                            words[_currentIndex].id, 'Learned');
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const Text("Learned",
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green)),
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.green,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: Center(
+                                              child: Text(
+                                            '$countLearned',
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _updateLearnedStatus('Learned');
-                                  updateWordStatus(widget.topicId,
-                                      words[_currentIndex].id, 'Learned');
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  const Text("Learned",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green)),
-                                  const SizedBox(width: 5),
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.green,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    child: Center(
-                                        child: Text(
-                                      '$countLearned',
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ]),
+                        ]),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -341,6 +329,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
                           ),
                         ),
                       );
+                    }
+                    if (countLearned + countUnlearned == words.length) {
+                      return buildFlashCardResult(countLearned, countUnlearned,
+                          countMastered, words.length);
                     }
                     _currentIndex = _currentIndex.clamp(0, words.length - 1);
                     if (autoSpeak && !showDefinition) {
