@@ -51,7 +51,7 @@ Widget buildFlashCardResult(int countLearned, int countUnlearned,
           children: [
             Column(
               children: [
-                countUnlearned == countLearned
+                countUnlearned < countLearned
                     ? const Icon(
                         Icons.check_circle,
                         size: 120,
