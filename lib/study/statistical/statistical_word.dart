@@ -20,7 +20,11 @@ class StatisticalWord extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       key: const ValueKey('front'),
-      color: const Color.fromARGB(255, 0, 191, 255),
+      color: status == 'Mastered'
+          ? Colors.green[900]
+          : status == 'Learned'
+          ? Colors.blue[900]
+          : Colors.red[900],
       elevation: 10,
       margin: const EdgeInsets.all(8),
       child: Padding(
@@ -41,7 +45,7 @@ class StatisticalWord extends StatelessWidget {
                   ),
                   Text(
                     definition,
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                    style: TextStyle(fontSize: 20, color: Colors.grey[300]),
                     textAlign: TextAlign.start,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 10,

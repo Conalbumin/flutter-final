@@ -69,7 +69,6 @@ class _StatisticalPageState extends State<StatisticalPage> {
                     masteredCount = 0;
                     for (var wordSnapshot in words) {
                       String status = wordSnapshot['status'];
-                      int countTimeWordIsLearn = wordSnapshot['countLearn'];
                       if (status == 'Learned') {
                         learnedCount++;
                       } else if (status == 'Unlearned') {
@@ -80,30 +79,30 @@ class _StatisticalPageState extends State<StatisticalPage> {
                     }
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 15, vertical: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Unlearned: $unlearnedCount',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red),
+                                color: Colors.red[900]),
                           ),
                           Text(
                             'Learned: $learnedCount',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green),
+                                color: Colors.blue[900]),
                           ),
                           Text(
                             'Mastered: $masteredCount',
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green[700]),
+                                color: Colors.green[900]),
                           ),
                         ],
                       ),
