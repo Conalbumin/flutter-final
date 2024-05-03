@@ -45,14 +45,14 @@ Future<void> updateWords(String topicId, List<WordData> wordsData) async {
         'definition': wordData.definition,
         'status': wordData.status,
         'isFavorited': wordData.isFavorited,
+        'countLearn': wordData.countLearn
       });
     }
-    showToast('Word updated successfully');
+    print('Word updated successfully');
   } catch (e) {
     print('Error updating word: $e');
   }
 }
-
 
 Future<void> updateWordStatus(
     String topicId, String wordId, String newStatus) async {
@@ -79,6 +79,20 @@ Future<void> updateWordIsFavorited(
         .doc(wordId)
         .update({'isFavorited': newIsFavorited});
     print('Word updated successfully');
+  } catch (e) {
+    print('Error updating word: $e');
+  }
+}
+
+Future<void> updateCountLearn(String topicId, String wordId) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('words')
+        .doc(wordId)
+        .update({'countLearn': FieldValue.increment(1)});
+    print('Learn ++');
   } catch (e) {
     print('Error updating word: $e');
   }

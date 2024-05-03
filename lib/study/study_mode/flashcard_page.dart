@@ -31,7 +31,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
   List<DocumentSnapshot> words = [];
   int countLearned = 0;
   int countUnlearned = 0;
-  int countMastered = 0;
   bool autoSpeak = true;
   bool showDefinition = false;
   late SwiperController _swiperController;
@@ -50,7 +49,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
-  void _updateLearnedStatus(String status) {
+  void updateLearnedStatus(String status) {
     setState(() {
       switch (status) {
         case 'Learned':
@@ -58,9 +57,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
           break;
         case 'Unlearned':
           countUnlearned++;
-          break;
-        case 'Mastered':
-          countMastered++;
           break;
       }
       if (widget.showAllWords) {
@@ -210,7 +206,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        _updateLearnedStatus('Unlearned');
+                                        updateLearnedStatus('Unlearned');
                                         updateWordStatus(
                                             widget.topicId,
                                             words[_currentIndex].id,
@@ -252,9 +248,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        _updateLearnedStatus('Learned');
+                                        updateLearnedStatus('Learned');
                                         updateWordStatus(widget.topicId,
                                             words[_currentIndex].id, 'Learned');
+                                        updateCountLearn(widget.topicId,  words[_currentIndex].id);
                                       });
                                     },
                                     child: Row(
@@ -331,8 +328,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
                       );
                     }
                     if (countLearned + countUnlearned == words.length) {
-                      return buildFlashCardResult(countLearned, countUnlearned,
-                          countMastered, words.length);
+                      return buildFlashCardResult(
+                          countLearned, countUnlearned, words.length);
                     }
                     _currentIndex = _currentIndex.clamp(0, words.length - 1);
                     if (autoSpeak && !showDefinition) {
@@ -373,7 +370,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
                             topicId: widget.topicId,
                             status: status,
                             isFavorited: isFavorited.toString() ?? '',
-                            showDefinition: showDefinition);
+                            showDefinition: showDefinition,
+                            countLearn: 0);
                       },
                     );
                   }

@@ -60,14 +60,16 @@ class _EditTopicPageState extends State<EditTopicPage> {
         String wordId = snapshot.id; // Get the document ID
         String initialWord = snapshot['word'];
         String initialDefinition = snapshot['definition'];
-        bool isFavorited = snapshot['isFavorited'] ?? false; // Add this line
-        String status = snapshot['status'] ?? ''; // Add this line
+        bool isFavorited = snapshot['isFavorited'] ?? false;
+        String status = snapshot['status'] ?? '';
+        int countLearn = snapshot['countLearn'];
         return WordData(
           id: wordId,
           word: initialWord,
           definition: initialDefinition,
           isFavorited: isFavorited,
           status: status,
+          countLearn: countLearn,
         );
       }).toList();
 
@@ -110,6 +112,7 @@ class _EditTopicPageState extends State<EditTopicPage> {
                 definition: newDefinition,
                 isFavorited: wordData.isFavorited,
                 status: wordData.status,
+                countLearn: wordData.countLearn,
               );
 
               wordPages = wordsData.map((data) {

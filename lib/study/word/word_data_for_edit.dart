@@ -4,6 +4,7 @@ class WordData {
   final String definition;
   final bool isFavorited;
   final String status;
+  final int countLearn;
 
   WordData({
     required this.id,
@@ -11,5 +12,6 @@ class WordData {
     required this.definition,
     required this.isFavorited,
     required this.status,
+    required this.countLearn,
   });
 }

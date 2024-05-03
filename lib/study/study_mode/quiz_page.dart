@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/study_mode/result_quiz_page.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 import '../word/text_to_speech.dart';
 import 'answer.dart';
 
@@ -117,6 +118,8 @@ class _QuizPageState extends State<QuizPage> {
   void checkAnswer(String selectedOption, int questionIndex) {
     String correctAnswer = correctAnswers[questionIndex];
     bool isCorrect = selectedOption == correctAnswer;
+    String wordId = words[questionIndex].id;
+
     setState(() {
       correctAns = correctAnswer;
       numberOfCorrectAns++;
@@ -126,6 +129,15 @@ class _QuizPageState extends State<QuizPage> {
         (index) => options[questionIndex][index] == selectedOption,
       );
     });
+
+    if(isCorrect) {
+      print('correct $isCorrect');
+      updateWordStatus(widget.topicId, wordId, 'Learned');
+      updateCountLearn(widget.topicId, wordId);
+    } else {
+      print('incorrect $isCorrect');
+      updateWordStatus(widget.topicId, wordId, 'Unlearned');
+    }
 
     showDialog(
       context: context,

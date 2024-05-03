@@ -3,7 +3,6 @@ import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
 import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/modal/flip_side.dart';
 import 'package:quizlet_final_flutter/study/word/text_to_speech.dart';
-
 import '../../constant/text_style.dart';
 
 class WordItem extends StatefulWidget {
@@ -11,6 +10,7 @@ class WordItem extends StatefulWidget {
   final String definition;
   final String status;
   final String isFavorited;
+  final int countLearn;
   final String wordId;
   final String topicId;
   final bool showDefinition;
@@ -24,6 +24,7 @@ class WordItem extends StatefulWidget {
     required this.status,
     required this.isFavorited,
     required this.showDefinition,
+    required this.countLearn,
   }) : super(key: key);
 
   @override
@@ -41,8 +42,8 @@ class _WordItemState extends State<WordItem> {
         controller: flip,
         onTapFlipping: true,
         rotateSide: RotateSide.bottom,
-        frontWidget: widget.showDefinition ? _buildBack() :_buildFront(),
-        backWidget: widget.showDefinition ? _buildFront() :_buildBack(),
+        frontWidget: widget.showDefinition ? _buildBack() : _buildFront(),
+        backWidget: widget.showDefinition ? _buildFront() : _buildBack(),
       ),
     );
   }

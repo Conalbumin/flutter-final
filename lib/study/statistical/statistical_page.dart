@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/statistical/statistical_word.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 
 class StatisticalPage extends StatefulWidget {
   final String topicId;

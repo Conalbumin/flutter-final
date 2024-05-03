@@ -263,6 +263,7 @@ class _TopicPageState extends State<TopicPage> {
                             status: status,
                             isFavorited: isFavorited.toString() ?? '',
                             showDefinition: false,
+                            countLearn: 0,
                           );
                         },
                       );
@@ -317,7 +318,8 @@ class _TopicPageState extends State<TopicPage> {
                             numberOfQuestions: words.length,
                             onSelectAnswer: (answers) {
                               // Handle selected answers here
-                            }, showAllWords: showAllWords,
+                            },
+                            showAllWords: showAllWords,
                           ),
                         ),
                       );
@@ -444,7 +446,7 @@ class _TopicPageState extends State<TopicPage> {
                               isFavorited: isFavorited.toString() ?? '',
                               handleWordDeleted: (wordId) {
                                 handleWordDeleted(wordId);
-                              },
+                              }, countLearn: 0,
                             );
                           },
                         )
@@ -468,7 +470,7 @@ class _TopicPageState extends State<TopicPage> {
                               isFavorited: isFavorited.toString() ?? '',
                               handleWordDeleted: (wordId) {
                                 handleWordDeleted(wordId);
-                              },
+                              }, countLearn: 0,
                             );
                           },
                         );

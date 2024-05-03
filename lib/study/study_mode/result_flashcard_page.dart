@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
 
-Widget buildFlashCardResult(int countLearned, int countUnlearned,
-    int countMastered, int numberOfQuestions) {
+Widget buildFlashCardResult(
+    int countLearned, int countUnlearned, int numberOfQuestions) {
   String getFeedback(int countLearned) {
     double percentage = (countLearned / numberOfQuestions) * 100;
     String feedback = '';

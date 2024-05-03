@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/study_mode/result_typing_page.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
+import '../firebase_study/update.dart';
 import '../word/text_to_speech.dart';
 
 class TypingPage extends StatefulWidget {
@@ -110,6 +111,7 @@ class _TypingPageState extends State<TypingPage> {
   void checkAnswer(String answer, int questionIndex) {
     String correctAnswer = correctAnswersInCode[questionIndex];
     bool isCorrect = answer.toLowerCase() == correctAnswer;
+    String wordId = words[questionIndex].id;
 
     setState(() {
       userAnswers.add(userInput);
@@ -117,6 +119,15 @@ class _TypingPageState extends State<TypingPage> {
       numberOfCorrectAns++;
       userInput = '';
     });
+
+    if(isCorrect) {
+      print('correct $isCorrect');
+      updateWordStatus(widget.topicId, wordId, 'Learned');
+      updateCountLearn(widget.topicId, wordId);
+    } else {
+      print('incorrect $isCorrect');
+      updateWordStatus(widget.topicId, wordId, 'Unlearned');
+    }
 
     _textFocus.unfocus();
     showDialog(

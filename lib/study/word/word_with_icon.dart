@@ -10,6 +10,7 @@ class WordWithIcon extends StatefulWidget {
   final String definition;
   final String status;
   final String isFavorited;
+  final int countLearn;
   final String wordId;
   final String topicId;
   final void Function(String wordId) handleWordDeleted;
@@ -22,7 +23,8 @@ class WordWithIcon extends StatefulWidget {
       required this.wordId,
       required this.topicId,
       required this.isFavorited,
-      required this.handleWordDeleted});
+      required this.handleWordDeleted,
+      required this.countLearn});
 
   @override
   State<WordWithIcon> createState() => _WordWithIconState();

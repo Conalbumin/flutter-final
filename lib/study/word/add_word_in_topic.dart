@@ -77,11 +77,14 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
             String? definition = wordPageState.getDefinition();
             String? status = wordPageState.getStatus();
             bool? isFavorited = wordPageState.getIsFavorited();
+            int? countLearn = wordPageState.getCountLearn();
+
             wordsData.add({
               'word': word,
               'definition': definition,
               'status': status,
-              'isFavorited': isFavorited.toString() ?? ''
+              'isFavorited': isFavorited.toString() ?? '',
+              'countLearn': countLearn.toString()
             });
           }
         }

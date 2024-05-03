@@ -5,8 +5,7 @@ import 'package:quizlet_final_flutter/constant/toast.dart';
 Future<void> addTopic(
     String topicName, String text, int numberOfWords, bool isPrivate) async {
   try {
-    String userUid =
-        FirebaseAuth.instance.currentUser!.uid;
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
@@ -21,8 +20,7 @@ Future<void> addTopic(
 
 Future<void> addFolder(String folderName, String text) async {
   try {
-    String userUid =
-        FirebaseAuth.instance.currentUser!.uid;
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection('folders').add({
       'name': folderName,
       'text': text,
@@ -40,6 +38,7 @@ Future<void> addWord(
 
     for (var wordData in wordsData) {
       String status = wordData['status'] ?? 'Unlearned';
+      int? countLearn = wordData['countLearn'] as int? ?? 0;
       bool isFavorited = false;
 
       await FirebaseFirestore.instance
@@ -50,7 +49,8 @@ Future<void> addWord(
         'word': wordData['word'],
         'definition': wordData['definition'],
         'status': status,
-        'isFavorited': isFavorited
+        'isFavorited': isFavorited,
+        'countLearn': countLearn
       });
     }
 
@@ -70,7 +70,7 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
     DocumentReference topicRef =
-    await FirebaseFirestore.instance.collection('topics').add({
+        await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
@@ -81,7 +81,8 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     String topicId = topicRef.id;
 
     for (var wordData in wordsData) {
-      String status = wordData['status'] ?? 'unLearned';
+      String status = wordData['status'] ?? 'Unlearned';
+      int countLearn = wordData['countLearn'] as int ?? 0;
       bool isFavorited = false;
 
       await FirebaseFirestore.instance
@@ -92,7 +93,8 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
         'word': wordData['word'],
         'definition': wordData['definition'],
         'status': status,
-        'isFavorited': isFavorited
+        'isFavorited': isFavorited,
+        'countLearn': countLearn
       });
     }
 
@@ -110,7 +112,7 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .doc(topicId)
         .get();
     Map<String, dynamic> topicData =
-    topicSnapshot.data() as Map<String, dynamic>;
+        topicSnapshot.data() as Map<String, dynamic>;
 
     // Fetch topic words
     QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
