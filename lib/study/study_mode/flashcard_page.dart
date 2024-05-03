@@ -248,10 +248,25 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        updateLearnedStatus('Learned');
-                                        updateWordStatus(widget.topicId,
-                                            words[_currentIndex].id, 'Learned');
-                                        updateCountLearn(widget.topicId,  words[_currentIndex].id);
+                                        if (words[_currentIndex]['countLearn'] >= 2) {
+                                          updateLearnedStatus('Mastered');
+                                          updateWordStatus(
+                                              widget.topicId,
+                                              words[_currentIndex].id,
+                                              'Mastered');
+                                          updateCountLearn(widget.topicId,
+                                              words[_currentIndex].id);
+                                          print('Mastered');
+                                        } else {
+                                          updateLearnedStatus('Learned');
+                                          updateWordStatus(
+                                              widget.topicId,
+                                              words[_currentIndex].id,
+                                              'Learned');
+                                          updateCountLearn(widget.topicId,
+                                              words[_currentIndex].id);
+                                          print('Learned');
+                                        }
                                       });
                                     },
                                     child: Row(

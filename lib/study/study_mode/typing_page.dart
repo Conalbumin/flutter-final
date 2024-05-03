@@ -121,9 +121,23 @@ class _TypingPageState extends State<TypingPage> {
     });
 
     if(isCorrect) {
-      print('correct $isCorrect');
-      updateWordStatus(widget.topicId, wordId, 'Learned');
-      updateCountLearn(widget.topicId, wordId);
+      if (words[_currentIndex]['countLearn'] >= 2) {
+        updateWordStatus(
+            widget.topicId,
+            words[_currentIndex].id,
+            'Mastered');
+        updateCountLearn(widget.topicId,
+            words[_currentIndex].id);
+        print('Mastered');
+      } else {
+        updateWordStatus(
+            widget.topicId,
+            words[_currentIndex].id,
+            'Learned');
+        updateCountLearn(widget.topicId,
+            words[_currentIndex].id);
+        print('Learned');
+      }
     } else {
       print('incorrect $isCorrect');
       updateWordStatus(widget.topicId, wordId, 'Unlearned');
