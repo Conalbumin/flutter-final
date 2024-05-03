@@ -69,12 +69,15 @@ class _StatisticalPageState extends State<StatisticalPage> {
                     masteredCount = 0;
                     for (var wordSnapshot in words) {
                       String status = wordSnapshot['status'];
+                      int countTimeWordIsLearn = wordSnapshot['countLearn'];
                       if (status == 'Learned') {
-                        learnedCount++;
+                        if (countTimeWordIsLearn >= 3) {
+                          masteredCount++;
+                        } else {
+                          learnedCount++;
+                        }
                       } else if (status == 'Unlearned') {
                         unlearnedCount++;
-                      } else {
-                        masteredCount++;
                       }
                     }
                     return Container(
