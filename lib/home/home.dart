@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
+import '../study/firebase_study/related_func.dart';
 import '../study/topic/topic.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,17 +13,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _sortBy = 'timeCreated';
-
-  List<DocumentSnapshot> sortTopicsByTime(
-      List<DocumentSnapshot> topics, String sortBy) {
-    topics.sort((a, b) {
-      DateTime timeA = (a[sortBy] as Timestamp).toDate();
-      DateTime timeB = (b[sortBy] as Timestamp).toDate();
-      return timeB
-          .compareTo(timeA);
-    });
-    return topics;
-  }
 
   @override
   Widget build(BuildContext context) {

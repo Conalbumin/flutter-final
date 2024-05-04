@@ -32,3 +32,14 @@ Future<void> setPrivateTopic(
     print('Error updating topic: $e');
   }
 }
+
+List<DocumentSnapshot> sortTopicsByTime(
+    List<DocumentSnapshot> topics, String sortBy) {
+  topics.sort((a, b) {
+    DateTime timeA = (a[sortBy] as Timestamp).toDate();
+    DateTime timeB = (b[sortBy] as Timestamp).toDate();
+    return timeB
+        .compareTo(timeA);
+  });
+  return topics;
+}
