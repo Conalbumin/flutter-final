@@ -58,3 +58,17 @@ Future<List<DocumentSnapshot>> fetchTopics(String folderId) async {
     rethrow;
   }
 }
+
+Future<List<DocumentSnapshot>> fetchAccess(String topicId) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .get();
+    return querySnapshot.docs;
+  } catch (e) {
+    print('Error fetching access topic: $e');
+    rethrow;
+  }
+}

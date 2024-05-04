@@ -29,6 +29,7 @@ class TopicPage extends StatefulWidget {
   final DateTime timeCreated;
   final DateTime lastAccess;
   final Function() refreshCallback;
+  final int accessPeople;
 
   const TopicPage({
     Key? key,
@@ -40,7 +41,7 @@ class TopicPage extends StatefulWidget {
     required this.userId,
     required this.refreshCallback,
     required this.timeCreated,
-    required this.lastAccess,
+    required this.lastAccess, required this.accessPeople,
   }) : super(key: key);
 
   @override

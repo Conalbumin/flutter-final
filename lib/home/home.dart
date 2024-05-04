@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
+import 'package:quizlet_final_flutter/study/topic/topic_public_item.dart';
 import '../study/firebase_study/related_func.dart';
-import '../study/topic/topic.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key});
@@ -128,9 +128,10 @@ class _HomePageState extends State<HomePage> {
                       (document['timeCreated'] as Timestamp).toDate();
                   DateTime lastAccess =
                       (document['lastAccess'] as Timestamp).toDate();
+                  int accessPeople = document['accessPeople'];
 
                   if (!isPrivate) {
-                    return TopicItem(
+                    return TopicPublicItem(
                       topicId: topicId,
                       topicName: topicName,
                       text: text,
@@ -139,6 +140,7 @@ class _HomePageState extends State<HomePage> {
                       userId: userId,
                       timeCreated: timeCreated,
                       lastAccess: lastAccess,
+                      accessPeople: accessPeople,
                     );
                   } else {
                     return Container();

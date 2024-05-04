@@ -15,6 +15,7 @@ Future<void> addTopic(String topicName, String text, int numberOfWords,
       'createdBy': userUid,
       'timeCreated': currentTime,
       'lastAccess': currentTime,
+      'accessPeople': 0
     });
   } catch (e) {
     print('Error adding topic: $e');
@@ -81,7 +82,8 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
       'isPrivate': isPrivate,
       'createdBy': userUid,
       'timeCreated': currentTime,
-      'lastAccess': currentTime
+      'lastAccess': currentTime,
+      'accessPeople': 0
     });
 
     String topicId = topicRef.id;
@@ -112,7 +114,6 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
 
 Future<void> addTopicToFolder(String topicId, String folderId) async {
   try {
-    // Fetch topic details
     DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
@@ -120,7 +121,6 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
     Map<String, dynamic> topicData =
     topicSnapshot.data() as Map<String, dynamic>;
 
-    // Fetch topic words
     QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
@@ -143,7 +143,8 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
       'isPrivate': topicData['isPrivate'],
       'createdBy': topicData['createdBy'],
       'timeCreated': topicData['timeCreated'],
-      'lastAccess': topicData['lastAccess']
+      'lastAccess': topicData['lastAccess'],
+      'accessPeople': topicData['accessPeople']
     });
 
     // Add topic words to the folder

@@ -43,3 +43,36 @@ List<DocumentSnapshot> sortTopicsByTime(
   });
   return topics;
 }
+
+Future<void> checkAndAddAccess(String topicId) async {
+  try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
+
+    DocumentSnapshot accessSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .get();
+
+    if (!accessSnapshot.exists) {
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('access')
+          .doc(userUid)
+          .set({});
+
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .update({'accessPeople': FieldValue.increment(1)});
+
+      print('Access added successfully');
+    } else {
+      print('User already has access');
+    }
+  } catch (e) {
+    print('Error checking and adding access: $e');
+  }
+}

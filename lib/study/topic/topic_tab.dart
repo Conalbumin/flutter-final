@@ -22,56 +22,54 @@ class _TopicTabState extends State<TopicTab> {
       children: [
         Container(
             child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Sort by:', style: normalTextBlack),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Center(
-                          child: DropdownButton<String>(
-                            dropdownColor: Colors.blue,
-                            value: _sortBy,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _sortBy = newValue!;
-                              });
-                            },
-                            items: <String>['timeCreated', 'lastAccess']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    value == 'timeCreated'
-                                        ? 'Creation time'
-                                        : 'Last access',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            )),
-
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Sort by:', style: normalTextBlack),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Center(
+                      child: DropdownButton<String>(
+                        dropdownColor: Colors.blue,
+                        value: _sortBy,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _sortBy = newValue!;
+                          });
+                        },
+                        items: <String>['timeCreated', 'lastAccess']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                value == 'timeCreated'
+                                    ? 'Creation time'
+                                    : 'Last access',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        )),
         Expanded(
           child: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
-            // Listen to authentication state changes
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
@@ -99,7 +97,7 @@ class _TopicTabState extends State<TopicTab> {
                   }
 
                   List<DocumentSnapshot> sortedTopics =
-                  sortTopicsByTime(snapshot.data!.docs, _sortBy);
+                      sortTopicsByTime(snapshot.data!.docs, _sortBy);
 
                   if (snapshot.data!.docs.isEmpty) {
                     return const Center(
@@ -120,7 +118,8 @@ class _TopicTabState extends State<TopicTab> {
                           (document['timeCreated'] as Timestamp).toDate();
                       DateTime lastAccess =
                           (document['lastAccess'] as Timestamp).toDate();
-          
+                      int accessPeople = document['accessPeople'];
+
                       return TopicItem(
                         topicId: topicId,
                         topicName: topicName,
@@ -130,6 +129,7 @@ class _TopicTabState extends State<TopicTab> {
                         userId: userId,
                         timeCreated: timeCreated,
                         lastAccess: lastAccess,
+                        accessPeople: accessPeople,
                       );
                     },
                   );

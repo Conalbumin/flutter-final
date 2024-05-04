@@ -17,10 +17,11 @@ class FolderPage extends StatelessWidget {
   final String folderName;
   final String text;
 
-  const FolderPage({Key? key,
-    required this.folderId,
-    required this.folderName,
-    required this.text});
+  const FolderPage(
+      {Key? key,
+      required this.folderId,
+      required this.folderName,
+      required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +99,10 @@ class FolderPage extends StatelessWidget {
         onPressed: () {
           _addTopicToFolder(context);
         },
-        child: const Icon(Icons.add, color: Colors.white,),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,16 +154,18 @@ class FolderPage extends StatelessWidget {
                     String userId = document['createdBy'];
                     DateTime timeCreated = document['timeCreated'];
                     DateTime lastAccess = document['lastAccess'];
+                    int accessPeople = document['accessPeople'];
 
                     return TopicItem(
-                        topicId: topicId,
-                        topicName: topicName,
-                        text: text,
-                        numberOfWords: numberOfWords,
-                        isPrivate: isPrivate,
-                        userId: userId,
-                        timeCreated: timeCreated,
-                        lastAccess: lastAccess,
+                      topicId: topicId,
+                      topicName: topicName,
+                      text: text,
+                      numberOfWords: numberOfWords,
+                      isPrivate: isPrivate,
+                      userId: userId,
+                      timeCreated: timeCreated,
+                      lastAccess: lastAccess,
+                      accessPeople: accessPeople,
                     );
                   },
                 );

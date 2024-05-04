@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_page.dart';
-
 import '../../constant/style.dart';
 
 class TopicItem extends StatelessWidget {
@@ -13,6 +12,7 @@ class TopicItem extends StatelessWidget {
   final String userId;
   final DateTime timeCreated;
   final DateTime lastAccess;
+  final int accessPeople;
 
   const TopicItem({
     super.key,
@@ -24,37 +24,42 @@ class TopicItem extends StatelessWidget {
     required this.userId,
     required this.timeCreated,
     required this.lastAccess,
+    required this.accessPeople,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () async {
-          DateTime currentTime = DateTime.now();
-          try {
-            await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
-              'lastAccess': currentTime,
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TopicPage(
-                  topicId: topicId,
-                  topicName: topicName,
-                  numberOfWords: numberOfWords,
-                  text: text,
-                  isPrivate: isPrivate,
-                  userId: userId,
-                  refreshCallback: () {},
-                  timeCreated: timeCreated,
-                  lastAccess: currentTime,
-                ),
+      onTap: () async {
+        DateTime currentTime = DateTime.now();
+        try {
+          await FirebaseFirestore.instance
+              .collection('topics')
+              .doc(topicId)
+              .update({
+            'lastAccess': currentTime,
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TopicPage(
+                topicId: topicId,
+                topicName: topicName,
+                numberOfWords: numberOfWords,
+                text: text,
+                isPrivate: isPrivate,
+                userId: userId,
+                refreshCallback: () {},
+                timeCreated: timeCreated,
+                lastAccess: currentTime,
+                accessPeople: accessPeople,
               ),
-            );
-          } catch (error) {
-            print('Error updating lastAccess: $error');
-          }
-        },
+            ),
+          );
+        } catch (error) {
+          print('Error updating lastAccess: $error');
+        }
+      },
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
