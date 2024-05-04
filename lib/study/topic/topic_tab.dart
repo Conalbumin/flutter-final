@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'topic.dart';
 
 class TopicTab extends StatelessWidget {
@@ -9,29 +9,25 @@ class TopicTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(), // Listen to authentication state changes
+      stream: FirebaseAuth.instance.authStateChanges(),
+      // Listen to authentication state changes
       builder: (context, userSnapshot) {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         }
-
         if (userSnapshot.hasError) {
           return Text('Error: ${userSnapshot.error}');
         }
-
         if (userSnapshot.data == null) {
-          // If no user is signed in
           return const Center(
             child: Text('No user signed in.'),
           );
         }
-
-        String currentUserId = userSnapshot.data!.uid; // Get the current user's ID
-
+        String currentUserId = userSnapshot.data!.uid;
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('topics')
-              .where('createdBy', isEqualTo: currentUserId) // Filter topics by 'createdBy' field
+              .where('createdBy', isEqualTo: currentUserId)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -55,6 +51,10 @@ class TopicTab extends StatelessWidget {
                 int numberOfWords = document['numberOfWords'];
                 bool isPrivate = document['isPrivate'];
                 String userId = document['createdBy'];
+                DateTime timeCreated =
+                    (document['timeCreated'] as Timestamp).toDate();
+                DateTime lastAccess =
+                    (document['lastAccess'] as Timestamp).toDate();
 
                 return TopicItem(
                   topicId: topicId,
@@ -63,6 +63,8 @@ class TopicTab extends StatelessWidget {
                   numberOfWords: numberOfWords,
                   isPrivate: isPrivate,
                   userId: userId,
+                  timeCreated: timeCreated,
+                  lastAccess: lastAccess,
                 );
               },
             );

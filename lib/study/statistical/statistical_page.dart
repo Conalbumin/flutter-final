@@ -12,6 +12,8 @@ class StatisticalPage extends StatefulWidget {
   final String text;
   final bool isPrivate;
   final String userId;
+  final DateTime timeCreated;
+  final DateTime lastAccess;
 
   const StatisticalPage({
     Key? key,
@@ -20,7 +22,7 @@ class StatisticalPage extends StatefulWidget {
     required this.topicName,
     required this.text,
     required this.isPrivate,
-    required this.userId,
+    required this.userId, required this.timeCreated, required this.lastAccess,
   }) : super(key: key);
 
   @override

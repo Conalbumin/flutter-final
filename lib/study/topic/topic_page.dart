@@ -26,6 +26,8 @@ class TopicPage extends StatefulWidget {
   final String text;
   final bool isPrivate;
   final String userId;
+  final DateTime timeCreated;
+  final DateTime lastAccess;
   final Function() refreshCallback;
 
   const TopicPage({
@@ -37,6 +39,8 @@ class TopicPage extends StatefulWidget {
     required this.isPrivate,
     required this.userId,
     required this.refreshCallback,
+    required this.timeCreated,
+    required this.lastAccess,
   }) : super(key: key);
 
   @override
@@ -446,7 +450,8 @@ class _TopicPageState extends State<TopicPage> {
                               isFavorited: isFavorited.toString() ?? '',
                               handleWordDeleted: (wordId) {
                                 handleWordDeleted(wordId);
-                              }, countLearn: 0,
+                              },
+                              countLearn: 0,
                             );
                           },
                         )
@@ -470,7 +475,8 @@ class _TopicPageState extends State<TopicPage> {
                               isFavorited: isFavorited.toString() ?? '',
                               handleWordDeleted: (wordId) {
                                 handleWordDeleted(wordId);
-                              }, countLearn: 0,
+                              },
+                              countLearn: 0,
                             );
                           },
                         );

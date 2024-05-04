@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:quizlet_final_flutter/constant/text_style.dart';
 import '../study/topic/topic.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,6 +11,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String _sortBy = 'timeCreated';
+
+  List<DocumentSnapshot> sortTopicsByTime(
+      List<DocumentSnapshot> topics, String sortBy) {
+    topics.sort((a, b) {
+      DateTime timeA = (a[sortBy] as Timestamp).toDate();
+      DateTime timeB = (b[sortBy] as Timestamp).toDate();
+      return timeB
+          .compareTo(timeA);
+    });
+    return topics;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -34,7 +47,8 @@ class _HomePageState extends State<HomePage> {
                 leading: const Icon(Icons.search),
               );
             },
-            suggestionsBuilder: (BuildContext context, SearchController controller) {
+            suggestionsBuilder:
+                (BuildContext context, SearchController controller) {
               return List<ListTile>.generate(5, (int index) {
                 final String item = 'item $index';
                 return ListTile(
@@ -49,7 +63,53 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
-        const SizedBox(height: 10),
+        Container(
+            child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Sort by:', style: normalTextBlack),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Center(
+                      child: DropdownButton<String>(
+                        dropdownColor: Colors.blue,
+                        value: _sortBy,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _sortBy = newValue!;
+                          });
+                        },
+                        items: <String>['timeCreated', 'lastAccess']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                value == 'timeCreated'
+                                    ? 'Creation time'
+                                    : 'Last access',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        )),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('topics').snapshots(),
@@ -60,25 +120,35 @@ class _HomePageState extends State<HomePage> {
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
+
+              List<DocumentSnapshot> sortedTopics =
+                  sortTopicsByTime(snapshot.data!.docs, _sortBy);
+
               return ListView.builder(
-                itemCount: snapshot.data!.docs.length > 5 ? 5 : snapshot.data!.docs.length,
+                itemCount: sortedTopics.length > 5 ? 5 : sortedTopics.length,
                 itemBuilder: (BuildContext context, int index) {
-                  DocumentSnapshot document = snapshot.data!.docs[index];
+                  DocumentSnapshot document = sortedTopics[index];
                   String topicId = document.id;
                   String topicName = document['name'];
                   String text = document['text'];
                   int numberOfWords = document['numberOfWords'];
                   bool isPrivate = document['isPrivate'];
                   String userId = document['createdBy'];
+                  DateTime timeCreated =
+                      (document['timeCreated'] as Timestamp).toDate();
+                  DateTime lastAccess =
+                      (document['lastAccess'] as Timestamp).toDate();
 
-                  // Check if the topic is not private
                   if (!isPrivate) {
                     return TopicItem(
                       topicId: topicId,
                       topicName: topicName,
                       text: text,
                       numberOfWords: numberOfWords,
-                      isPrivate: isPrivate, userId: userId,
+                      isPrivate: isPrivate,
+                      userId: userId,
+                      timeCreated: timeCreated,
+                      lastAccess: lastAccess,
                     );
                   } else {
                     return Container();
@@ -92,5 +162,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

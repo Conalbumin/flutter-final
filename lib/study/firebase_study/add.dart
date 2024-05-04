@@ -2,16 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 
-Future<void> addTopic(
-    String topicName, String text, int numberOfWords, bool isPrivate) async {
+Future<void> addTopic(String topicName, String text, int numberOfWords,
+    bool isPrivate) async {
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
+    DateTime currentTime = DateTime.now();
     await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': numberOfWords,
       'isPrivate': isPrivate,
       'createdBy': userUid,
+      'timeCreated': currentTime,
+      'lastAccess': currentTime,
     });
   } catch (e) {
     print('Error adding topic: $e');
@@ -31,8 +34,8 @@ Future<void> addFolder(String folderName, String text) async {
   }
 }
 
-Future<void> addWord(
-    String topicId, List<Map<String, String>> wordsData) async {
+Future<void> addWord(String topicId,
+    List<Map<String, String>> wordsData) async {
   try {
     int totalWordsAdded = wordsData.length;
 
@@ -69,13 +72,16 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     List<Map<String, String>> wordsData) async {
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
+    DateTime currentTime = DateTime.now();
     DocumentReference topicRef =
-        await FirebaseFirestore.instance.collection('topics').add({
+    await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
       'isPrivate': isPrivate,
-      'createdBy': userUid
+      'createdBy': userUid,
+      'timeCreated': currentTime,
+      'lastAccess': currentTime
     });
 
     String topicId = topicRef.id;
@@ -112,7 +118,7 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .doc(topicId)
         .get();
     Map<String, dynamic> topicData =
-        topicSnapshot.data() as Map<String, dynamic>;
+    topicSnapshot.data() as Map<String, dynamic>;
 
     // Fetch topic words
     QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
@@ -131,12 +137,13 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .collection('topics')
         .doc(topicId);
     batch.set(topicRef, {
-      // 'topicId': topicId,
       'name': topicData['name'],
       'text': topicData['text'],
       'numberOfWords': topicData['numberOfWords'],
       'isPrivate': topicData['isPrivate'],
-      'createdBy': topicData['createdBy']
+      'createdBy': topicData['createdBy'],
+      'timeCreated': topicData['timeCreated'],
+      'lastAccess': topicData['lastAccess']
     });
 
     // Add topic words to the folder

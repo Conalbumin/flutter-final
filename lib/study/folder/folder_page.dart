@@ -148,14 +148,18 @@ class FolderPage extends StatelessWidget {
                     int numberOfWords = document['numberOfWords'];
                     bool isPrivate = document['isPrivate'];
                     String userId = document['createdBy'];
+                    DateTime timeCreated = document['timeCreated'];
+                    DateTime lastAccess = document['lastAccess'];
 
                     return TopicItem(
-                      topicId: topicId,
-                      topicName: topicName,
-                      text: text,
-                      numberOfWords: numberOfWords,
-                      isPrivate: isPrivate,
-                      userId: userId,
+                        topicId: topicId,
+                        topicName: topicName,
+                        text: text,
+                        numberOfWords: numberOfWords,
+                        isPrivate: isPrivate,
+                        userId: userId,
+                        timeCreated: timeCreated,
+                        lastAccess: lastAccess,
                     );
                   },
                 );

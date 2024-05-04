@@ -19,6 +19,12 @@ TextStyle normalText = const TextStyle(
   fontSize: 25,
 );
 
+TextStyle normalTextBlack = const TextStyle(
+  color: Colors.black,
+  fontWeight: FontWeight.bold,
+  fontSize: 18,
+);
+
 TextStyle normalSubText = const TextStyle(
   color: Colors.white,
   fontWeight: FontWeight.normal,

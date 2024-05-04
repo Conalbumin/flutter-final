@@ -11,7 +11,8 @@ class StatisticalTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(), // Listen to authentication state changes
+      stream: FirebaseAuth.instance.authStateChanges(),
+      // Listen to authentication state changes
       builder: (context, userSnapshot) {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -29,7 +30,9 @@ class StatisticalTab extends StatelessWidget {
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('topics')
-              .where('createdBy', isEqualTo: currentUserId) // Filter topics by 'createdBy' field
+              .where('createdBy',
+                  isEqualTo:
+                      currentUserId) // Filter topics by 'createdBy' field
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -53,6 +56,8 @@ class StatisticalTab extends StatelessWidget {
                 int numberOfWords = document['numberOfWords'];
                 bool isPrivate = document['isPrivate'];
                 String userId = document['createdBy'];
+                DateTime timeCreated = (document['timeCreated'] as Timestamp).toDate();
+                DateTime lastAccess = (document['lastAccess'] as Timestamp).toDate();
 
                 return StatisticalItem(
                   topicId: topicId,
@@ -61,6 +66,8 @@ class StatisticalTab extends StatelessWidget {
                   numberOfWords: numberOfWords,
                   isPrivate: isPrivate,
                   userId: userId,
+                  timeCreated: timeCreated,
+                  lastAccess: lastAccess,
                 );
               },
             );

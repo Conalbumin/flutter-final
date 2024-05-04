@@ -9,6 +9,8 @@ class StatisticalItem extends StatelessWidget {
   final int numberOfWords;
   final bool isPrivate;
   final String userId;
+  final DateTime timeCreated;
+  final DateTime lastAccess;
 
   const StatisticalItem({
     Key? key,
@@ -18,6 +20,8 @@ class StatisticalItem extends StatelessWidget {
     required this.numberOfWords,
     required this.isPrivate,
     required this.userId,
+    required this.timeCreated,
+    required this.lastAccess,
   }) : super(key: key);
 
   @override
@@ -32,7 +36,11 @@ class StatisticalItem extends StatelessWidget {
               topicName: topicName,
               numberOfWords: numberOfWords,
               text: text,
-              isPrivate: isPrivate, userId: userId,),
+              isPrivate: isPrivate,
+              userId: userId,
+              timeCreated: timeCreated,
+              lastAccess: lastAccess,
+            ),
           ),
         );
       },
