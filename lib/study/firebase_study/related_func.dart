@@ -76,3 +76,28 @@ Future<void> checkAndAddAccess(String topicId) async {
     print('Error checking and adding access: $e');
   }
 }
+
+Future<void> duplicateTopic(String topicId, String userId) async {
+  try {
+    DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .get();
+    Map<String, dynamic> topicData =
+    topicSnapshot.data() as Map<String, dynamic>;
+    DateTime currentTime = DateTime.now();
+
+    await FirebaseFirestore.instance.collection('topics').add({
+      ...topicData,
+      'createdBy': userId,
+      'timeCreated': currentTime,
+      'lastAccess': currentTime,
+      'accessPeople': 0,
+    });
+
+    print('Topic duplicated successfully');
+  } catch (e) {
+    print('Error duplicating topic: $e');
+  }
+}
+

@@ -36,6 +36,32 @@ class TopicPublicItem extends StatefulWidget {
 
 class _TopicPublicItemState extends State<TopicPublicItem> {
   final user = FirebaseAuth.instance.currentUser;
+  String displayName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDisplayName();
+  }
+
+  Future<void> fetchDisplayName() async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        setState(() {
+          displayName = userSnapshot['displayName'];
+        });
+      } else {
+        print('User not found');
+      }
+    } catch (error) {
+      print('Error fetching display name: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,19 +79,18 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  TopicPage(
-                    topicId: widget.topicId,
-                    topicName: widget.topicName,
-                    numberOfWords: widget.numberOfWords,
-                    text: widget.text,
-                    isPrivate: widget.isPrivate,
-                    userId: widget.userId,
-                    refreshCallback: () {},
-                    timeCreated: widget.timeCreated,
-                    lastAccess: currentTime,
-                    accessPeople: widget.accessPeople,
-                  ),
+              builder: (context) => TopicPage(
+                topicId: widget.topicId,
+                topicName: widget.topicName,
+                numberOfWords: widget.numberOfWords,
+                text: widget.text,
+                isPrivate: widget.isPrivate,
+                userId: widget.userId,
+                refreshCallback: () {},
+                timeCreated: widget.timeCreated,
+                lastAccess: currentTime,
+                accessPeople: widget.accessPeople,
+              ),
             ),
           );
         } catch (error) {
@@ -82,11 +107,12 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           decoration: CustomCardDecoration.cardDecoration,
           child: ListTile(
             leading: const Icon(Icons.topic, size: 60, color: Colors.white),
-            trailing:
-            Column(
+            trailing: Column(
               children: [
-                Text(user!.displayName ?? 'Anonymous', style: normalSubText),
-                Text('People joined: ${widget.accessPeople.toString()}', style: const TextStyle(fontSize: 18, color: Colors.white))
+                Text(displayName.isNotEmpty ? displayName : 'Anonymous',
+                    style: normalSubText),
+                Text('People joined: ${widget.accessPeople.toString()}',
+                    style: const TextStyle(fontSize: 18, color: Colors.white))
               ],
             ),
             title: Text(
