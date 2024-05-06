@@ -89,6 +89,7 @@ Future<void> duplicateTopic(String topicId, String userId) async {
 
     await FirebaseFirestore.instance.collection('topics').add({
       ...topicData,
+      'isPrivate': true,
       'createdBy': userId,
       'timeCreated': currentTime,
       'lastAccess': currentTime,
