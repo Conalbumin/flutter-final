@@ -92,7 +92,6 @@ Future<void> updateCountLearn(String topicId, String wordId) async {
         .collection('words')
         .doc(wordId)
         .update({'countLearn': FieldValue.increment(1)});
-    print('Learn ++');
   } catch (e) {
     print('Error updating word: $e');
   }

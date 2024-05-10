@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<User?> signUpWithEmailAndPassword(BuildContext context, String email, String password, String username) async {
+  Future<User?> signUpWithEmailAndPassword(BuildContext context, String email,
+      String password, String username) async {
     try {
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      await addUserToFirestore(credential.user!, username); // Pass username to add to Firestore
-      await credential.user!.updateDisplayName(username); // Update display name
+      UserCredential credential = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      await addUserToFirestore(credential.user!, username);
+      await credential.user!.updateDisplayName(username);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -27,10 +29,11 @@ class FirebaseAuthService {
     return null;
   }
 
-
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
-      UserCredential credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
@@ -45,7 +48,6 @@ class FirebaseAuthService {
   Future<User?> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      // Return null because there's no user associated with the reset password action
       return null;
     } catch (e) {
       print("An error occurred: $e");
@@ -61,18 +63,21 @@ class FirebaseAuthService {
     DocumentReference userDoc = users.doc(uid);
 
     String email = user.email ?? '';
+    String avatarURL = 'assets/default_avatar.png';
 
     Map<String, dynamic> userData = {
       'email': email,
       'displayName': username,
+      'avatarURL': avatarURL
     };
 
     await userDoc.set(userData);
+    // CollectionReference achievements = userDoc.collection('achievements');
+    // await achievements.add({
+    // });
   }
 
   void handleSignIn(User user) async {
-    // Handle user sign-in (e.g., navigate to the home screen, show a success message, etc.)
     print('User signed in: ${user.displayName}');
   }
-
 }

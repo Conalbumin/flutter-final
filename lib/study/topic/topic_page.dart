@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/study/ranking/rank.dart';
 import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'package:quizlet_final_flutter/study/study_mode/typing_page.dart';
+import 'package:quizlet_final_flutter/study/topic/topic_page_widget.dart';
 import 'package:quizlet_final_flutter/study/word/word.dart';
 import '../../constant/text_style.dart';
 import '../csv.dart';
@@ -41,7 +43,8 @@ class TopicPage extends StatefulWidget {
     required this.userId,
     required this.refreshCallback,
     required this.timeCreated,
-    required this.lastAccess, required this.accessPeople,
+    required this.lastAccess,
+    required this.accessPeople,
   }) : super(key: key);
 
   @override
@@ -226,29 +229,7 @@ class _TopicPageState extends State<TopicPage> {
                   } else {
                     List<DocumentSnapshot> words = snapshot.data!;
                     if (words.isEmpty) {
-                      return Container(
-                        color: Colors.lightBlueAccent,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Please provide at least',
-                                style: normalText,
-                              ),
-                              Text(
-                                '3 vocabulary words to start',
-                                style: normalText,
-                              ),
-                              Text(
-                                'studying',
-                                style: normalText,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                      return warning();
                     } else {
                       return Swiper(
                         scrollDirection: Axis.horizontal,
@@ -278,18 +259,43 @@ class _TopicPageState extends State<TopicPage> {
               ),
             ),
             const SizedBox(height: 20),
-            Center(
-              child: Container(
-                height: 60,
-                width: 300,
-                decoration: BoxDecoration(
-                  color: Colors.indigo,
-                  borderRadius: BorderRadius.circular(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 60,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    color: Colors.indigo,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text("Description: $_text", style: normalSubText),
+                  ),
                 ),
-                child: Center(
-                  child: Text("Description: $_text", style: normalSubText),
+                const SizedBox(width: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.indigo,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.stacked_bar_chart,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RankingPage(
+                                    topicId: widget.topicId,
+                                  )));
+                    },
+                  ),
                 ),
-              ),
+              ],
             ),
             const SizedBox(height: 20),
             Container(

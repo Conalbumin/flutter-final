@@ -63,40 +63,6 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
     }
   }
 
-  Future<void> _showStudyConfirmationDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Study Topic'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to put this topic into your personal list?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                duplicateTopic(widget.topicId, user!.uid);
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -109,27 +75,24 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
               .update({
             'lastAccess': currentTime,
           });
-          await checkAndAddAccess(widget.topicId);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TopicPage(
-                topicId: widget.topicId,
-                topicName: widget.topicName,
-                numberOfWords: widget.numberOfWords,
-                text: widget.text,
-                isPrivate: widget.isPrivate,
-                userId: widget.userId,
-                refreshCallback: () {},
-                timeCreated: widget.timeCreated,
-                lastAccess: currentTime,
-                accessPeople: widget.accessPeople,
+          checkAndAddAccess(widget.topicId);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TopicPage(
+                  topicId: widget.topicId,
+                  topicName: widget.topicName,
+                  numberOfWords: widget.numberOfWords,
+                  text: widget.text,
+                  isPrivate: widget.isPrivate,
+                  userId: widget.userId,
+                  refreshCallback: () {},
+                  timeCreated: widget.timeCreated,
+                  lastAccess: currentTime,
+                  accessPeople: widget.accessPeople,
+                ),
               ),
-            ),
-          );
-          if (user != null && user?.uid != widget.userId) {
-            _showStudyConfirmationDialog(context); // Show confirmation dialog
-          }
+            );
         } catch (error) {
           print('Error updating lastAccess: $error');
         }

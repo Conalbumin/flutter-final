@@ -13,7 +13,6 @@ Future<void> setPrivateTopic(
           .doc(topicId)
           .get();
       String? ownerId = topicSnapshot['createdBy'];
-
       if (ownerId == user.uid) {
         await FirebaseFirestore.instance
             .collection('topics')
@@ -44,7 +43,7 @@ List<DocumentSnapshot> sortTopicsByTime(
   return topics;
 }
 
-Future<void> checkAndAddAccess(String topicId) async {
+Future<bool> checkAndAddAccess(String topicId) async {
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -69,36 +68,13 @@ Future<void> checkAndAddAccess(String topicId) async {
           .update({'accessPeople': FieldValue.increment(1)});
 
       print('Access added successfully');
+      return false; // User didn't have access before
     } else {
       print('User already has access');
+      return true; // User already had access
     }
   } catch (e) {
     print('Error checking and adding access: $e');
+    return false; // Error occurred, treat as if user didn't have access
   }
 }
-
-Future<void> duplicateTopic(String topicId, String userId) async {
-  try {
-    DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
-        .collection('topics')
-        .doc(topicId)
-        .get();
-    Map<String, dynamic> topicData =
-    topicSnapshot.data() as Map<String, dynamic>;
-    DateTime currentTime = DateTime.now();
-
-    await FirebaseFirestore.instance.collection('topics').add({
-      ...topicData,
-      'isPrivate': true,
-      'createdBy': userId,
-      'timeCreated': currentTime,
-      'lastAccess': currentTime,
-      'accessPeople': 0,
-    });
-
-    print('Topic duplicated successfully');
-  } catch (e) {
-    print('Error duplicating topic: $e');
-  }
-}
-

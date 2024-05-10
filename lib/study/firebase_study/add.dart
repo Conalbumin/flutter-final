@@ -87,12 +87,10 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     });
 
     String topicId = topicRef.id;
-
     for (var wordData in wordsData) {
       String status = wordData['status'] ?? 'Unlearned';
       int countLearn = wordData['countLearn'] as int ?? 0;
       bool isFavorited = false;
-
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -105,7 +103,6 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
         'countLearn': countLearn
       });
     }
-
     print('Topic with words added successfully');
   } catch (e) {
     print('Error adding topic with words: $e');

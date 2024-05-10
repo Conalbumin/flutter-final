@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/study_mode/result_flashcard_page.dart';
 import '../../constant/text_style.dart';
 import '../firebase_study/fetch.dart';
 import '../firebase_study/update.dart';
+import '../ranking/user_performance.dart';
 import '../word/text_to_speech.dart';
 import '../word/word.dart';
 
@@ -37,6 +39,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
   Timer? _timer;
   bool autoplay = true;
   GlobalKey _menuKey = GlobalKey();
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  String? userName = FirebaseAuth.instance.currentUser!.displayName;
+  late String userAvatar;
 
   void shuffleWords(List<DocumentSnapshot> words) {
     setState(() {
@@ -78,6 +83,40 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
+  void saveUserPerformance() {
+    UserPerformance userPerformance = UserPerformance(
+      userId: userUid,
+      topicId: widget.topicId,
+      correctAnswers: countLearned,
+      timeTaken: DateTime.now(),
+      completionCount: 0,
+      lastStudied: DateTime.now(),
+      userName: userName,
+      userAvatar: userAvatar,
+    );
+
+    CollectionReference accessCollection = FirebaseFirestore.instance
+        .collection('topics')
+        .doc(widget.topicId)
+        .collection('access');
+
+    accessCollection
+        .doc(userPerformance.userId)
+        .set(userPerformance.toMap())
+        .then((value) {
+      print('User performance saved successfully');
+      accessCollection
+          .doc(userPerformance.userId)
+          .update({'completionCount': FieldValue.increment(1)})
+          .then((_) => print('Completion count updated'))
+          .catchError(
+              (error) => print('Failed to update completion count: $error'));
+    }).catchError((error) {
+      print('Failed to save user performance: $error');
+    });
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,6 +135,16 @@ class _FlashCardPageState extends State<FlashCardPage> {
         if (words.isNotEmpty) {
           speak(words[_currentIndex]['word']);
         }
+      });
+    });
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userUid)
+        .get()
+        .then((DocumentSnapshot userSnapshot) {
+      setState(() {
+        userAvatar = userSnapshot['avatarURL'];
       });
     });
     wordStatuses = List.filled(widget.numberOfWords, "");
@@ -182,6 +231,12 @@ class _FlashCardPageState extends State<FlashCardPage> {
           ),
         ],
       ),
+      floatingActionButton: countLearned + countUnlearned == words.length
+          ? FloatingActionButton(
+              onPressed: saveUserPerformance,
+              child: const Icon(Icons.save),
+            )
+          : null,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -248,15 +303,16 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        if (words[_currentIndex]['countLearn'] >= 2) {
-                                          updateLearnedStatus('Mastered');
+                                        if (words[_currentIndex]
+                                                ['countLearn'] >=
+                                            2) {
+                                          updateLearnedStatus('Learned');
                                           updateWordStatus(
                                               widget.topicId,
                                               words[_currentIndex].id,
                                               'Mastered');
                                           updateCountLearn(widget.topicId,
                                               words[_currentIndex].id);
-                                          print('Mastered');
                                         } else {
                                           updateLearnedStatus('Learned');
                                           updateWordStatus(
@@ -265,7 +321,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                               'Learned');
                                           updateCountLearn(widget.topicId,
                                               words[_currentIndex].id);
-                                          print('Learned');
                                         }
                                       });
                                     },

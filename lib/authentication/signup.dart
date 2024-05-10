@@ -149,22 +149,18 @@ class _SignUpState extends State<SignUp> {
     String email = _emailController.text;
     String password = _passwordController.text;
     String confirmPassword = _passwordConfirmController.text;
-
     if (password != confirmPassword) {
       setState(() {
         isSigningUp = false;
       });
-
       showToast("Password do not match");
       return;
     }
 
     User? user = await _auth.signUpWithEmailAndPassword(context, email, password, username);
-
     setState(() {
       isSigningUp = false;
     });
-
     if (user != null) {
       showToast("Sign up successful!");
       Navigator.pushNamed(context, "/home");

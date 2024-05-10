@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constant/color.dart';
 import '../constant/style.dart';
 import '../constant/toast.dart';
+import '../study/ranking/achivement.dart';
 import 'firebase_setting_page.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -34,7 +34,7 @@ class _SettingPageState extends State<SettingPage> {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               Container(
                 child: GestureDetector(
                   onTap: () {},
@@ -67,7 +67,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ), // Profile
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Container(
                 child: GestureDetector(
                   onTap: () {
@@ -87,7 +87,8 @@ class _SettingPageState extends State<SettingPage> {
                             child:
                                 Text('Change username', style: normalSubText),
                           ),
-                          const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          const Icon(Icons.arrow_forward_ios,
+                              color: Colors.white),
                         ],
                       ),
                     ),
@@ -95,7 +96,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ), // Change username
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Container(
                 child: GestureDetector(
                   onTap: () {
@@ -113,7 +114,8 @@ class _SettingPageState extends State<SettingPage> {
                           Expanded(
                             child: Text('Change avatar', style: normalSubText),
                           ),
-                          const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          const Icon(Icons.arrow_forward_ios,
+                              color: Colors.white),
                         ],
                       ),
                     ),
@@ -121,7 +123,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ), // Change avatar
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Container(
                 child: GestureDetector(
                   onTap: () {
@@ -148,6 +150,40 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ), // Change password
+
+              const SizedBox(height: 10),
+              Container(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Achievement(
+                          userId: _user?.uid ?? '',
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    color: Colors.blue[500],
+                    child: Container(
+                      decoration: CustomCardDecoration.cardDecoration,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.bar_chart, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text('Achievement', style: normalSubText),
+                          ),
+                          const Icon(Icons.arrow_forward_ios,
+                              color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ), // Achievement
             ],
           ),
         ),
@@ -181,8 +217,80 @@ class _SettingPageState extends State<SettingPage> {
         Map<String, dynamic>? userData =
             userSnapshot.data() as Map<String, dynamic>?;
         _avatarURL =
-            userData?['avatarURL']; // Retrieve avatar URL from Firestore
+            userData?['avatarURL'];
       });
+    }
+  }
+
+  void changeUsername() async {
+    String? newUsername = await _showUsernameInputDialog();
+
+    if (newUsername != null && newUsername.isNotEmpty) {
+      try {
+        await FirebaseAuth.instance.currentUser!.updateDisplayName(newUsername);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser?.uid)
+            .update({'displayName': newUsername});
+        await getUserProfile();
+        showToast("Username updated successfully.");
+      } catch (e) {
+        print("Error updating username: $e");
+        showToast("Error updating username: $e");
+      }
+    } else {
+      showToast("Error: Invalid username or canceled");
+    }
+  }
+
+  void changeAvatar() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile =
+      await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        String imagePath = pickedFile.path;
+
+        String newAvatarURL = await updateAvatar(_user!, imagePath);
+        showToast('Avatar updated successfully.');
+
+        setState(() {
+          _avatarURL = newAvatarURL;
+        });
+      } else {
+        showToast('No image selected.');
+      }
+    } catch (e) {
+      print('Error changing avatar: $e');
+      showToast('Error changing avatar: $e');
+    }
+  }
+
+  void changePassword() async {
+    Map<String, String>? passwords = await _showPasswordInputDialog();
+    if (passwords != null &&
+        passwords['newPassword'] != null &&
+        passwords['newPassword']!.isNotEmpty) {
+      try {
+        String? oldPassword = passwords['oldPassword'];
+        if (oldPassword == null || oldPassword.isEmpty) {
+          showToast("Please enter your old password to confirm.");
+          return;
+        }
+
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: _user!.email!,
+          password: oldPassword,
+        );
+        await _user!.reauthenticateWithCredential(credential);
+        await _user!.updatePassword(passwords['newPassword']!);
+        showToast("Password updated successfully.");
+      } catch (e) {
+        showToast("Error updating password: $e");
+      }
+    } else {
+      showToast("Error: Invalid password or canceled");
     }
   }
 
@@ -215,51 +323,6 @@ class _SettingPageState extends State<SettingPage> {
         );
       },
     );
-  }
-
-  void changeUsername() async {
-    String? newUsername = await _showUsernameInputDialog();
-
-    if (newUsername != null && newUsername.isNotEmpty) {
-      try {
-        await FirebaseAuth.instance.currentUser!.updateDisplayName(newUsername);
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(FirebaseAuth.instance.currentUser?.uid)
-            .update({'displayName': newUsername});
-        await getUserProfile();
-        showToast("Username updated successfully.");
-      } catch (e) {
-        print("Error updating username: $e");
-        showToast("Error updating username: $e");
-      }
-    } else {
-      showToast("Error: Invalid username or canceled");
-    }
-  }
-
-  void changeAvatar() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? pickedFile =
-          await picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile != null) {
-        String imagePath = pickedFile.path;
-
-        String newAvatarURL = await updateAvatar(_user!, imagePath);
-        showToast('Avatar updated successfully.');
-
-        setState(() {
-          _avatarURL = newAvatarURL;
-        });
-      } else {
-        showToast('No image selected.');
-      }
-    } catch (e) {
-      print('Error changing avatar: $e');
-      showToast('Error changing avatar: $e');
-    }
   }
 
   Future<Map<String, String>?> _showPasswordInputDialog() async {
@@ -312,37 +375,10 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  void changePassword() async {
-    Map<String, String>? passwords = await _showPasswordInputDialog();
-    if (passwords != null && passwords['newPassword'] != null && passwords['newPassword']!.isNotEmpty) {
-      try {
-        String? oldPassword = passwords['oldPassword'];
-        if (oldPassword == null || oldPassword.isEmpty) {
-          showToast("Please enter your old password to confirm.");
-          return;
-        }
-
-        AuthCredential credential = EmailAuthProvider.credential(
-          email: _user!.email!,
-          password: oldPassword,
-        );
-        await _user!.reauthenticateWithCredential(credential);
-        await _user!.updatePassword(passwords['newPassword']!);
-        showToast("Password updated successfully.");
-      } catch (e) {
-        showToast("Error updating password: $e");
-      }
-    } else {
-      showToast("Error: Invalid password or canceled");
-    }
-  }
-
   void logout() async {
     await FirebaseAuth.instance.signOut();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLoggedIn', false);
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
-
-
 }

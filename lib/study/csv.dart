@@ -69,7 +69,6 @@ Future<void> exportTopicToCSV(List<Map<String, dynamic>> words,
   List<List<dynamic>> csvData = [
     ['word', 'definition', 'status', 'isFavorited']
   ];
-
   // Convert the list of words into a List<List<dynamic>> format for CSV conversion
   csvData.addAll(words.map((word) {
     return [
@@ -79,13 +78,10 @@ Future<void> exportTopicToCSV(List<Map<String, dynamic>> words,
       word['isFavorited'],
     ];
   }).toList());
-
   String csvString = const ListToCsvConverter().convert(csvData);
-
   Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
   String downloadsPath = downloadsDirectory.path;
   String filePath = '$downloadsPath/$topicName.csv';
-
   await File(filePath).writeAsString(csvString);
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(

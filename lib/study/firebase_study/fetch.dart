@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Stream<QuerySnapshot> getTopics() {
-  String userUid = FirebaseAuth.instance.currentUser!.uid;
-  return FirebaseFirestore.instance
-      .collection('topics')
-      .where('isPrivate', isEqualTo: false)
-      .where('createdBy', isEqualTo: userUid)
-      .snapshots();
-}
+// Stream<QuerySnapshot> getTopics() {
+//   String userUid = FirebaseAuth.instance.currentUser!.uid;
+//   return FirebaseFirestore.instance
+//       .collection('topics')
+//       .where('isPrivate', isEqualTo: false)
+//       .where('createdBy', isEqualTo: userUid)
+//       .snapshots();
+// }
 
 Stream<QuerySnapshot> getFolders() {
   String userUid = FirebaseAuth.instance.currentUser!.uid;

@@ -63,7 +63,6 @@ class _WordItemState extends State<WordItem> {
               child: GestureDetector(
                 onTap: () {
                   speak(widget.word);
-                  print("volume_down_rounded icon clicked");
                 },
                 child: const Icon(
                   Icons.volume_down_rounded,

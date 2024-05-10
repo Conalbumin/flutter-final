@@ -72,37 +72,47 @@ void deleteFolder(BuildContext context, String folderId) {
   }
 }
 
-void deleteTopic(BuildContext context, String topicId) {
+void deleteTopic(BuildContext context, String topicId) async {
   try {
-    // Create a batch to perform multiple delete operations atomically
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    // Delete the topic document
     DocumentReference topicRef =
     FirebaseFirestore.instance.collection('topics').doc(topicId);
     batch.delete(topicRef);
 
+    DocumentReference accessRef =
+    FirebaseFirestore.instance.collection('access').doc(topicId);
+    batch.delete(accessRef);
+
+
     // Delete all words associated with the topic
-    FirebaseFirestore.instance
+    QuerySnapshot wordSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('words')
-        .get()
-        .then((querySnapshot) {
-      querySnapshot.docs.forEach((wordDoc) {
-        batch.delete(wordDoc.reference);
-      });
+        .get();
 
-      // Commit the batch
-      batch.commit().then((_) {
-        print('Topic and associated words deleted successfully');
-        Navigator.of(context).pop();
-      }).catchError((error) {
-        print('Error committing batch delete: $error');
-      });
+    wordSnapshot.docs.forEach((wordDoc) {
+      batch.delete(wordDoc.reference);
+    });
+
+    // Delete all access associated with the topic
+    QuerySnapshot accessSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .get();
+
+    accessSnapshot.docs.forEach((accessDoc) {
+      batch.delete(accessDoc.reference);
+    });
+
+    // Commit the batch
+    batch.commit().then((_) {
+      print('Topic, associated words, and access collection deleted successfully');
       Navigator.of(context).pop();
     }).catchError((error) {
-      print('Error fetching words for deletion: $error');
+      print('Error committing batch delete: $error');
     });
   } catch (e) {
     print('Error: $e');
