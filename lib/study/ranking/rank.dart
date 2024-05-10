@@ -71,7 +71,7 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                 ),
                 SizedBox(
-                  height: 250,
+                  height: 330,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('topics')
@@ -87,11 +87,12 @@ class _RankingPageState extends State<RankingPage> {
                       } else {
                         List<DocumentSnapshot> users = snapshot.data!.docs;
                         if (users.isEmpty) {
-                          return Text("No users found in access sub-collection");
+                          return Text(
+                              "No users found in access sub-collection");
                         } else {
                           return Swiper(
                             scrollDirection: Axis.horizontal,
-                            itemCount: users.length > 3 ? 3 : users.length,
+                            itemCount: users.length > 5 ? 5 : users.length,
                             viewportFraction: 0.6,
                             itemBuilder: (BuildContext context, int index) {
                               final userData =
@@ -99,6 +100,10 @@ class _RankingPageState extends State<RankingPage> {
                               return UserItem(
                                 displayName: userData['userName'],
                                 avatarURL: userData['userAvatar'],
+                                finishedAt: userData['lastStudied'].toDate(),
+                                startAt: userData['timeTaken'].toDate(),
+                                correctAns: userData['correctAnswers'],
+                                completionCount: userData['completionCount'],
                               );
                             },
                           );

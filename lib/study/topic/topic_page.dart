@@ -304,13 +304,15 @@ class _TopicPageState extends State<TopicPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      DateTime currentTime = DateTime.now();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FlashCardPage(
                               topicId: widget.topicId,
                               numberOfWords: widget.numberOfWords,
-                              showAllWords: showAllWords),
+                              showAllWords: showAllWords,
+                              lastAccess: currentTime),
                         ),
                       );
                     },

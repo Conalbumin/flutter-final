@@ -19,6 +19,12 @@ TextStyle normalText = const TextStyle(
   fontSize: 25,
 );
 
+TextStyle rankText = const TextStyle(
+  color: Colors.white,
+  fontWeight: FontWeight.bold,
+  fontSize: 22
+);
+
 TextStyle normalTextBlack = const TextStyle(
   color: Colors.black,
   fontWeight: FontWeight.bold,

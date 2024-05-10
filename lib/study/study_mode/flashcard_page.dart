@@ -15,12 +15,14 @@ class FlashCardPage extends StatefulWidget {
   final String topicId;
   final int numberOfWords;
   final bool showAllWords;
+  final DateTime lastAccess;
 
   const FlashCardPage(
       {Key? key,
       required this.topicId,
       required this.numberOfWords,
-      required this.showAllWords})
+      required this.showAllWords,
+      required this.lastAccess})
       : super(key: key);
 
   @override
@@ -88,7 +90,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
       userId: userUid,
       topicId: widget.topicId,
       correctAnswers: countLearned,
-      timeTaken: DateTime.now(),
+      timeTaken: widget.lastAccess,
       completionCount: 0,
       lastStudied: DateTime.now(),
       userName: userName,
