@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/study_mode/result_typing_page.dart';
 import '../../constant/text_style.dart';
@@ -12,6 +13,7 @@ class TypingPage extends StatefulWidget {
   final int numberOfWords;
   final int numberOfQuestions;
   final bool showAllWords;
+  final DateTime lastAccess;
   final Function(List<String>) onType;
 
   const TypingPage(
@@ -21,13 +23,17 @@ class TypingPage extends StatefulWidget {
       required this.numberOfWords,
       required this.numberOfQuestions,
       required this.onType,
-      required this.showAllWords});
+      required this.showAllWords,
+      required this.lastAccess});
 
   @override
   State<TypingPage> createState() => _TypingPageState();
 }
 
 class _TypingPageState extends State<TypingPage> {
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  String? userName = FirebaseAuth.instance.currentUser!.displayName;
+  late String userAvatar;
   int _currentIndex = 0;
   GlobalKey _menuKey = GlobalKey();
   FocusNode _textFocus = FocusNode();
@@ -87,8 +93,7 @@ class _TypingPageState extends State<TypingPage> {
 
   void fetchAnswers(List<DocumentSnapshot> words) async {
     try {
-      List<DocumentSnapshot> selectedQuestions =
-          words.sublist(0, words.length);
+      List<DocumentSnapshot> selectedQuestions = words.sublist(0, words.length);
 
       selectedQuestions.forEach((question) {
         String correctAnswer =
@@ -120,22 +125,14 @@ class _TypingPageState extends State<TypingPage> {
       userInput = '';
     });
 
-    if(isCorrect) {
+    if (isCorrect) {
       if (words[_currentIndex]['countLearn'] >= 2) {
-        updateWordStatus(
-            widget.topicId,
-            words[_currentIndex].id,
-            'Mastered');
-        updateCountLearn(widget.topicId,
-            words[_currentIndex].id);
+        updateWordStatus(widget.topicId, words[_currentIndex].id, 'Mastered');
+        updateCountLearn(widget.topicId, words[_currentIndex].id);
         print('Mastered');
       } else {
-        updateWordStatus(
-            widget.topicId,
-            words[_currentIndex].id,
-            'Learned');
-        updateCountLearn(widget.topicId,
-            words[_currentIndex].id);
+        updateWordStatus(widget.topicId, words[_currentIndex].id, 'Learned');
+        updateCountLearn(widget.topicId, words[_currentIndex].id);
         print('Learned');
       }
     } else {
@@ -208,6 +205,16 @@ class _TypingPageState extends State<TypingPage> {
         }
       });
       fetchAnswers(words);
+    });
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userUid)
+        .get()
+        .then((DocumentSnapshot userSnapshot) {
+      setState(() {
+        userAvatar = userSnapshot['avatarURL'];
+      });
     });
   }
 
@@ -306,8 +313,19 @@ class _TypingPageState extends State<TypingPage> {
                     correctCount++;
                   }
                 }
-                return buildTypingResult(correctCount, words.length,
-                    userAnswers, correctAnswers, words, showDefinition);
+                print(words.length);
+                return buildTypingResult(
+                    correctCount,
+                    words.length,
+                    userAnswers,
+                    correctAnswers,
+                    words,
+                    showDefinition,
+                    widget.topicId,
+                    userUid,
+                    userName!,
+                    userAvatar,
+                    widget.lastAccess);
               }
               if (!hasSpoken && autoSpeak) {
                 String wordToSpeak = words[_currentIndex]['word'];

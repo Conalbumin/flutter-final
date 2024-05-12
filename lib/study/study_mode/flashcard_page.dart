@@ -85,40 +85,6 @@ class _FlashCardPageState extends State<FlashCardPage> {
     });
   }
 
-  void saveUserPerformance() {
-    UserPerformance userPerformance = UserPerformance(
-      userId: userUid,
-      topicId: widget.topicId,
-      correctAnswers: countLearned,
-      timeTaken: widget.lastAccess,
-      completionCount: 0,
-      lastStudied: DateTime.now(),
-      userName: userName,
-      userAvatar: userAvatar,
-    );
-
-    CollectionReference accessCollection = FirebaseFirestore.instance
-        .collection('topics')
-        .doc(widget.topicId)
-        .collection('access');
-
-    accessCollection
-        .doc(userPerformance.userId)
-        .set(userPerformance.toMap())
-        .then((value) {
-      print('User performance saved successfully');
-      accessCollection
-          .doc(userPerformance.userId)
-          .update({'completionCount': FieldValue.increment(1)})
-          .then((_) => print('Completion count updated'))
-          .catchError(
-              (error) => print('Failed to update completion count: $error'));
-    }).catchError((error) {
-      print('Failed to save user performance: $error');
-    });
-    Navigator.pop(context);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -235,7 +201,12 @@ class _FlashCardPageState extends State<FlashCardPage> {
       ),
       floatingActionButton: countLearned + countUnlearned == words.length
           ? FloatingActionButton(
-              onPressed: saveUserPerformance,
+              onPressed: () {
+                int numberOfCorrectAnswers = countLearned;
+                saveUserPerformance(widget.topicId, userUid, userName!,
+                    userAvatar, widget.lastAccess, numberOfCorrectAnswers);
+                Navigator.pop(context);
+              },
               child: const Icon(Icons.save),
             )
           : null,

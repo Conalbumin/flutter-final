@@ -48,3 +48,91 @@ class UserPerformance {
     };
   }
 }
+
+Future<void> saveUserPerformance(
+    String topicId,
+    String userUid,
+    String userName,
+    String userAvatar,
+    DateTime timeTaken,
+    int numberOfCorrectAnswers,
+    ) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .get()
+        .then((DocumentSnapshot accessSnapshot) {
+      if (accessSnapshot.exists) {
+        // User has accessed before
+        UserPerformance userPerformance;
+
+        Map<String, dynamic>? data = accessSnapshot.data() as Map<String, dynamic>?;
+
+        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers')) {
+          // If completionCount exists, update it
+          userPerformance = UserPerformance(
+            userId: userUid,
+            topicId: topicId,
+            correctAnswers: numberOfCorrectAnswers,
+            timeTaken: timeTaken,
+            completionCount: data['completionCount'] + 1,
+            lastStudied: DateTime.now(),
+            userName: userName,
+            userAvatar: userAvatar,
+          );
+        } else {
+          // If completionCount doesn't exist, set default value
+          userPerformance = UserPerformance(
+            userId: userUid,
+            topicId: topicId,
+            correctAnswers: numberOfCorrectAnswers,
+            timeTaken: timeTaken,
+            completionCount: 1,
+            lastStudied: DateTime.now(),
+            userName: userName,
+            userAvatar: userAvatar,
+          );
+        }
+
+        accessSnapshot.reference
+            .set(userPerformance.toMap())
+            .then((value) => print('User performance updated successfully'))
+            .catchError(
+                (error) => print('Failed to update user performance: $error'));
+      } else {
+        // First access, set default performance
+        UserPerformance userPerformance = UserPerformance(
+          userId: userUid,
+          topicId: topicId,
+          correctAnswers: 0, // Default value
+          timeTaken: timeTaken,
+          completionCount: 1,
+          lastStudied: DateTime.now(),
+          userName: userName,
+          userAvatar: userAvatar,
+        );
+
+        CollectionReference accessCollection = FirebaseFirestore.instance
+            .collection('topics')
+            .doc(topicId)
+            .collection('access');
+
+        accessCollection
+            .doc(userPerformance.userId)
+            .set(userPerformance.toMap())
+            .then((value) => print('User performance saved successfully'))
+            .catchError(
+                (error) => print('Failed to save user performance: $error'));
+      }
+    });
+  } catch (e) {
+    print('Error saving user performance: $e');
+  }
+}
+
+
+
+

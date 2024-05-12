@@ -291,6 +291,7 @@ class _TopicPageState extends State<TopicPage> {
                           MaterialPageRoute(
                               builder: (context) => RankingPage(
                                     topicId: widget.topicId,
+                                    numberOfWords: widget.numberOfWords,
                                   )));
                     },
                   ),
@@ -346,14 +347,16 @@ class _TopicPageState extends State<TopicPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => TypingPage(
-                              topicId: widget.topicId,
-                              topicName: widget.topicName,
-                              numberOfWords: widget.numberOfWords,
-                              numberOfQuestions: words.length,
-                              showAllWords: showAllWords,
-                              onType: (answers) {
-                                // Handle typed answers here
-                              }),
+                            topicId: widget.topicId,
+                            topicName: widget.topicName,
+                            numberOfWords: widget.numberOfWords,
+                            numberOfQuestions: words.length,
+                            showAllWords: showAllWords,
+                            onType: (answers) {
+                              // Handle typed answers here
+                            },
+                            lastAccess: widget.lastAccess,
+                          ),
                         ),
                       );
                     },
