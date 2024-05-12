@@ -46,22 +46,34 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
 
   Future<void> fetchDisplayName() async {
     try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.userId)
+      DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(widget.topicId)
           .get();
 
-      if (userSnapshot.exists) {
-        setState(() {
-          displayName = userSnapshot['displayName'];
-        });
+      if (topicSnapshot.exists) {
+        String createdBy = topicSnapshot['createdBy'];
+
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(createdBy)
+            .get();
+
+        if (userSnapshot.exists) {
+          setState(() {
+            displayName = userSnapshot['displayName'];
+          });
+        } else {
+          print('User not found');
+        }
       } else {
-        print('User not found');
+        print('Topic not found');
       }
     } catch (error) {
       print('Error fetching display name: $error');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

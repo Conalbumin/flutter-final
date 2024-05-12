@@ -71,10 +71,37 @@ class _RankingPageState extends State<RankingPage> {
                                   return const Text(
                                       "No users found in access sub-collection");
                                 } else {
-                                  users.sort((a, b) => b['correctAnswers']
-                                      .compareTo(a['correctAnswers']));
-                                  users.sort((a, b) =>
-                                      b['timeTaken'].compareTo(a['timeTaken']));
+                                  users.sort((a, b) {
+                                    // Check if the 'correctAnswers' field exists in both documents
+                                    bool aHasCorrectAnswers = (a.data() as Map<String, dynamic>).containsKey('correctAnswers');
+                                    bool bHasCorrectAnswers = (b.data() as Map<String, dynamic>).containsKey('correctAnswers');
+
+                                    // If one of the documents doesn't have 'correctAnswers', prioritize the other
+                                    if (!aHasCorrectAnswers && bHasCorrectAnswers) {
+                                      return 1; // Move document 'a' after document 'b'
+                                    } else if (aHasCorrectAnswers && !bHasCorrectAnswers) {
+                                      return -1; // Move document 'b' after document 'a'
+                                    }
+
+                                    // If both documents have 'correctAnswers', sort based on it
+                                    return (b['correctAnswers'] as int).compareTo(a['correctAnswers'] as int);
+                                  });
+
+                                  users.sort((a, b) {
+                                    // Check if the 'timeTaken' field exists in both documents
+                                    bool aHasTimeTaken = (a.data() as Map<String, dynamic>).containsKey('timeTaken');
+                                    bool bHasTimeTaken = (b.data() as Map<String, dynamic>).containsKey('timeTaken');
+
+                                    // If one of the documents doesn't have 'timeTaken', prioritize the other
+                                    if (!aHasTimeTaken && bHasTimeTaken) {
+                                      return 1; // Move document 'a' after document 'b'
+                                    } else if (aHasTimeTaken && !bHasTimeTaken) {
+                                      return -1; // Move document 'b' after document 'a'
+                                    }
+
+                                    // If both documents have 'timeTaken', sort based on it
+                                    return (b['timeTaken'] as Timestamp).compareTo(a['timeTaken'] as Timestamp);
+                                  });
 
                                   List<DocumentSnapshot> mostCorrectAnsUser =
                                       users
@@ -82,45 +109,36 @@ class _RankingPageState extends State<RankingPage> {
                                               ? 3
                                               : users.length)
                                           .toList();
-
                                   return Swiper(
                                     loop: false,
                                     autoplay: true,
                                     scrollDirection: Axis.horizontal,
                                     itemCount: mostCorrectAnsUser.length,
                                     viewportFraction: 0.6,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final userData = mostCorrectAnsUser
-                                          .reversed
-                                          .toList()[index]
-                                          .data() as Map<String, dynamic>;
-                                      if (userData.isNotEmpty) {
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final userData = mostCorrectAnsUser.reversed.toList()[index].data() as Map<String, dynamic>;
+                                      if (userData.isNotEmpty && userData.containsKey('correctAnswers')) {
                                         return UserItem(
                                           displayName: userData['userName'],
                                           avatarURL: userData['userAvatar'],
-                                          finishedAt:
-                                              userData['lastStudied'].toDate(),
-                                          startAt:
-                                              userData['timeTaken'].toDate(),
-                                          correctAns:
-                                              userData['correctAnswers'],
-                                          completionCount:
-                                              userData['completionCount'],
+                                          finishedAt: userData['lastStudied'].toDate(),
+                                          startAt: userData['timeTaken'].toDate(),
+                                          correctAns: userData['correctAnswers'],
+                                          completionCount: userData['completionCount'],
                                           cardType: CardType.Answer,
                                           numberOfWords: widget.numberOfWords,
                                         );
                                       } else {
                                         return Container(
-                                          decoration: CustomCardDecoration
-                                              .cardDecoration,
+                                          decoration: CustomCardDecoration.cardDecoration,
                                           padding: const EdgeInsets.all(20.0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Text(
-                                                  "Let become one of the first user study this topic",
-                                                  style: normalText),
+                                                "Let become one of the first 3 users who study this topic",
+                                                style: normalText,
+                                              ),
                                             ],
                                           ),
                                         );
@@ -235,7 +253,7 @@ class _RankingPageState extends State<RankingPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
-                                              "Let become one of the first user study this topic",
+                                              "Let become one of the first 3 users who study this topic",
                                               style: normalText),
                                         ],
                                       ),
@@ -330,7 +348,7 @@ class _RankingPageState extends State<RankingPage> {
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Text(
-                                                  "Let become one of the first user study this topic",
+                                                  "Let become one of the first 3 users who study this topic",
                                                   style: normalText),
                                             ],
                                           ),
