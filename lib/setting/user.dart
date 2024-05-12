@@ -26,7 +26,8 @@ class UserItem extends StatelessWidget {
     required this.startAt,
     required this.correctAns,
     required this.completionCount,
-    required this.cardType, required this.numberOfWords,
+    required this.cardType,
+    required this.numberOfWords,
   }) : super(key: key);
 
   String computeTimeDifference(DateTime lastStudied, DateTime timeTaken) {
@@ -42,13 +43,10 @@ class UserItem extends StatelessWidget {
     int minutes = difference.inMinutes.remainder(60);
     int seconds = difference.inSeconds.remainder(60);
 
-    String formattedDifference = '$hours hours,\n$minutes minutes,\n$seconds seconds';
+    String formattedDifference =
+        '$hours hours,\n$minutes minutes,\n$seconds seconds';
 
     return formattedDifference;
-  }
-
-  String computeMostCorrectAns() {
-    return '';
   }
 
   Widget buildCard(BuildContext context) {
@@ -67,7 +65,8 @@ class UserItem extends StatelessWidget {
                   radius: 60,
                   backgroundImage: avatarURL.isNotEmpty
                       ? NetworkImage(avatarURL)
-                      : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                      : const AssetImage('assets/default_avatar.png')
+                          as ImageProvider,
                 ),
                 const SizedBox(height: 10),
                 Text(displayName ?? '', style: normalText),
@@ -89,7 +88,8 @@ class UserItem extends StatelessWidget {
                   radius: 60,
                   backgroundImage: avatarURL.isNotEmpty
                       ? NetworkImage(avatarURL)
-                      : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                      : const AssetImage('assets/default_avatar.png')
+                          as ImageProvider,
                 ),
                 const SizedBox(height: 10),
                 Text(displayName ?? '', style: normalText),
@@ -111,7 +111,8 @@ class UserItem extends StatelessWidget {
                   radius: 60,
                   backgroundImage: avatarURL.isNotEmpty
                       ? NetworkImage(avatarURL)
-                      : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                      : const AssetImage('assets/default_avatar.png')
+                          as ImageProvider,
                 ),
                 const SizedBox(height: 10),
                 Text(displayName ?? '', style: normalText),

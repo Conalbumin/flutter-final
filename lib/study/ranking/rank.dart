@@ -68,39 +68,44 @@ class _RankingPageState extends State<RankingPage> {
                                 List<DocumentSnapshot> users =
                                     snapshot.data!.docs;
                                 if (users.isEmpty) {
-                                  return const Text(
-                                      "No users found in access sub-collection");
+                                  return Text(
+                                      "No users found in access sub-collection",
+                                      style: normalText);
                                 } else {
                                   users.sort((a, b) {
-                                    // Check if the 'correctAnswers' field exists in both documents
-                                    bool aHasCorrectAnswers = (a.data() as Map<String, dynamic>).containsKey('correctAnswers');
-                                    bool bHasCorrectAnswers = (b.data() as Map<String, dynamic>).containsKey('correctAnswers');
+                                    bool aHasCorrectAnswers =
+                                        (a.data() as Map<String, dynamic>)
+                                            .containsKey('correctAnswers');
+                                    bool bHasCorrectAnswers =
+                                        (b.data() as Map<String, dynamic>)
+                                            .containsKey('correctAnswers');
 
-                                    // If one of the documents doesn't have 'correctAnswers', prioritize the other
-                                    if (!aHasCorrectAnswers && bHasCorrectAnswers) {
-                                      return 1; // Move document 'a' after document 'b'
-                                    } else if (aHasCorrectAnswers && !bHasCorrectAnswers) {
-                                      return -1; // Move document 'b' after document 'a'
+                                    if (!aHasCorrectAnswers &&
+                                        bHasCorrectAnswers) {
+                                      return 1;
+                                    } else if (aHasCorrectAnswers &&
+                                        !bHasCorrectAnswers) {
+                                      return -1;
                                     }
-
-                                    // If both documents have 'correctAnswers', sort based on it
-                                    return (b['correctAnswers'] as int).compareTo(a['correctAnswers'] as int);
+                                    return (b['correctAnswers'] as int)
+                                        .compareTo(a['correctAnswers'] as int);
                                   });
-
                                   users.sort((a, b) {
-                                    // Check if the 'timeTaken' field exists in both documents
-                                    bool aHasTimeTaken = (a.data() as Map<String, dynamic>).containsKey('timeTaken');
-                                    bool bHasTimeTaken = (b.data() as Map<String, dynamic>).containsKey('timeTaken');
+                                    bool aHasTimeTaken =
+                                        (a.data() as Map<String, dynamic>)
+                                            .containsKey('timeTaken');
+                                    bool bHasTimeTaken =
+                                        (b.data() as Map<String, dynamic>)
+                                            .containsKey('timeTaken');
 
-                                    // If one of the documents doesn't have 'timeTaken', prioritize the other
                                     if (!aHasTimeTaken && bHasTimeTaken) {
-                                      return 1; // Move document 'a' after document 'b'
-                                    } else if (aHasTimeTaken && !bHasTimeTaken) {
-                                      return -1; // Move document 'b' after document 'a'
+                                      return 1;
+                                    } else if (aHasTimeTaken &&
+                                        !bHasTimeTaken) {
+                                      return -1;
                                     }
-
-                                    // If both documents have 'timeTaken', sort based on it
-                                    return (b['timeTaken'] as Timestamp).compareTo(a['timeTaken'] as Timestamp);
+                                    return (a['timeTaken'] as Timestamp)
+                                        .compareTo(b['timeTaken'] as Timestamp);
                                   });
 
                                   List<DocumentSnapshot> mostCorrectAnsUser =
@@ -109,42 +114,84 @@ class _RankingPageState extends State<RankingPage> {
                                               ? 3
                                               : users.length)
                                           .toList();
-                                  return Swiper(
-                                    loop: false,
-                                    autoplay: true,
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: mostCorrectAnsUser.length,
-                                    viewportFraction: 0.6,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final userData = mostCorrectAnsUser.reversed.toList()[index].data() as Map<String, dynamic>;
-                                      if (userData.isNotEmpty && userData.containsKey('correctAnswers')) {
-                                        return UserItem(
-                                          displayName: userData['userName'],
-                                          avatarURL: userData['userAvatar'],
-                                          finishedAt: userData['lastStudied'].toDate(),
-                                          startAt: userData['timeTaken'].toDate(),
-                                          correctAns: userData['correctAnswers'],
-                                          completionCount: userData['completionCount'],
-                                          cardType: CardType.Answer,
-                                          numberOfWords: widget.numberOfWords,
-                                        );
-                                      } else {
-                                        return Container(
-                                          decoration: CustomCardDecoration.cardDecoration,
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                "Let become one of the first 3 users who study this topic",
-                                                style: normalText,
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  );
+                                  mostCorrectAnsUser.reversed;
+                                  for (int i = 0;
+                                      i < mostCorrectAnsUser.length;
+                                      i++) {
+                                    String userId = mostCorrectAnsUser[i].id;
+                                    int rank = i + 1;
+                                    FirebaseFirestore.instance
+                                        .collection('achievements')
+                                        .doc(userId)
+                                        .collection('topics')
+                                        .doc(widget.topicId)
+                                        .set({
+                                      'rank_most_correct_answer': rank,
+                                      // Add other relevant user information here
+                                    }, SetOptions(merge: true));
+                                  }
+                                  if (mostCorrectAnsUser.isNotEmpty) {
+                                    return Swiper(
+                                      loop: false,
+                                      autoplay: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: mostCorrectAnsUser.length,
+                                      viewportFraction: 0.6,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        final userData = mostCorrectAnsUser
+                                            .toList()[index]
+                                            .data() as Map<String, dynamic>;
+                                        if (userData.isNotEmpty &&
+                                            userData.containsKey(
+                                                'correctAnswers')) {
+                                          return UserItem(
+                                            displayName: userData['userName'],
+                                            avatarURL: userData['userAvatar'],
+                                            finishedAt: userData['lastStudied']
+                                                .toDate(),
+                                            startAt:
+                                                userData['timeTaken'].toDate(),
+                                            correctAns:
+                                                userData['correctAnswers'],
+                                            completionCount:
+                                                userData['completionCount'],
+                                            cardType: CardType.Answer,
+                                            numberOfWords: widget.numberOfWords,
+                                          );
+                                        } else {
+                                          return Container(
+                                            decoration: CustomCardDecoration
+                                                .cardDecoration,
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  "Let become one of the first 3 users who study this topic",
+                                                  style: normalText,
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  } else {
+                                    return Container(
+                                      decoration:
+                                          CustomCardDecoration.cardDecoration,
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                              "Let become one of the first 3 users who study this topic",
+                                              style: normalText),
+                                        ],
+                                      ),
+                                    );
+                                  }
                                 }
                               }
                             },
@@ -195,8 +242,9 @@ class _RankingPageState extends State<RankingPage> {
                                 List<DocumentSnapshot> users =
                                     snapshot.data!.docs;
                                 if (users.isEmpty) {
-                                  return const Text(
-                                      "No users found in access sub-collection");
+                                  return Text(
+                                      "No users found in access sub-collection",
+                                      style: normalText);
                                 } else {
                                   users = users
                                       .where((user) => (user.data()
@@ -213,52 +261,65 @@ class _RankingPageState extends State<RankingPage> {
                                   List<DocumentSnapshot> fastestUsers = users
                                       .take(users.length > 3 ? 3 : users.length)
                                       .toList();
-                                  print("users $users");
-
-                                  if(fastestUsers.isNotEmpty) {
-                                    return Swiper(
-                                      loop: false,
-                                      autoplay: true,
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: fastestUsers.length,
-                                      viewportFraction: 0.6,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        final userData = fastestUsers.reversed
-                                            .toList()[index]
-                                            .data() as Map<String, dynamic>;
+                                  fastestUsers.reversed;
+                                  for (int i = 0;
+                                      i < fastestUsers.length;
+                                      i++) {
+                                    String userId = fastestUsers[i].id;
+                                    int rank = i + 1;
+                                    FirebaseFirestore.instance
+                                        .collection('achievements')
+                                        .doc(userId)
+                                        .collection('topics')
+                                        .doc(widget.topicId)
+                                        .set({
+                                      'rank_shortest_time': rank,
+                                      // Add other relevant user information here
+                                    }, SetOptions(merge: true));
+                                  }
+                                  return Swiper(
+                                    loop: false,
+                                    autoplay: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: fastestUsers.length,
+                                    viewportFraction: 0.6,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final userData = fastestUsers
+                                          .toList()[index]
+                                          .data() as Map<String, dynamic>;
+                                      if (fastestUsers.isNotEmpty) {
                                         return UserItem(
                                           displayName: userData['userName'],
                                           avatarURL: userData['userAvatar'],
                                           finishedAt:
-                                          userData['lastStudied'].toDate(),
+                                              userData['lastStudied'].toDate(),
                                           startAt:
-                                          userData['timeTaken'].toDate(),
+                                              userData['timeTaken'].toDate(),
                                           correctAns:
-                                          userData['correctAnswers'],
+                                              userData['correctAnswers'],
                                           completionCount:
-                                          userData['completionCount'],
+                                              userData['completionCount'],
                                           cardType: CardType.Time,
                                           numberOfWords: widget.numberOfWords,
                                         );
-
-                                      },
-                                    );
-                                  } else {
-                                    return Container(
-                                      decoration: CustomCardDecoration
-                                          .cardDecoration,
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                              "Let become one of the first 3 users who study this topic",
-                                              style: normalText),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                      } else {
+                                        return Container(
+                                          decoration: CustomCardDecoration
+                                              .cardDecoration,
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                  "Let become one of the first 3 users who study this topic",
+                                                  style: normalText),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  );
                                 }
                               }
                             },
@@ -308,13 +369,44 @@ class _RankingPageState extends State<RankingPage> {
                                 List<DocumentSnapshot> users =
                                     snapshot.data!.docs;
                                 if (users.isEmpty) {
-                                  return const Text(
-                                      "No users found in access sub-collection");
+                                  return Text(
+                                      "No users found in access sub-collection",
+                                      style: normalText);
                                 } else {
+                                  users.sort((a, b) {
+                                    bool acompletionCount =
+                                        (a.data() as Map<String, dynamic>)
+                                            .containsKey('completionCount');
+                                    bool bcompletionCount =
+                                        (b.data() as Map<String, dynamic>)
+                                            .containsKey('completionCount');
+
+                                    if (!acompletionCount && bcompletionCount) {
+                                      return 1;
+                                    } else if (acompletionCount &&
+                                        !bcompletionCount) {
+                                      return -1;
+                                    }
+                                    return (b['completionCount'] as int)
+                                        .compareTo(a['completionCount'] as int);
+                                  });
                                   List<DocumentSnapshot> mostTimesUser = users
                                       .take(users.length > 3 ? 3 : users.length)
                                       .toList();
-
+                                  for (int i = 0;
+                                      i < mostTimesUser.length;
+                                      i++) {
+                                    String userId = mostTimesUser[i].id;
+                                    int rank = i + 1;
+                                    FirebaseFirestore.instance
+                                        .collection('achievements')
+                                        .doc(userId)
+                                        .collection('topics')
+                                        .doc(widget.topicId)
+                                        .set({
+                                      'rank_most_times': rank,
+                                    }, SetOptions(merge: true));
+                                  }
                                   return Swiper(
                                     loop: false,
                                     autoplay: true,
@@ -323,19 +415,21 @@ class _RankingPageState extends State<RankingPage> {
                                     viewportFraction: 0.6,
                                     itemBuilder:
                                         (BuildContext context, int index) {
-                                      final userData = mostTimesUser.reversed
+                                      final userData = mostTimesUser
                                           .toList()[index]
                                           .data() as Map<String, dynamic>;
-                                      if(userData.isNotEmpty) {
+                                      if (userData.isNotEmpty) {
                                         return UserItem(
                                           displayName: userData['userName'],
                                           avatarURL: userData['userAvatar'],
                                           finishedAt:
-                                          userData['lastStudied'].toDate(),
-                                          startAt: userData['timeTaken'].toDate(),
-                                          correctAns: userData['correctAnswers'],
+                                              userData['lastStudied'].toDate(),
+                                          startAt:
+                                              userData['timeTaken'].toDate(),
+                                          correctAns:
+                                              userData['correctAnswers'],
                                           completionCount:
-                                          userData['completionCount'],
+                                              userData['completionCount'],
                                           cardType: CardType.MostTimes,
                                           numberOfWords: widget.numberOfWords,
                                         );

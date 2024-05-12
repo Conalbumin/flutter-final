@@ -3,10 +3,18 @@ import 'package:quizlet_final_flutter/constant/text_style.dart';
 
 class Achievement extends StatelessWidget {
   final String userId;
+  final String type;
+  final String topicId;
+  final String topicName;
+  final int rank;
 
   const Achievement({
     super.key,
     required this.userId,
+    required this.type,
+    required this.topicId,
+    required this.topicName,
+    required this.rank,
   });
 
   @override
@@ -26,7 +34,8 @@ class Achievement extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.indigo, // Background color
                   border: Border.all(color: Colors.black), // Border color
-                  borderRadius: BorderRadius.circular(15.0), // Optional: border radius
+                  borderRadius:
+                      BorderRadius.circular(15.0), // Optional: border radius
                 ),
                 child: Column(
                   children: [
@@ -46,7 +55,8 @@ class Achievement extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.indigo, // Background color
                   border: Border.all(color: Colors.black), // Border color
-                  borderRadius: BorderRadius.circular(15.0), // Optional: border radius
+                  borderRadius:
+                      BorderRadius.circular(15.0), // Optional: border radius
                 ),
                 child: Column(
                   children: [
@@ -66,7 +76,8 @@ class Achievement extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.indigo, // Background color
                   border: Border.all(color: Colors.black), // Border color
-                  borderRadius: BorderRadius.circular(15.0), // Optional: border radius
+                  borderRadius:
+                      BorderRadius.circular(15.0), // Optional: border radius
                 ),
                 child: Column(
                   children: [

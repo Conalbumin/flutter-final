@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_page.dart';
 import '../../constant/style.dart';
+import '../firebase_study/related_func.dart';
 
 class TopicItem extends StatelessWidget {
   final String topicId;
@@ -39,6 +40,7 @@ class TopicItem extends StatelessWidget {
               .update({
             'lastAccess': currentTime,
           });
+          checkAndAddAccess(topicId);
           Navigator.push(
             context,
             MaterialPageRoute(

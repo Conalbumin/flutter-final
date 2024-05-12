@@ -114,6 +114,7 @@ void deleteTopic(BuildContext context, String topicId) async {
     }).catchError((error) {
       print('Error committing batch delete: $error');
     });
+    Navigator.pop(context);
   } catch (e) {
     print('Error: $e');
   }

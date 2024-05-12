@@ -160,6 +160,10 @@ class _SettingPageState extends State<SettingPage> {
                       MaterialPageRoute(
                         builder: (context) => Achievement(
                           userId: _user?.uid ?? '',
+                          type: '',
+                          topicId: '',
+                          topicName: '',
+                          rank: 1,
                         ),
                       ),
                     );
@@ -216,8 +220,7 @@ class _SettingPageState extends State<SettingPage> {
         _user = user;
         Map<String, dynamic>? userData =
             userSnapshot.data() as Map<String, dynamic>?;
-        _avatarURL =
-            userData?['avatarURL'];
+        _avatarURL = userData?['avatarURL'];
       });
     }
   }
@@ -247,7 +250,7 @@ class _SettingPageState extends State<SettingPage> {
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? pickedFile =
-      await picker.pickImage(source: ImageSource.gallery);
+          await picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         String imagePath = pickedFile.path;
