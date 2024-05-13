@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 
-Future<void> addTopic(String topicName, String text, int numberOfWords,
-    bool isPrivate) async {
+Future<void> addTopic(
+    String topicName, String text, int numberOfWords, bool isPrivate) async {
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
     DateTime currentTime = DateTime.now();
@@ -35,14 +35,20 @@ Future<void> addFolder(String folderName, String text) async {
   }
 }
 
-Future<void> addWord(String topicId,
-    List<Map<String, String>> wordsData) async {
+Future<void> addWord(
+    String topicId, List<Map<String, String>> wordsData) async {
   try {
     int totalWordsAdded = wordsData.length;
 
     for (var wordData in wordsData) {
       String status = wordData['status'] ?? 'Unlearned';
-      int? countLearn = wordData['countLearn'] as int? ?? 0;
+      int? countLearn;
+      if (wordData['countLearn'] is int) {
+        countLearn = wordData['countLearn'] as int?;
+      } else if (wordData['countLearn'] is String) {
+        countLearn = int.tryParse(wordData['countLearn'] as String);
+      }
+      countLearn ??= 0;
       bool isFavorited = false;
 
       await FirebaseFirestore.instance
@@ -58,13 +64,13 @@ Future<void> addWord(String topicId,
       });
     }
 
-    // Increment the numberOfWords field in the topic document by the total number of words added
     await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
       'numberOfWords': FieldValue.increment(totalWordsAdded),
     });
 
     print('Words added successfully');
   } catch (e) {
+    print('here');
     print('Error adding words: $e');
   }
 }
@@ -75,7 +81,7 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     String userUid = FirebaseAuth.instance.currentUser!.uid;
     DateTime currentTime = DateTime.now();
     DocumentReference topicRef =
-    await FirebaseFirestore.instance.collection('topics').add({
+        await FirebaseFirestore.instance.collection('topics').add({
       'name': topicName,
       'text': text,
       'numberOfWords': wordsData.length,
@@ -116,7 +122,7 @@ Future<void> addTopicToFolder(String topicId, String folderId) async {
         .doc(topicId)
         .get();
     Map<String, dynamic> topicData =
-    topicSnapshot.data() as Map<String, dynamic>;
+        topicSnapshot.data() as Map<String, dynamic>;
 
     QuerySnapshot wordsSnapshot = await FirebaseFirestore.instance
         .collection('topics')

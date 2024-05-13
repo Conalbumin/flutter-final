@@ -84,7 +84,6 @@ void deleteTopic(BuildContext context, String topicId) async {
     FirebaseFirestore.instance.collection('access').doc(topicId);
     batch.delete(accessRef);
 
-
     // Delete all words associated with the topic
     QuerySnapshot wordSnapshot = await FirebaseFirestore.instance
         .collection('topics')
@@ -108,13 +107,30 @@ void deleteTopic(BuildContext context, String topicId) async {
     });
 
     // Commit the batch
-    batch.commit().then((_) {
-      print('Topic, associated words, and access collection deleted successfully');
-      Navigator.of(context).pop();
-    }).catchError((error) {
-      print('Error committing batch delete: $error');
-    });
-    Navigator.pop(context);
+    await batch.commit();
+
+    // Get folders containing the topic
+    QuerySnapshot folderSnapshot = await FirebaseFirestore.instance
+        .collection('folders')
+        .get();
+
+    for (QueryDocumentSnapshot folderDoc in folderSnapshot.docs) {
+      DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+          .collection('folders')
+          .doc(folderDoc.id)
+          .collection('topics')
+          .doc(topicId)
+          .get();
+
+      print(folderDoc.id);
+      print('topicSnapshot 1 ${topicSnapshot}');
+      if (topicSnapshot.exists) {
+        print('topicSnapshot exists');
+        String folderId = folderDoc.id;
+        deleteTopicInFolder(context, topicId, folderId);
+        print('Topic, associated words, and access collection deleted successfully');
+      }
+    }
   } catch (e) {
     print('Error: $e');
   }
@@ -123,17 +139,39 @@ void deleteTopic(BuildContext context, String topicId) async {
 void deleteTopicInFolder(
     BuildContext context, String topicId, String folderId) {
   try {
-    // Fetch the reference of the topic in the folder's collection
+    // Delete the topic document from the folder's collection
     DocumentReference topicRef = FirebaseFirestore.instance
         .collection('folders')
         .doc(folderId)
         .collection('topics')
         .doc(topicId);
 
-    // Delete the reference of the topic from the folder
     topicRef.delete().then((_) {
-      showToast('Topic removed from folder successfully');
-      showToast("Please go back to the previous page to see result");
+      // Delete all words associated with the topic within the folder
+      FirebaseFirestore.instance
+          .collection('folders')
+          .doc(folderId)
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .get()
+          .then((wordSnapshot) {
+        List<Future> deleteOperations = [];
+
+        wordSnapshot.docs.forEach((wordDoc) {
+          deleteOperations.add(wordDoc.reference.delete());
+        });
+
+        // Wait for all delete operations to complete
+        Future.wait(deleteOperations).then((_) {
+          showToast('Topic and associated words removed from folder successfully');
+          showToast("Please go back to the previous page to see the result");
+        }).catchError((error) {
+          print('Error completing delete operations: $error');
+        });
+      }).catchError((error) {
+        print('Error fetching words for deletion: $error');
+      });
     }).catchError((error) {
       print('Error removing topic from folder: $error');
     });
@@ -141,6 +179,7 @@ void deleteTopicInFolder(
     print('Error: $e');
   }
 }
+
 
 void deleteWord(BuildContext context, String topicId, String wordId) {
   try {
