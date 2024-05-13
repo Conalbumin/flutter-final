@@ -313,19 +313,15 @@ class _TypingPageState extends State<TypingPage> {
                     correctCount++;
                   }
                 }
-                print(words.length);
-                return buildTypingResult(
-                    correctCount,
-                    words.length,
-                    userAnswers,
-                    correctAnswers,
-                    words,
-                    showDefinition,
-                    widget.topicId,
-                    userUid,
-                    userName!,
-                    userAvatar,
-                    widget.lastAccess);
+                return TypingResultPage(
+                    correctCount: correctCount,
+                    numberOfQuestions: words.length,
+                    correctAnswers: correctAnswers,
+                    words: words,
+                    showDefinition: showDefinition,
+                    topicId: widget.topicId,
+                    lastAccess: widget.lastAccess,
+                    userAnswers: userAnswers);
               }
               if (!hasSpoken && autoSpeak) {
                 String wordToSpeak = words[_currentIndex]['word'];

@@ -1,87 +1,139 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../ranking/user_performance.dart';
 
-Widget buildQuizResult(int correctCount, int numberOfQuestions,
-    List<String> selectedAnswers, List<String> correctAnswers,
-    List<DocumentSnapshot> words, bool showDefinition) {
-  String getFeedback(int correctCount) {
-    double percentage =
-        (correctCount / numberOfQuestions) * 100;
-    String feedback = '';
-    if (percentage > 80) {
-      feedback = 'Excellent';
-    } else if (percentage < 50) {
-      feedback = 'Practice more';
-    } else {
-      feedback = 'Good job';
-    }
-    return feedback;
+class QuizResultPage extends StatefulWidget {
+  final int correctCount;
+  final int numberOfQuestions;
+  final List<String> selectedAnswers;
+  final List<String> correctAnswers;
+  final List<DocumentSnapshot> words;
+  final bool showDefinition;
+  final String topicId;
+  final DateTime lastAccess;
+
+  const QuizResultPage({
+    Key? key,
+    required this.correctCount,
+    required this.numberOfQuestions,
+    required this.selectedAnswers,
+    required this.correctAnswers,
+    required this.words,
+    required this.showDefinition, required this.topicId, required this.lastAccess,
+  }) : super(key: key);
+
+  @override
+  State<QuizResultPage> createState() => _QuizResultPageState();
+}
+
+class _QuizResultPageState extends State<QuizResultPage> {
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  String? userName = FirebaseAuth.instance.currentUser!.displayName;
+  late String userAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userUid)
+        .get()
+        .then((DocumentSnapshot userSnapshot) {
+      setState(() {
+        userAvatar = userSnapshot['avatarURL'];
+      });
+    });
   }
 
-  Color getFeedbackColor(int correctCount) {
-    double percentage =
-        (correctCount / numberOfQuestions) * 100;
-    if (percentage > 80) {
-      return Colors.green.shade600;
-    } else if (percentage < 50) {
-      return Colors.red;
-    } else {
-      return Colors.lightGreen.shade400;
+  @override
+  Widget build(BuildContext context) {
+    String getFeedback(int correctCount) {
+      double percentage = (correctCount / widget.numberOfQuestions) * 100;
+      String feedback = '';
+      if (percentage > 80) {
+        feedback = 'Excellent';
+      } else if (percentage < 50) {
+        feedback = 'Practice more';
+      } else {
+        feedback = 'Good job';
+      }
+      return feedback;
     }
-  }
 
-  return SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          'Quiz Completed!',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+    Color getFeedbackColor(int correctCount) {
+      double percentage = (correctCount / widget.numberOfQuestions) * 100;
+      if (percentage > 80) {
+        return Colors.green.shade600;
+      } else if (percentage < 50) {
+        return Colors.red;
+      } else {
+        return Colors.lightGreen.shade400;
+      }
+    }
+
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, widget.lastAccess, widget.correctCount);
+          Navigator.pop(context);
+        },
+        child: const Icon(Icons.save),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Quiz Completed!',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Total Score: ${widget.correctCount} / ${widget.numberOfQuestions}',
+              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Feedback: ${getFeedback(widget.correctCount)}',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: getFeedbackColor(widget.correctCount)),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Questions answered correctly:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Column(
+              children: widget.selectedAnswers.asMap().entries.map((entry) {
+                int index = entry.key;
+                String answer = entry.value;
+                bool isCorrect = answer == widget.correctAnswers[index];
+                return ListTile(
+                  title: Text(
+                    widget.showDefinition
+                        ? 'Question: ${widget.words[index]['definition']}'
+                        : 'Question: ${widget.words[index]['word']}',
+                    style: TextStyle(
+                        color: isCorrect ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22),
+                  ),
+                  subtitle: Text(
+                    'Your Answer: $answer\nCorrect Answer: ${widget.correctAnswers[index]}',
+                    style: TextStyle(
+                        color: isCorrect ? Colors.green : Colors.red,
+                        fontSize: 20),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
-        Text(
-          'Total Score: $correctCount / $numberOfQuestions',
-          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          'Feedback: ${getFeedback(correctCount)}',
-          style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: getFeedbackColor(correctCount)),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Questions answered correctly:',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        Column(
-          children: selectedAnswers.asMap().entries.map((entry) {
-            int index = entry.key;
-            String answer = entry.value;
-            bool isCorrect = answer == correctAnswers[index];
-            return ListTile(
-              title: Text(
-                showDefinition
-                    ? 'Question: ${words[index]['definition']}'
-                    : 'Question: ${words[index]['word']}',
-                style: TextStyle(
-                    color: isCorrect ? Colors.green : Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22),
-              ),
-              subtitle: Text(
-                'Your Answer: $answer\nCorrect Answer: ${correctAnswers[index]}',
-                style: TextStyle(
-                    color: isCorrect ? Colors.green : Colors.red,
-                    fontSize: 20),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

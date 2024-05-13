@@ -104,8 +104,8 @@ class _RankingPageState extends State<RankingPage> {
                                         !bHasTimeTaken) {
                                       return -1;
                                     }
-                                    return (a['timeTaken'] as Timestamp)
-                                        .compareTo(b['timeTaken'] as Timestamp);
+                                    return (b['timeTaken'] as Timestamp)
+                                        .compareTo(a['timeTaken'] as Timestamp);
                                   });
 
                                   List<DocumentSnapshot> mostCorrectAnsUser =
@@ -114,7 +114,6 @@ class _RankingPageState extends State<RankingPage> {
                                               ? 3
                                               : users.length)
                                           .toList();
-                                  mostCorrectAnsUser.reversed;
                                   for (int i = 0;
                                       i < mostCorrectAnsUser.length;
                                       i++) {
@@ -256,12 +255,11 @@ class _RankingPageState extends State<RankingPage> {
                                           : false)
                                       .toList();
                                   users.sort((a, b) =>
-                                      a['timeTaken'].compareTo(b['timeTaken']));
+                                      b['timeTaken'].compareTo(a['timeTaken']));
 
                                   List<DocumentSnapshot> fastestUsers = users
                                       .take(users.length > 3 ? 3 : users.length)
                                       .toList();
-                                  fastestUsers.reversed;
                                   for (int i = 0;
                                       i < fastestUsers.length;
                                       i++) {

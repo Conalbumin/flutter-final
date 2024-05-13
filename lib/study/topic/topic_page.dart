@@ -334,6 +334,7 @@ class _TopicPageState extends State<TopicPage> {
                               // Handle selected answers here
                             },
                             showAllWords: showAllWords,
+                            lastAccess: DateTime.now(),
                           ),
                         ),
                       );
@@ -355,7 +356,7 @@ class _TopicPageState extends State<TopicPage> {
                             onType: (answers) {
                               // Handle typed answers here
                             },
-                            lastAccess: widget.lastAccess,
+                            lastAccess: DateTime.now(),
                           ),
                         ),
                       );

@@ -14,6 +14,7 @@ class QuizPage extends StatefulWidget {
   final int numberOfQuestions;
   final bool showAllWords;
   final Function(List<String>) onSelectAnswer;
+  final DateTime lastAccess;
 
   const QuizPage({
     Key? key,
@@ -23,6 +24,7 @@ class QuizPage extends StatefulWidget {
     required this.numberOfWords,
     required this.onSelectAnswer,
     required this.showAllWords,
+    required this.lastAccess,
   }) : super(key: key);
 
   @override
@@ -66,14 +68,13 @@ class _QuizPageState extends State<QuizPage> {
 
   void fetchQuestions(List<DocumentSnapshot> words) async {
     try {
-      List<DocumentSnapshot> selectedQuestions =
-      words.sublist(0, words.length);
+      List<DocumentSnapshot> selectedQuestions = words.sublist(0, words.length);
 
       List<List<String>> newOptions = [];
 
       selectedQuestions.forEach((question) {
         String correctAnswer =
-        showDefinition ? question['word'] : question['definition'];
+            showDefinition ? question['word'] : question['definition'];
 
         List<String> allOptions = [correctAnswer];
 
@@ -101,9 +102,9 @@ class _QuizPageState extends State<QuizPage> {
 
         selectedQuestions.forEach((question) {
           String correctAnswer =
-          showDefinition ? question['word'] : question['definition'];
+              showDefinition ? question['word'] : question['definition'];
           List<bool> selected =
-          List.generate(options[questions.length].length, (index) => false);
+              List.generate(options[questions.length].length, (index) => false);
           questions.add(question);
           correctAnswers.add(correctAnswer);
           selectedAnswers.add('');
@@ -130,22 +131,14 @@ class _QuizPageState extends State<QuizPage> {
       );
     });
 
-    if(isCorrect) {
+    if (isCorrect) {
       if (words[_currentIndex]['countLearn'] >= 2) {
-        updateWordStatus(
-            widget.topicId,
-            words[_currentIndex].id,
-            'Mastered');
-        updateCountLearn(widget.topicId,
-            words[_currentIndex].id);
+        updateWordStatus(widget.topicId, words[_currentIndex].id, 'Mastered');
+        updateCountLearn(widget.topicId, words[_currentIndex].id);
         print('Mastered');
       } else {
-        updateWordStatus(
-            widget.topicId,
-            words[_currentIndex].id,
-            'Learned');
-        updateCountLearn(widget.topicId,
-            words[_currentIndex].id);
+        updateWordStatus(widget.topicId, words[_currentIndex].id, 'Learned');
+        updateCountLearn(widget.topicId, words[_currentIndex].id);
         print('Learned');
       }
     } else {
@@ -313,8 +306,16 @@ class _QuizPageState extends State<QuizPage> {
                     correctCount++;
                   }
                 }
-                return buildQuizResult(correctCount, words.length,
-                    selectedAnswers, correctAnswers, words, showDefinition);
+                return QuizResultPage(
+                  correctCount: correctCount,
+                  numberOfQuestions: words.length,
+                  selectedAnswers: selectedAnswers,
+                  correctAnswers: correctAnswers,
+                  words: words,
+                  showDefinition: showDefinition,
+                  topicId: widget.topicId,
+                  lastAccess: widget.lastAccess,
+                );
               }
               if (!hasSpoken && autoSpeak) {
                 String wordToSpeak = words[_currentIndex]['word'];
