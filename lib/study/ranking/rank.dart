@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
 import 'package:quizlet_final_flutter/setting/user.dart';
-
 import '../../constant/style.dart';
 
 class RankingPage extends StatefulWidget {
@@ -50,7 +49,7 @@ class _RankingPageState extends State<RankingPage> {
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 250,
+                          height: 300,
                           child: StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('topics')

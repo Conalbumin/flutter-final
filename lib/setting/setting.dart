@@ -159,11 +159,7 @@ class _SettingPageState extends State<SettingPage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => Achievement(
-                          userId: _user?.uid ?? '',
-                          type: '',
-                          topicId: '',
-                          topicName: '',
-                          rank: 1,
+                          userId: _user!.uid,
                         ),
                       ),
                     );
