@@ -83,10 +83,10 @@ class _TopicTabState extends State<TopicTab> {
                 );
               }
               String currentUserId = userSnapshot.data!.uid;
+              // Lấy danh sách topic mà sub-collection 'access' chứa user id
               return StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('topics')
-                    .where('createdBy', isEqualTo: currentUserId)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -95,41 +95,70 @@ class _TopicTabState extends State<TopicTab> {
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   }
-
-                  List<DocumentSnapshot> sortedTopics =
-                      sortTopicsByTime(snapshot.data!.docs, _sortBy);
-
-                  if (snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text('No topics created by the user.'),
-                    );
-                  }
-                  return ListView.builder(
-                    itemCount: sortedTopics.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      DocumentSnapshot document = sortedTopics[index];
-                      String topicId = document.id;
-                      String topicName = document['name'];
-                      String text = document['text'];
-                      int numberOfWords = document['numberOfWords'];
-                      bool isPrivate = document['isPrivate'];
-                      String userId = document['createdBy'];
-                      DateTime timeCreated =
+                  // Đối với mỗi document trong 'topics'
+                  List<Future<DocumentSnapshot>> futureAccessSnapshots = snapshot.data!.docs.map((DocumentSnapshot document) {
+                    // Trả về future của document trong 'access'
+                    return FirebaseFirestore.instance
+                        .collection('topics')
+                        .doc(document.id)
+                        .collection('access')
+                        .doc(currentUserId) // Lấy theo user hiện tại
+                        .get();
+                  }).toList();
+                  // Sử dụng Future.wait để đợi tất cả các tương lai hoàn thành và trả về danh sách
+                  return FutureBuilder<List<DocumentSnapshot>>(
+                    future: Future.wait(futureAccessSnapshots),
+                    builder: (context, accessSnapshotList) {
+                      if (accessSnapshotList.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+                      if (accessSnapshotList.hasError) {
+                        return Text('Error: ${accessSnapshotList.error}');
+                      }
+                      // Duyệt qua danh sách document của 'topics'
+                      List<DocumentSnapshot> topics = snapshot.data!.docs;
+                      List<DocumentSnapshot> sortedTopics = [];
+                      for (int i = 0; i < topics.length; i++) {
+                        // Nếu document 'access' tồn tại
+                        if (accessSnapshotList.data![i].exists) {
+                          sortedTopics.add(topics[i]);
+                        }
+                      }
+                      // Sắp xếp các topic theo yêu cầu
+                      sortedTopics = sortTopicsByTime(sortedTopics, _sortBy);
+                      if (sortedTopics.isEmpty) {
+                        return const Center(
+                          child: Text('No topics created by the user.'),
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: sortedTopics.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          DocumentSnapshot document = sortedTopics[index];
+                          String topicId = document.id;
+                          String topicName = document['name'];
+                          String text = document['text'];
+                          int numberOfWords = document['numberOfWords'];
+                          bool isPrivate = document['isPrivate'];
+                          String userId = document['createdBy'];
+                          DateTime timeCreated =
                           (document['timeCreated'] as Timestamp).toDate();
-                      DateTime lastAccess =
+                          DateTime lastAccess =
                           (document['lastAccess'] as Timestamp).toDate();
-                      int accessPeople = document['accessPeople'];
+                          int accessPeople = document['accessPeople'];
 
-                      return TopicItem(
-                        topicId: topicId,
-                        topicName: topicName,
-                        text: text,
-                        numberOfWords: numberOfWords,
-                        isPrivate: isPrivate,
-                        userId: userId,
-                        timeCreated: timeCreated,
-                        lastAccess: lastAccess,
-                        accessPeople: accessPeople,
+                          return TopicItem(
+                            topicId: topicId,
+                            topicName: topicName,
+                            text: text,
+                            numberOfWords: numberOfWords,
+                            isPrivate: isPrivate,
+                            userId: userId,
+                            timeCreated: timeCreated,
+                            lastAccess: lastAccess,
+                            accessPeople: accessPeople,
+                          );
+                        },
                       );
                     },
                   );
@@ -137,6 +166,7 @@ class _TopicTabState extends State<TopicTab> {
               );
             },
           ),
+
         ),
       ],
     );
