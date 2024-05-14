@@ -57,18 +57,6 @@ Future<bool> checkAndAddAccess(String topicId) async {
         .doc(userUid)
         .get();
 
-    CollectionReference userProgressCollection =
-    FirebaseFirestore.instance
-        .collection('topics')
-        .doc(topicId)
-        .collection('access')
-        .doc(userUid)
-        .collection('user_progress');
-
-    fetchedWords.forEach((wordSnapshot) {
-      userProgressCollection.add(wordSnapshot.data());
-    });
-
     if (!accessSnapshot.exists) {
       await FirebaseFirestore.instance
           .collection('topics')
@@ -82,10 +70,41 @@ Future<bool> checkAndAddAccess(String topicId) async {
           .doc(topicId)
           .update({'accessPeople': FieldValue.increment(1)});
 
+      CollectionReference userProgressCollection =
+      FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('access')
+          .doc(userUid)
+          .collection('user_progress');
+
+      fetchedWords.forEach((wordSnapshot) {
+        userProgressCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
+      });
+
       print('Access added successfully');
       return false; // User didn't have access before
     } else {
-      print('User already has access');
+      // Check if user_progress collection exists
+      CollectionReference userProgressCollection =
+      FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('access')
+          .doc(userUid)
+          .collection('user_progress');
+
+      QuerySnapshot userProgressSnapshot =
+      await userProgressCollection.limit(1).get();
+
+      if (userProgressSnapshot.docs.isEmpty) {
+        fetchedWords.forEach((wordSnapshot) {
+          userProgressCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
+        });
+        print('Access added successfully');
+      } else {
+        print('User already has access');
+      }
       return true; // User already had access
     }
   } catch (e) {

@@ -81,7 +81,8 @@ class Achievement extends StatelessWidget {
                           style: rankText,
                         ),
                       ),
-                    );                  }
+                    );
+                  }
 
                   final rankingDocs = snapshot.data!.docs;
                   final achievements = rankingDocs.map((doc) {
@@ -93,12 +94,24 @@ class Achievement extends StatelessWidget {
                           .doc(topicId)
                           .get(),
                       builder: (context, topicSnapshot) {
-                        if (topicSnapshot.connectionState == ConnectionState.waiting ||
+                        if (topicSnapshot.connectionState ==
+                            ConnectionState.waiting ||
                             !topicSnapshot.hasData) {
                           return CircularProgressIndicator();
                         }
 
-                        final topicData = topicSnapshot.data!.data() as Map<String, dynamic>;
+                        if (topicSnapshot.hasData) {
+                          return Center(
+                            child: Text(
+                              "Try harder \nto be in top 3",
+                              style: rankText,
+                            ),
+                          );
+                        }
+
+                        final topicData = topicSnapshot.data!.data() as Map<
+                            String,
+                            dynamic>;
                         final topicName = topicData['name'];
                         final numberOfWords = topicData['numberOfWords'];
 
@@ -109,18 +122,23 @@ class Achievement extends StatelessWidget {
                               .collection('access')
                               .get(),
                           builder: (context, accessSnapshot) {
-                            if (accessSnapshot.connectionState == ConnectionState.waiting ||
+                            if (accessSnapshot.connectionState ==
+                                ConnectionState.waiting ||
                                 !accessSnapshot.hasData) {
                               return CircularProgressIndicator();
                             }
 
                             // Lấy các giá trị từ document trong collection 'access'
                             final accessDocs = accessSnapshot.data!.docs;
-                            final accessData = accessDocs.first.data() as Map<String, dynamic>;
+                            final accessData = accessDocs.first.data() as Map<
+                                String,
+                                dynamic>;
                             int completionCount = accessData['completionCount'];
                             int correctAnswers = accessData['correctAnswers'];
-                            DateTime lastStudied = accessData['lastStudied'].toDate();
-                            DateTime timeTaken = accessData['timeTaken'].toDate();
+                            DateTime lastStudied = accessData['lastStudied']
+                                .toDate();
+                            DateTime timeTaken = accessData['timeTaken']
+                                .toDate();
                             String userAvatar = accessData['userAvatar'];
                             String userName = accessData['userName'];
 
@@ -159,8 +177,7 @@ class Achievement extends StatelessWidget {
     );
   }
 
-  Widget _buildSwiperItem(
-      String topicName,
+  Widget _buildSwiperItem(String topicName,
       int rank,
       int completionCount,
       int correctAnswers,
@@ -169,8 +186,7 @@ class Achievement extends StatelessWidget {
       String userAvatar,
       String userName,
       int numberOfWords,
-      String rankingField,
-      ) {
+      String rankingField,) {
     CardAchievementType cardType;
 
     switch (rankingField) {
@@ -190,15 +206,15 @@ class Achievement extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10),
       child: UserAchievementItem(
-        displayName: topicName,
-        avatarURL: userAvatar,
-        finishedAt: lastStudied,
-        startAt: timeTaken,
-        correctAns: correctAnswers,
-        completionCount: completionCount,
-        numberOfWords: numberOfWords,
-        cardType: cardType,
-        rank: rank
+          displayName: topicName,
+          avatarURL: userAvatar,
+          finishedAt: lastStudied,
+          startAt: timeTaken,
+          correctAns: correctAnswers,
+          completionCount: completionCount,
+          numberOfWords: numberOfWords,
+          cardType: cardType,
+          rank: rank
       ),
     );
   }

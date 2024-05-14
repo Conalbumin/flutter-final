@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 import '../word/word_data_for_edit.dart';
 
@@ -34,7 +35,9 @@ Future<void> updateFolder(
 Future<void> updateWords(String topicId, List<WordData> wordsData) async {
   try {
     for (var wordData in wordsData) {
-      String wordId = wordData.id; // Access id directly
+      String wordId = wordData.id;
+      String userUid = FirebaseAuth.instance.currentUser!.uid;
+
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -45,7 +48,22 @@ Future<void> updateWords(String topicId, List<WordData> wordsData) async {
         'definition': wordData.definition,
         'status': wordData.status,
         'isFavorited': wordData.isFavorited,
-        'countLearn': wordData.countLearn
+        'countLearn': wordData.countLearn,
+      });
+
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('access')
+          .doc(userUid)
+          .collection('user_progress')
+          .doc(wordId)
+          .set({
+        'word': wordData.word,
+        'definition': wordData.definition,
+        'status': wordData.status,
+        'isFavorited': wordData.isFavorited,
+        'countLearn': wordData.countLearn,
       });
     }
     print('Word updated successfully');
@@ -57,10 +75,20 @@ Future<void> updateWords(String topicId, List<WordData> wordsData) async {
 Future<void> updateWordStatus(
     String topicId, String wordId, String newStatus) async {
   try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('words')
+        .doc(wordId)
+        .update({'status': newStatus});
+
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress')
         .doc(wordId)
         .update({'status': newStatus});
     print('Word updated successfully');
@@ -72,10 +100,20 @@ Future<void> updateWordStatus(
 Future<void> updateWordIsFavorited(
     String topicId, String wordId, bool newIsFavorited) async {
   try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('words')
+        .doc(wordId)
+        .update({'isFavorited': newIsFavorited});
+
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress')
         .doc(wordId)
         .update({'isFavorited': newIsFavorited});
     print('Word updated successfully');
@@ -86,10 +124,13 @@ Future<void> updateWordIsFavorited(
 
 Future<void> updateCountLearn(String topicId, String wordId) async {
   try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
-        .collection('words')
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress')
         .doc(wordId)
         .update({'countLearn': FieldValue.increment(1)});
   } catch (e) {
