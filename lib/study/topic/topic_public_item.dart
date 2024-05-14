@@ -87,7 +87,8 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
               .update({
             'lastAccess': currentTime,
           });
-          checkAndAddAccess(widget.topicId);
+          bool hasAccess = await checkAndAddAccess(widget.topicId);
+          if (hasAccess) {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -105,6 +106,11 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                 ),
               ),
             );
+          } else {
+            if (user != null && user?.uid != widget.userId) {
+              _showStudyConfirmationDialog(context);
+            }
+          }
         } catch (error) {
           print('Error updating lastAccess: $error');
         }
@@ -151,6 +157,40 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showStudyConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Study Topic'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to put this topic into your personal list?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                duplicateTopic(widget.topicId, user!.uid);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

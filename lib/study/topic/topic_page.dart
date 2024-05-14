@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizlet_final_flutter/constant/toast.dart';
 import 'package:quizlet_final_flutter/study/ranking/rank.dart';
 import 'package:quizlet_final_flutter/study/study_mode/quiz_page.dart';
 import 'package:quizlet_final_flutter/study/study_mode/typing_page.dart';
@@ -58,6 +60,7 @@ class _TopicPageState extends State<TopicPage> {
   late String _text;
   bool showAllWords = true;
   List<DocumentSnapshot> favoritedWords = [];
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -516,25 +519,29 @@ class _TopicPageState extends State<TopicPage> {
   }
 
   void editAction(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditTopicPage(
-          initialTopicName: _topicName,
-          initialDescription: _text,
-          topicId: widget.topicId,
+    if (userUid == widget.userId) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditTopicPage(
+            initialTopicName: _topicName,
+            initialDescription: _text,
+            topicId: widget.topicId,
+          ),
         ),
-      ),
-    );
+      );
 
-    if (result != null &&
-        result['topicName'] != null &&
-        result['description'] != null) {
-      setState(() {
-        _topicName = result['topicName'];
-        _text = result['description'];
-        fetchWords(widget.topicId);
-      });
+      if (result != null &&
+          result['topicName'] != null &&
+          result['description'] != null) {
+        setState(() {
+          _topicName = result['topicName'];
+          _text = result['description'];
+          fetchWords(widget.topicId);
+        });
+      }
+    } else {
+      showToast('You are not allowed to modify this topic');
     }
   }
 

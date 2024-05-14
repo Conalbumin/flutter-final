@@ -2,20 +2,67 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
-
 import 'fetch.dart';
+
+Future<void> duplicateTopic(String topicId, String userId) async {
+  try {
+    DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .get();
+    Map<String, dynamic> topicData =
+    topicSnapshot.data() as Map<String, dynamic>;
+    DateTime currentTime = DateTime.now();
+
+    // Duplicate the topic
+    DocumentReference duplicatedTopicRef = await FirebaseFirestore.instance
+        .collection('topics')
+        .add({
+      ...topicData,
+      'isPrivate': true,
+      'createdBy': userId,
+      'timeCreated': currentTime,
+      'lastAccess': currentTime,
+      'accessPeople': 0,
+    });
+
+    // Fetch words from the original topic
+    List<DocumentSnapshot> words = await fetchWords(topicId);
+
+    // Add words to the duplicated topic
+    CollectionReference wordsCollection = duplicatedTopicRef.collection('words');
+    words.forEach((wordSnapshot) {
+      wordsCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
+    });
+
+    print('Topic duplicated successfully');
+  } catch (e) {
+    print('Error duplicating topic: $e');
+  }
+}
+
+Future<bool> isTopicCreatedByCurrentUser(String topicId) async {
+  try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .get();
+    String? ownerId = topicSnapshot['createdBy'];
+    return ownerId == userUid;
+  } catch (e) {
+    print('Error checking if topic is created by current user: $e');
+    return false;
+  }
+}
 
 Future<void> setPrivateTopic(
     BuildContext context, String topicId, bool isPrivate) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
-          .collection('topics')
-          .doc(topicId)
-          .get();
-      String? ownerId = topicSnapshot['createdBy'];
-      if (ownerId == user.uid) {
+      bool createdByCurrentUser = await isTopicCreatedByCurrentUser(topicId);
+      if (createdByCurrentUser) {
         await FirebaseFirestore.instance
             .collection('topics')
             .doc(topicId)
