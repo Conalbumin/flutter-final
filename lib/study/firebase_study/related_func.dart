@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 
+import 'fetch.dart';
+
 Future<void> setPrivateTopic(
     BuildContext context, String topicId, bool isPrivate) async {
   try {
@@ -46,6 +48,7 @@ List<DocumentSnapshot> sortTopicsByTime(
 Future<bool> checkAndAddAccess(String topicId) async {
   try {
     String userUid = FirebaseAuth.instance.currentUser!.uid;
+    List<DocumentSnapshot> fetchedWords = await fetchWords(topicId);
 
     DocumentSnapshot accessSnapshot = await FirebaseFirestore.instance
         .collection('topics')
@@ -53,6 +56,18 @@ Future<bool> checkAndAddAccess(String topicId) async {
         .collection('access')
         .doc(userUid)
         .get();
+
+    CollectionReference userProgressCollection =
+    FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress');
+
+    fetchedWords.forEach((wordSnapshot) {
+      userProgressCollection.add(wordSnapshot.data());
+    });
 
     if (!accessSnapshot.exists) {
       await FirebaseFirestore.instance

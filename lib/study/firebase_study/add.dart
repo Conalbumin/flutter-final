@@ -75,6 +75,40 @@ Future<void> addWord(
   }
 }
 
+Future<void> addWordIntoUserProgress(
+    String topicId, List<Map<String, String>> wordsData) async {
+  try {
+    for (var wordData in wordsData) {
+      String status = wordData['status'] ?? 'Unlearned';
+      int? countLearn;
+      if (wordData['countLearn'] is int) {
+        countLearn = wordData['countLearn'] as int?;
+      } else if (wordData['countLearn'] is String) {
+        countLearn = int.tryParse(wordData['countLearn'] as String);
+      }
+      countLearn ??= 0;
+      bool isFavorited = false;
+
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('words')
+          .add({
+        'word': wordData['word'],
+        'definition': wordData['definition'],
+        'status': status,
+        'isFavorited': isFavorited,
+        'countLearn': countLearn
+      });
+    }
+
+    print('Words added successfully');
+  } catch (e) {
+    print('here');
+    print('Error adding words: $e');
+  }
+}
+
 Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
     List<Map<String, String>> wordsData) async {
   try {
