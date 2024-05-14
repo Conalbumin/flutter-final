@@ -85,9 +85,8 @@ class _TopicTabState extends State<TopicTab> {
               String currentUserId = userSnapshot.data!.uid;
               // Lấy danh sách topic mà sub-collection 'access' chứa user id
               return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('topics')
-                    .snapshots(),
+                stream:
+                    FirebaseFirestore.instance.collection('topics').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -96,7 +95,8 @@ class _TopicTabState extends State<TopicTab> {
                     return Text('Error: ${snapshot.error}');
                   }
                   // Đối với mỗi document trong 'topics'
-                  List<Future<DocumentSnapshot>> futureAccessSnapshots = snapshot.data!.docs.map((DocumentSnapshot document) {
+                  List<Future<DocumentSnapshot>> futureAccessSnapshots =
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
                     // Trả về future của document trong 'access'
                     return FirebaseFirestore.instance
                         .collection('topics')
@@ -109,7 +109,8 @@ class _TopicTabState extends State<TopicTab> {
                   return FutureBuilder<List<DocumentSnapshot>>(
                     future: Future.wait(futureAccessSnapshots),
                     builder: (context, accessSnapshotList) {
-                      if (accessSnapshotList.connectionState == ConnectionState.waiting) {
+                      if (accessSnapshotList.connectionState ==
+                          ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
                       if (accessSnapshotList.hasError) {
@@ -142,9 +143,9 @@ class _TopicTabState extends State<TopicTab> {
                           bool isPrivate = document['isPrivate'];
                           String userId = document['createdBy'];
                           DateTime timeCreated =
-                          (document['timeCreated'] as Timestamp).toDate();
+                              (document['timeCreated'] as Timestamp).toDate();
                           DateTime lastAccess =
-                          (document['lastAccess'] as Timestamp).toDate();
+                              (document['lastAccess'] as Timestamp).toDate();
                           int accessPeople = document['accessPeople'];
 
                           return TopicItem(
@@ -166,7 +167,6 @@ class _TopicTabState extends State<TopicTab> {
               );
             },
           ),
-
         ),
       ],
     );

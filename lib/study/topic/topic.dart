@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/study/topic/topic_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../constant/style.dart';
 import '../firebase_study/related_func.dart';
 
-class TopicItem extends StatelessWidget {
+class TopicItem extends StatefulWidget {
   final String topicId;
   final String topicName;
   final String text;
@@ -16,7 +16,7 @@ class TopicItem extends StatelessWidget {
   final int accessPeople;
 
   const TopicItem({
-    super.key,
+    Key? key,
     required this.topicId,
     required this.topicName,
     required this.text,
@@ -26,7 +26,20 @@ class TopicItem extends StatelessWidget {
     required this.timeCreated,
     required this.lastAccess,
     required this.accessPeople,
-  });
+  }) : super(key: key);
+
+  @override
+  _TopicItemState createState() => _TopicItemState();
+}
+
+class _TopicItemState extends State<TopicItem> {
+  late GlobalKey _key;
+
+  @override
+  void initState() {
+    super.initState();
+    _key = GlobalKey();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,27 +47,21 @@ class TopicItem extends StatelessWidget {
       onTap: () async {
         DateTime currentTime = DateTime.now();
         try {
-          await FirebaseFirestore.instance
-              .collection('topics')
-              .doc(topicId)
-              .update({
-            'lastAccess': currentTime,
-          });
-          checkAndAddAccess(topicId);
+          checkAndAddAccess(widget.topicId);
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => TopicPage(
-                topicId: topicId,
-                topicName: topicName,
-                numberOfWords: numberOfWords,
-                text: text,
-                isPrivate: isPrivate,
-                userId: userId,
+                topicId: widget.topicId,
+                topicName: widget.topicName,
+                numberOfWords: widget.numberOfWords,
+                text: widget.text,
+                isPrivate: widget.isPrivate,
+                userId: widget.userId,
                 refreshCallback: () {},
-                timeCreated: timeCreated,
+                timeCreated: widget.timeCreated,
                 lastAccess: currentTime,
-                accessPeople: accessPeople,
+                accessPeople: widget.accessPeople,
               ),
             ),
           );
@@ -63,6 +70,7 @@ class TopicItem extends StatelessWidget {
         }
       },
       child: Card(
+        key: _key,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -73,24 +81,24 @@ class TopicItem extends StatelessWidget {
           child: ListTile(
             leading: const Icon(Icons.topic, size: 60, color: Colors.white),
             title: Text(
-              topicName,
+              widget.topicName,
               style: const TextStyle(fontSize: 30.0, color: Colors.white),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  text,
+                  widget.text,
                   style: const TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
                 Text(
-                  '$numberOfWords words',
+                  '${widget.numberOfWords} words',
                   style: const TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
               ],
             ),
             trailing: Visibility(
-              visible: isPrivate,
+              visible: widget.isPrivate,
               child: const Icon(Icons.lock, size: 30, color: Colors.white),
             ),
           ),

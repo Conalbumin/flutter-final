@@ -94,6 +94,13 @@ List<DocumentSnapshot> sortTopicsByTime(
 
 Future<bool> checkAndAddAccess(String topicId) async {
   try {
+    DateTime currentTime = DateTime.now();
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .update({
+      'lastAccess': currentTime,
+    });
     String userUid = FirebaseAuth.instance.currentUser!.uid;
     List<DocumentSnapshot> fetchedWords = await fetchWords(topicId);
 

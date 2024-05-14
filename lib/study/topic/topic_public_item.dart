@@ -81,14 +81,14 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
       onTap: () async {
         DateTime currentTime = DateTime.now();
         try {
-          await FirebaseFirestore.instance
-              .collection('topics')
-              .doc(widget.topicId)
-              .update({
-            'lastAccess': currentTime,
-          });
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {
+            await FirebaseFirestore.instance
+                .collection('topics')
+                .doc(widget.topicId)
+                .update({
+              'lastAccess': currentTime,
+            });
             Navigator.push(
               context,
               MaterialPageRoute(
