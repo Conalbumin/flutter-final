@@ -15,7 +15,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
   final _formKey = GlobalKey<FormState>();
   String _topicName = '';
   String _text = '';
-  bool isPrivate = false;
+  bool isPrivate = true;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class _AddTopicPageState extends State<AddTopicPage> {
           }
         }
       }
-      addTopicWithWords(_topicName, _text, isPrivate, wordsData);
+      addTopicWithWords(_topicName, _text, true, wordsData);
       Navigator.of(context).pop();
     }
   }

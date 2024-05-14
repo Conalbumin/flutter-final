@@ -317,7 +317,7 @@ class _QuizPageState extends State<QuizPage> {
                   lastAccess: widget.lastAccess,
                 );
               }
-              if (!hasSpoken && autoSpeak) {
+              if (!hasSpoken && autoSpeak && !showDefinition) {
                 String wordToSpeak = words[_currentIndex]['word'];
                 speak(wordToSpeak);
                 hasSpoken = true;
@@ -339,7 +339,7 @@ class _QuizPageState extends State<QuizPage> {
                               String word = showDefinition
                                   ? words[_currentIndex]['definition']
                                   : words[_currentIndex]['word'];
-                              speak(word);
+                                speak(word);
                             },
                           ),
                         Text(

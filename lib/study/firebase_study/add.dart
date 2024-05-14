@@ -2,25 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 
-Future<void> addTopic(
-    String topicName, String text, int numberOfWords, bool isPrivate) async {
-  try {
-    String userUid = FirebaseAuth.instance.currentUser!.uid;
-    DateTime currentTime = DateTime.now();
-    await FirebaseFirestore.instance.collection('topics').add({
-      'name': topicName,
-      'text': text,
-      'numberOfWords': numberOfWords,
-      'isPrivate': isPrivate,
-      'createdBy': userUid,
-      'timeCreated': currentTime,
-      'lastAccess': currentTime,
-      'accessPeople': 0
-    });
-  } catch (e) {
-    print('Error adding topic: $e');
-  }
-}
+// Future<void> addTopic(
+//     String topicName, String text, int numberOfWords, bool isPrivate) async {
+//   try {
+//     String userUid = FirebaseAuth.instance.currentUser!.uid;
+//     DateTime currentTime = DateTime.now();
+//     await FirebaseFirestore.instance.collection('topics').add({
+//       'name': topicName,
+//       'text': text,
+//       'numberOfWords': numberOfWords,
+//       'isPrivate': isPrivate,
+//       'createdBy': userUid,
+//       'timeCreated': currentTime,
+//       'lastAccess': currentTime,
+//       'accessPeople': 0
+//     });
+//   } catch (e) {
+//     print('Error adding topic: $e');
+//   }
+// }
 
 Future<void> addFolder(String folderName, String text) async {
   try {

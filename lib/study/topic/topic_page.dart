@@ -392,7 +392,7 @@ class _TopicPageState extends State<TopicPage> {
                           onTap: () {
                             setState(() {
                               showAllWords = true;
-                              updateFavWordsList();
+                              fetchDataAndUpdateState();
                             });
                           },
                           child: Padding(
@@ -415,7 +415,7 @@ class _TopicPageState extends State<TopicPage> {
                           onTap: () {
                             setState(() {
                               showAllWords = false;
-                              updateFavWordsList();
+                              fetchDataAndUpdateState();
                             });
                           },
                           child: Padding(

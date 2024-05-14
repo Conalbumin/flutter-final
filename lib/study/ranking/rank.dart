@@ -73,11 +73,11 @@ class _RankingPageState extends State<RankingPage> {
                                 } else {
                                   users.sort((a, b) {
                                     bool aHasCorrectAnswers =
-                                        (a.data() as Map<String, dynamic>)
-                                            .containsKey('correctAnswers');
+                                    (a.data() as Map<String, dynamic>)
+                                        .containsKey('correctAnswers');
                                     bool bHasCorrectAnswers =
-                                        (b.data() as Map<String, dynamic>)
-                                            .containsKey('correctAnswers');
+                                    (b.data() as Map<String, dynamic>)
+                                        .containsKey('correctAnswers');
 
                                     if (!aHasCorrectAnswers &&
                                         bHasCorrectAnswers) {
@@ -86,36 +86,38 @@ class _RankingPageState extends State<RankingPage> {
                                         !bHasCorrectAnswers) {
                                       return -1;
                                     }
-                                    return (b['correctAnswers'] as int)
+                                    int correctAnswersComparison = (b['correctAnswers'] as int)
                                         .compareTo(a['correctAnswers'] as int);
-                                  });
-                                  users.sort((a, b) {
-                                    bool aHasTimeTaken =
-                                        (a.data() as Map<String, dynamic>)
-                                            .containsKey('timeTaken');
-                                    bool bHasTimeTaken =
-                                        (b.data() as Map<String, dynamic>)
-                                            .containsKey('timeTaken');
+                                    if (correctAnswersComparison != 0) {
+                                      return correctAnswersComparison;
+                                    } else {
+                                      bool aHasTimeTaken =
+                                      (a.data() as Map<String, dynamic>)
+                                          .containsKey('timeTaken');
+                                      bool bHasTimeTaken =
+                                      (b.data() as Map<String, dynamic>)
+                                          .containsKey('timeTaken');
 
-                                    if (!aHasTimeTaken && bHasTimeTaken) {
-                                      return 1;
-                                    } else if (aHasTimeTaken &&
-                                        !bHasTimeTaken) {
-                                      return -1;
+                                      if (!aHasTimeTaken && bHasTimeTaken) {
+                                        return 1;
+                                      } else if (aHasTimeTaken &&
+                                          !bHasTimeTaken) {
+                                        return -1;
+                                      }
+                                      return (a['timeTaken'] as Timestamp)
+                                          .compareTo(b['timeTaken'] as Timestamp);
                                     }
-                                    return (b['timeTaken'] as Timestamp)
-                                        .compareTo(a['timeTaken'] as Timestamp);
                                   });
 
                                   List<DocumentSnapshot> mostCorrectAnsUser =
-                                      users
-                                          .take(users.length > 3
-                                              ? 3
-                                              : users.length)
-                                          .toList();
+                                  users
+                                      .take(users.length > 3
+                                      ? 3
+                                      : users.length)
+                                      .toList();
                                   for (int i = 0;
-                                      i < mostCorrectAnsUser.length;
-                                      i++) {
+                                  i < mostCorrectAnsUser.length;
+                                  i++) {
                                     String userId = mostCorrectAnsUser[i].id;
                                     int rank = i + 1;
                                     FirebaseFirestore.instance
@@ -149,11 +151,11 @@ class _RankingPageState extends State<RankingPage> {
                                             finishedAt: userData['lastStudied']
                                                 .toDate(),
                                             startAt:
-                                                userData['timeTaken'].toDate(),
+                                            userData['timeTaken'].toDate(),
                                             correctAns:
-                                                userData['correctAnswers'],
+                                            userData['correctAnswers'],
                                             completionCount:
-                                                userData['completionCount'],
+                                            userData['completionCount'],
                                             cardType: CardType.Answer,
                                             numberOfWords: widget.numberOfWords,
                                           );
@@ -178,7 +180,7 @@ class _RankingPageState extends State<RankingPage> {
                                   } else {
                                     return Container(
                                       decoration:
-                                          CustomCardDecoration.cardDecoration,
+                                      CustomCardDecoration.cardDecoration,
                                       padding: const EdgeInsets.all(20.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -253,9 +255,27 @@ class _RankingPageState extends State<RankingPage> {
                                               widget.numberOfWords
                                           : false)
                                       .toList();
-                                  users.sort((a, b) =>
-                                      b['timeTaken'].compareTo(a['timeTaken']));
+                                  Duration computeTimeDifference(DateTime lastStudied, DateTime timeTaken) {
+                                    if (lastStudied.isAfter(timeTaken)) {
+                                      final temp = lastStudied;
+                                      lastStudied = timeTaken;
+                                      timeTaken = temp;
+                                    }
 
+                                    return timeTaken.difference(lastStudied);
+                                  }
+
+                                  users.sort((a, b) {
+                                    DateTime aLastStudied = (a.data() as Map<String, dynamic>)['lastStudied'].toDate();
+                                    DateTime aTimeTaken = (a.data() as Map<String, dynamic>)['timeTaken'].toDate();
+                                    DateTime bLastStudied = (b.data() as Map<String, dynamic>)['lastStudied'].toDate();
+                                    DateTime bTimeTaken = (b.data() as Map<String, dynamic>)['timeTaken'].toDate();
+
+                                    Duration aDifference = computeTimeDifference(aLastStudied, aTimeTaken);
+                                    Duration bDifference = computeTimeDifference(bLastStudied, bTimeTaken);
+
+                                    return aDifference.compareTo(bDifference);
+                                  });
                                   List<DocumentSnapshot> fastestUsers = users
                                       .take(users.length > 3 ? 3 : users.length)
                                       .toList();

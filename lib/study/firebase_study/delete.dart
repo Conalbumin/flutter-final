@@ -84,7 +84,6 @@ void deleteTopic(BuildContext context, String topicId) async {
     FirebaseFirestore.instance.collection('access').doc(topicId);
     batch.delete(accessRef);
 
-    // Delete all words associated with the topic
     QuerySnapshot wordSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
@@ -95,7 +94,6 @@ void deleteTopic(BuildContext context, String topicId) async {
       batch.delete(wordDoc.reference);
     });
 
-    // Delete all access associated with the topic
     QuerySnapshot accessSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
@@ -106,10 +104,7 @@ void deleteTopic(BuildContext context, String topicId) async {
       batch.delete(accessDoc.reference);
     });
 
-    // Commit the batch
     await batch.commit();
-
-    // Get folders containing the topic
     QuerySnapshot folderSnapshot = await FirebaseFirestore.instance
         .collection('folders')
         .get();
@@ -122,10 +117,7 @@ void deleteTopic(BuildContext context, String topicId) async {
           .doc(topicId)
           .get();
 
-      print(folderDoc.id);
-      print('topicSnapshot 1 ${topicSnapshot}');
       if (topicSnapshot.exists) {
-        print('topicSnapshot exists');
         String folderId = folderDoc.id;
         deleteTopicInFolder(context, topicId, folderId);
         print('Topic, associated words, and access collection deleted successfully');
