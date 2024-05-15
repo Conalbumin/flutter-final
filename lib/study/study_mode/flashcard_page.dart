@@ -204,7 +204,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
               onPressed: () {
                 int numberOfCorrectAnswers = countLearned;
                 saveUserPerformance(widget.topicId, userUid, userName!,
-                    userAvatar, widget.lastAccess, numberOfCorrectAnswers);
+                    userAvatar, widget.lastAccess, numberOfCorrectAnswers, updateCompletionCount: true);
                 Navigator.pop(context);
               },
               child: const Icon(Icons.save),

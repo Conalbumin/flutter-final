@@ -16,6 +16,13 @@ class CustomCardDecoration {
   );
 }
 
+BoxDecoration rankingDecoration = BoxDecoration(
+  color: Colors.indigo, // Background color
+  border: Border.all(color: Colors.black), // Border color
+  borderRadius: BorderRadius.circular(
+      15.0), // Optional: border radius
+);
+
 class CustomSearchBar {
   static final BoxDecoration searchBarDecoration = BoxDecoration(
       gradient: LinearGradient(

@@ -20,7 +20,9 @@ class QuizResultPage extends StatefulWidget {
     required this.selectedAnswers,
     required this.correctAnswers,
     required this.words,
-    required this.showDefinition, required this.topicId, required this.lastAccess,
+    required this.showDefinition,
+    required this.topicId,
+    required this.lastAccess,
   }) : super(key: key);
 
   @override
@@ -75,7 +77,8 @@ class _QuizResultPageState extends State<QuizResultPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, widget.lastAccess, widget.correctCount);
+          saveUserPerformance(widget.topicId, userUid, userName!, userAvatar,
+              widget.lastAccess, widget.correctCount, updateCompletionCount: true);
           Navigator.pop(context);
         },
         child: const Icon(Icons.save),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizlet_final_flutter/constant/toast.dart';
 
@@ -74,41 +75,59 @@ void deleteFolder(BuildContext context, String folderId) {
 
 void deleteTopic(BuildContext context, String topicId) async {
   try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
+    // Delete the topic document
     DocumentReference topicRef =
     FirebaseFirestore.instance.collection('topics').doc(topicId);
+    print('topicRef $topicRef');
     batch.delete(topicRef);
 
+    // Delete the access document for the current user
     DocumentReference accessRef =
-    FirebaseFirestore.instance.collection('access').doc(topicId);
+    FirebaseFirestore.instance.collection('topics').doc(topicId).collection('access').doc(userUid);
+    print('accessRef $accessRef');
     batch.delete(accessRef);
 
+    // Delete all words related to the topic
     QuerySnapshot wordSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('words')
         .get();
-
     wordSnapshot.docs.forEach((wordDoc) {
       batch.delete(wordDoc.reference);
     });
 
+    // Delete all user progress related to the topic
+    QuerySnapshot userProgressSnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress')
+        .get();
+    userProgressSnapshot.docs.forEach((userProgressDoc) {
+      batch.delete(userProgressDoc.reference);
+    });
+
+    // Delete the access subcollection for all users
     QuerySnapshot accessSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('access')
         .get();
-
     accessSnapshot.docs.forEach((accessDoc) {
       batch.delete(accessDoc.reference);
     });
 
+    // Commit the batch
     await batch.commit();
-    QuerySnapshot folderSnapshot = await FirebaseFirestore.instance
-        .collection('folders')
-        .get();
 
+    // Iterate over all folders to check if the topic exists and delete it
+    QuerySnapshot folderSnapshot =
+    await FirebaseFirestore.instance.collection('folders').get();
     for (QueryDocumentSnapshot folderDoc in folderSnapshot.docs) {
       DocumentSnapshot topicSnapshot = await FirebaseFirestore.instance
           .collection('folders')
@@ -120,7 +139,8 @@ void deleteTopic(BuildContext context, String topicId) async {
       if (topicSnapshot.exists) {
         String folderId = folderDoc.id;
         deleteTopicInFolder(context, topicId, folderId);
-        print('Topic, associated words, and access collection deleted successfully');
+        print(
+            'Topic, associated words, and access collection deleted successfully');
       }
     }
   } catch (e) {
@@ -156,7 +176,8 @@ void deleteTopicInFolder(
 
         // Wait for all delete operations to complete
         Future.wait(deleteOperations).then((_) {
-          showToast('Topic and associated words removed from folder successfully');
+          showToast(
+              'Topic and associated words removed from folder successfully');
           showToast("Please go back to the previous page to see the result");
         }).catchError((error) {
           print('Error completing delete operations: $error');
@@ -171,7 +192,6 @@ void deleteTopicInFolder(
     print('Error: $e');
   }
 }
-
 
 void deleteWord(BuildContext context, String topicId, String wordId) {
   try {

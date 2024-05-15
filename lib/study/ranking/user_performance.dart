@@ -56,6 +56,7 @@ Future<void> saveUserPerformance(
     String userAvatar,
     DateTime timeTaken,
     int numberOfCorrectAnswers,
+    {bool updateCompletionCount = true}
     ) async {
   try {
     await FirebaseFirestore.instance
@@ -66,13 +67,12 @@ Future<void> saveUserPerformance(
         .get()
         .then((DocumentSnapshot accessSnapshot) {
       if (accessSnapshot.exists) {
-        // User has accessed before
         UserPerformance userPerformance;
 
         Map<String, dynamic>? data = accessSnapshot.data() as Map<String, dynamic>?;
 
-        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers')) {
-          // If completionCount exists, update it
+        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers') && updateCompletionCount) {
+          // If completionCount exists and updateCompletionCount is true, update it
           userPerformance = UserPerformance(
             userId: userUid,
             topicId: topicId,
@@ -84,7 +84,7 @@ Future<void> saveUserPerformance(
             userAvatar: userAvatar,
           );
         } else {
-          // If completionCount doesn't exist, set default value
+          // Otherwise, set default values
           userPerformance = UserPerformance(
             userId: userUid,
             topicId: topicId,
@@ -103,13 +103,12 @@ Future<void> saveUserPerformance(
             .catchError(
                 (error) => print('Failed to update user performance: $error'));
       } else {
-        // First access, set default performance
         UserPerformance userPerformance = UserPerformance(
           userId: userUid,
           topicId: topicId,
           correctAnswers: 0, // Default value
           timeTaken: timeTaken,
-          completionCount: 1,
+          completionCount: 0,
           lastStudied: DateTime.now(),
           userName: userName,
           userAvatar: userAvatar,
@@ -132,6 +131,7 @@ Future<void> saveUserPerformance(
     print('Error saving user performance: $e');
   }
 }
+
 
 
 

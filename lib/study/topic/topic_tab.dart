@@ -120,8 +120,7 @@ class _TopicTabState extends State<TopicTab> {
                       List<DocumentSnapshot> topics = snapshot.data!.docs;
                       List<DocumentSnapshot> sortedTopics = [];
                       for (int i = 0; i < topics.length; i++) {
-                        // Nếu document 'access' tồn tại
-                        if (accessSnapshotList.data![i].exists) {
+                        if (accessSnapshotList.data![i].exists || topics[i]['createdBy'] == currentUserId) {
                           sortedTopics.add(topics[i]);
                         }
                       }

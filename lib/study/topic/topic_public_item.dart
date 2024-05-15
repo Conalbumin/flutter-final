@@ -5,6 +5,7 @@ import 'package:quizlet_final_flutter/study/topic/topic_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../constant/style.dart';
 import '../firebase_study/related_func.dart';
+import '../ranking/user_performance.dart';
 
 class TopicPublicItem extends StatefulWidget {
   final String topicId;
@@ -37,11 +38,23 @@ class TopicPublicItem extends StatefulWidget {
 class _TopicPublicItemState extends State<TopicPublicItem> {
   final user = FirebaseAuth.instance.currentUser;
   String displayName = '';
+  String userUid = FirebaseAuth.instance.currentUser!.uid;
+  String? userName = FirebaseAuth.instance.currentUser!.displayName;
+  late String userAvatar;
 
   @override
   void initState() {
     super.initState();
     fetchDisplayName();
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userUid)
+        .get()
+        .then((DocumentSnapshot userSnapshot) {
+      setState(() {
+        userAvatar = userSnapshot['avatarURL'];
+      });
+    });
   }
 
   Future<void> fetchDisplayName() async {
@@ -80,6 +93,7 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
     return GestureDetector(
       onTap: () async {
         DateTime currentTime = DateTime.now();
+        saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, currentTime, 0,  updateCompletionCount: false);
         try {
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {

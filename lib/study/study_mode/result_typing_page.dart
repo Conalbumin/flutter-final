@@ -79,7 +79,8 @@ class _TypingResultPageState extends State<TypingResultPage> {
         onPressed: () {
           int numberOfCorrectAnswers = widget.correctCount;
           saveUserPerformance(widget.topicId, userUid, userName!, userAvatar,
-              widget.lastAccess, numberOfCorrectAnswers);
+              widget.lastAccess, numberOfCorrectAnswers,
+              updateCompletionCount: true);
           Navigator.pop(context);
         },
         child: const Icon(Icons.save),

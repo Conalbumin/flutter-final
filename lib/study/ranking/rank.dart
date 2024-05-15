@@ -36,12 +36,7 @@ class _RankingPageState extends State<RankingPage> {
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo, // Background color
-                      border: Border.all(color: Colors.black), // Border color
-                      borderRadius: BorderRadius.circular(
-                          15.0), // Optional: border radius
-                    ),
+                    decoration: rankingDecoration,
                     child: Column(
                       children: [
                         Center(
@@ -127,7 +122,6 @@ class _RankingPageState extends State<RankingPage> {
                                         .doc(widget.topicId)
                                         .set({
                                       'rank_most_correct_answer': rank,
-                                      // Add other relevant user information here
                                     }, SetOptions(merge: true));
                                   }
                                   if (mostCorrectAnsUser.isNotEmpty) {
@@ -160,37 +154,12 @@ class _RankingPageState extends State<RankingPage> {
                                             numberOfWords: widget.numberOfWords,
                                           );
                                         } else {
-                                          return Container(
-                                            decoration: CustomCardDecoration
-                                                .cardDecoration,
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  "Let become one of the first 3 users who study this topic",
-                                                  style: normalText,
-                                                ),
-                                              ],
-                                            ),
-                                          );
+                                          return warning();
                                         }
                                       },
                                     );
                                   } else {
-                                    return Container(
-                                      decoration:
-                                      CustomCardDecoration.cardDecoration,
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                              "Let become one of the first 3 users who study this topic",
-                                              style: normalText),
-                                        ],
-                                      ),
-                                    );
+                                    return warning();
                                   }
                                 }
                               }
@@ -210,12 +179,7 @@ class _RankingPageState extends State<RankingPage> {
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo, // Background color
-                      border: Border.all(color: Colors.black), // Border color
-                      borderRadius: BorderRadius.circular(
-                          15.0), // Optional: border radius
-                    ),
+                    decoration: rankingDecoration,
                     child: Column(
                       children: [
                         Center(
@@ -321,19 +285,7 @@ class _RankingPageState extends State<RankingPage> {
                                           numberOfWords: widget.numberOfWords,
                                         );
                                       } else {
-                                        return Container(
-                                          decoration: CustomCardDecoration
-                                              .cardDecoration,
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                  "Let become one of the first 3 users who study this topic",
-                                                  style: normalText),
-                                            ],
-                                          ),
-                                        );
+                                        return warning();
                                       }
                                     },
                                   );
@@ -355,12 +307,7 @@ class _RankingPageState extends State<RankingPage> {
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo, // Background color
-                      border: Border.all(color: Colors.black), // Border color
-                      borderRadius: BorderRadius.circular(
-                          15.0), // Optional: border radius
-                    ),
+                    decoration: rankingDecoration,
                     child: Column(
                       children: [
                         Center(
@@ -451,19 +398,7 @@ class _RankingPageState extends State<RankingPage> {
                                           numberOfWords: widget.numberOfWords,
                                         );
                                       } else {
-                                        return Container(
-                                          decoration: CustomCardDecoration
-                                              .cardDecoration,
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                  "Let become one of the first 3 users who study this topic",
-                                                  style: normalText),
-                                            ],
-                                          ),
-                                        );
+                                        return warning();
                                       }
                                     },
                                   );
@@ -484,4 +419,21 @@ class _RankingPageState extends State<RankingPage> {
       ),
     );
   }
+
+  Widget warning() {
+    return Container(
+      decoration: CustomCardDecoration
+          .cardDecoration,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+              "Let become one of the first 3 users who study this topic",
+              style: normalText),
+        ],
+      ),
+    );
+  }
+  
 }
