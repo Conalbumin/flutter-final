@@ -90,6 +90,7 @@ class _AddWordInTopicState extends State<AddWordInTopic> {
         }
       }
       addWord(widget.topicId, wordsData);
+      addWordIntoUserProgress(widget.topicId, wordsData);
       widget.updateNumberOfWords(wordsData.length);
       widget.handleWordAdded(widget.topicId);
       wordPages.clear();

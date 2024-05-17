@@ -37,7 +37,7 @@ TextStyle normalSubText = const TextStyle(
   fontSize: 20,
 );
 
-TextStyle wordStyle = const TextStyle(fontSize: 35, color: Colors.white);
+TextStyle wordStyle = const TextStyle(fontSize: 25, color: Colors.white);
 
 TextStyle all_FavInTopic = const TextStyle(
   color: Colors.indigo,

@@ -18,7 +18,6 @@ Stream<QuerySnapshot> getFolders() {
       .snapshots();
 }
 
-
 Stream<QuerySnapshot> getTopicsInFolder(String folderId) {
   String userUid = FirebaseAuth.instance.currentUser!.uid;
   return FirebaseFirestore.instance
@@ -36,6 +35,24 @@ Future<List<DocumentSnapshot>> fetchWords(String topicId) async {
         .collection('topics')
         .doc(topicId)
         .collection('words')
+        .get();
+
+    return querySnapshot.docs;
+  } catch (e) {
+    print('Error fetching words: $e');
+    rethrow;
+  }
+}
+
+Future<List<DocumentSnapshot>> fetchWordsInStatistical(String topicId) async {
+  try {
+    String userUid = FirebaseAuth.instance.currentUser!.uid;
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .collection('user_progress')
         .get();
 
     return querySnapshot.docs;

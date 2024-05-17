@@ -235,7 +235,7 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
             child: ListBody(
               children: <Widget>[
                 Text(
-                    'Are you sure you want to put this topic into your personal list?'),
+                    'If you access then this topic will go into your personal list'),
               ],
             ),
           ),
@@ -243,7 +243,7 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                duplicateTopic(widget.topicId, user!.uid);
+                // duplicateTopic(widget.topicId, user!.uid);
                 Navigator.of(context).pop();
               },
             ),

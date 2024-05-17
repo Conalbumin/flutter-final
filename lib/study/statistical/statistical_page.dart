@@ -60,7 +60,7 @@ class _StatisticalPageState extends State<StatisticalPage> {
               padding: const EdgeInsets.only(top: 10),
               child: SizedBox(
                 child: FutureBuilder(
-                  future: fetchWords(widget.topicId),
+                  future: fetchWordsInStatistical(widget.topicId),
                   builder: (context,
                       AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -135,7 +135,7 @@ class _StatisticalPageState extends State<StatisticalPage> {
             SizedBox(
               height: 700,
               child: FutureBuilder(
-                future: fetchWords(widget.topicId),
+                future: fetchWordsInStatistical(widget.topicId),
                 builder:
                     (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

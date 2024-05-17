@@ -71,17 +71,7 @@ class Achievement extends StatelessWidget {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Container(
-                      decoration: CustomCardDecoration
-                          .cardDecoration,
-                      padding: const EdgeInsets.all(20.0),
-                      child: Center(
-                        child: Text(
-                          "Try harder \nto be in top 3",
-                          style: rankText,
-                        ),
-                      ),
-                    );
+                    return warning();
                   }
 
                   final rankingDocs = snapshot.data!.docs;
@@ -100,18 +90,8 @@ class Achievement extends StatelessWidget {
                           return CircularProgressIndicator();
                         }
 
-                        if (topicSnapshot.hasData) {
-                          return Container(
-                            decoration: CustomCardDecoration
-                                .cardDecoration,
-                            padding: const EdgeInsets.all(20.0),
-                            child: Center(
-                              child: Text(
-                                "Try harder \nto be in top 3",
-                                style: rankText,
-                              ),
-                            ),
-                          );
+                        if (!topicSnapshot.hasData) {
+                          return warning();
                         }
 
                         final topicData = topicSnapshot.data!.data() as Map<
@@ -147,18 +127,32 @@ class Achievement extends StatelessWidget {
                             String userAvatar = accessData['userAvatar'];
                             String userName = accessData['userName'];
 
-                            return _buildSwiperItem(
-                              topicName,
-                              rank,
-                              completionCount,
-                              correctAnswers,
-                              lastStudied,
-                              timeTaken,
-                              userAvatar,
-                              userName,
-                              numberOfWords,
-                              rankingField,
-                            );
+                            if(rank == 0) {
+                              return Container(
+                                decoration: CustomCardDecoration
+                                    .cardDecoration,
+                                padding: const EdgeInsets.all(20.0),
+                                child: Center(
+                                  child: Text(
+                                    "Try harder \nto be in top 3",
+                                    style: rankText,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return _buildSwiperItem(
+                                topicName,
+                                rank,
+                                completionCount,
+                                correctAnswers,
+                                lastStudied,
+                                timeTaken,
+                                userAvatar,
+                                userName,
+                                numberOfWords,
+                                rankingField,
+                              );
+                            }
                           },
                         );
                       },
@@ -166,8 +160,8 @@ class Achievement extends StatelessWidget {
                   }).toList();
 
                   return Swiper(
-                    loop: false,
-                    autoplay: false,
+                    loop: true,
+                    autoplay: true,
                     itemCount: achievements.length,
                     itemBuilder: (BuildContext context, int index) {
                       return achievements[index];
@@ -224,4 +218,17 @@ class Achievement extends StatelessWidget {
     );
   }
 
+  Widget warning() {
+    return Container(
+      decoration: CustomCardDecoration
+          .cardDecoration,
+      padding: const EdgeInsets.all(20.0),
+      child: Center(
+        child: Text(
+          "Try harder \nto be in top 3",
+          style: rankText,
+        ),
+      ),
+    );
+  }
 }
