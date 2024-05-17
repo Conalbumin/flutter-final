@@ -70,27 +70,26 @@ Future<void> saveUserPerformance(
         UserPerformance userPerformance;
 
         Map<String, dynamic>? data = accessSnapshot.data() as Map<String, dynamic>?;
-
-        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers') && updateCompletionCount) {
-          // If completionCount exists and updateCompletionCount is true, update it
+        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers') && updateCompletionCount == true) {
+          int currentCompletionCount = data['completionCount'] ?? 0;
           userPerformance = UserPerformance(
             userId: userUid,
             topicId: topicId,
             correctAnswers: numberOfCorrectAnswers,
             timeTaken: timeTaken,
-            completionCount: data['completionCount'] + 1,
+            completionCount: currentCompletionCount + 1,
             lastStudied: DateTime.now(),
             userName: userName,
             userAvatar: userAvatar,
           );
         } else {
-          // Otherwise, set default values
+          int currentCompletionCount = data?['completionCount'] ?? 0;
           userPerformance = UserPerformance(
             userId: userUid,
             topicId: topicId,
             correctAnswers: numberOfCorrectAnswers,
             timeTaken: timeTaken,
-            completionCount: 1,
+            completionCount: currentCompletionCount,
             lastStudied: DateTime.now(),
             userName: userName,
             userAvatar: userAvatar,

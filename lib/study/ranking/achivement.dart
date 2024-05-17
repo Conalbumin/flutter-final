@@ -101,10 +101,15 @@ class Achievement extends StatelessWidget {
                         }
 
                         if (topicSnapshot.hasData) {
-                          return Center(
-                            child: Text(
-                              "Try harder \nto be in top 3",
-                              style: rankText,
+                          return Container(
+                            decoration: CustomCardDecoration
+                                .cardDecoration,
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text(
+                                "Try harder \nto be in top 3",
+                                style: rankText,
+                              ),
                             ),
                           );
                         }

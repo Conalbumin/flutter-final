@@ -107,7 +107,6 @@ Future<bool> checkAndAddAccess(String topicId) async {
         .collection('access')
         .get();
 
-    print(accessSnapshot.docs);
     // Check if the user's document exists in the "access" collection
     bool userExists = accessSnapshot.docs.any((doc) => doc.id == userUid);
 

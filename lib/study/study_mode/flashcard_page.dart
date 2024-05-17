@@ -204,7 +204,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
               onPressed: () {
                 int numberOfCorrectAnswers = countLearned;
                 saveUserPerformance(widget.topicId, userUid, userName!,
-                    userAvatar, widget.lastAccess, numberOfCorrectAnswers, updateCompletionCount: true);
+                    userAvatar, widget.lastAccess, numberOfCorrectAnswers,
+                    updateCompletionCount: true);
                 Navigator.pop(context);
               },
               child: const Icon(Icons.save),
@@ -242,7 +243,8 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                       });
                                     },
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Container(
                                           width: 40,
@@ -276,25 +278,28 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      setState(() {
-                                        if (words[_currentIndex]
-                                                ['countLearn'] >=
-                                            2) {
-                                          updateLearnedStatus('Learned');
-                                          updateWordStatus(
-                                              widget.topicId,
-                                              words[_currentIndex].id,
-                                              'Mastered');
-                                          updateCountLearn(widget.topicId,
-                                              words[_currentIndex].id);
-                                        } else {
-                                          updateLearnedStatus('Learned');
-                                          updateWordStatus(
-                                              widget.topicId,
-                                              words[_currentIndex].id,
-                                              'Learned');
-                                          updateCountLearn(widget.topicId,
-                                              words[_currentIndex].id);
+                                      FirebaseFirestore.instance
+                                          .collection('topics')
+                                          .doc(widget.topicId)
+                                          .collection('access')
+                                          .doc(userUid)
+                                          .collection('user_progress')
+                                          .doc(words[_currentIndex].id)
+                                          .get()
+                                          .then((DocumentSnapshot progressSnapshot) {
+                                        if (progressSnapshot.exists) {
+                                          int countLearn = progressSnapshot['countLearn'];
+                                          setState(() {
+                                            if (countLearn >= 2) {
+                                              updateLearnedStatus('Learned');
+                                              updateWordStatus(widget.topicId, words[_currentIndex].id, 'Mastered');
+                                              updateCountLearn(widget.topicId, words[_currentIndex].id);
+                                            } else {
+                                              updateLearnedStatus('Learned');
+                                              updateWordStatus(widget.topicId, words[_currentIndex].id, 'Learned');
+                                              updateCountLearn(widget.topicId, words[_currentIndex].id);
+                                            }
+                                          });
                                         }
                                       });
                                     },
@@ -319,12 +324,12 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                           ),
                                           child: Center(
                                               child: Text(
-                                            '$countLearned',
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.bold),
-                                          )),
+                                                '$countLearned',
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.bold),
+                                              )),
                                         ),
                                       ],
                                     ),

@@ -124,7 +124,11 @@ class _TopicPageState extends State<TopicPage> {
               size: 35,
             ),
             onPressed: () {
-              _showDeleteConfirmationDialog(context, widget.topicId);
+              if(userUid == widget.userId) {
+                _showDeleteConfirmationDialog(context, widget.topicId);
+              } else {
+                showToast('You are not allowed to delete this topic');
+              }
             },
           ),
           PopupMenuButton<String>(
@@ -151,11 +155,11 @@ class _TopicPageState extends State<TopicPage> {
                   title: Text('Add new Word'),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'setPrivate',
                 child: ListTile(
                   leading: Icon(Icons.private_connectivity),
-                  title: Text('Set private'),
+                  title: Text(widget.isPrivate ? 'Set public' : 'Set private'),
                 ),
               ),
               const PopupMenuItem<String>(
@@ -196,7 +200,11 @@ class _TopicPageState extends State<TopicPage> {
                   ),
                 );
               } else if (choice == 'setPrivate') {
-                setPrivateTopic(context, widget.topicId, !widget.isPrivate);
+                if (userUid == widget.userId) {
+                  setPrivateTopic(context, widget.topicId, !widget.isPrivate);
+                } else {
+                  showToast('You are not allowed to modify this topic');
+                }
               } else if (choice == 'exportCsv') {
                 List<Map<String, dynamic>> wordData =
                     convertDocumentSnapshotsToMapList(words);
@@ -262,44 +270,51 @@ class _TopicPageState extends State<TopicPage> {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 60,
-                  width: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.indigo,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text("Description: $_text", style: normalSubText),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.indigo,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.stacked_bar_chart,
-                      color: Colors.white,
-                      size: 40,
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text("Description: $_text", style: normalSubText),
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
+                  ),
+                  const SizedBox(width: 10), // Spacer
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.indigo,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.stacked_bar_chart,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RankingPage(
-                                    topicId: widget.topicId,
-                                    numberOfWords: widget.numberOfWords,
-                                  )));
-                    },
+                            builder: (context) => RankingPage(
+                              topicId: widget.topicId,
+                              numberOfWords: widget.numberOfWords,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             Container(
@@ -399,7 +414,7 @@ class _TopicPageState extends State<TopicPage> {
                             });
                           },
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
                             child: Text(
                               'All',
                               textAlign: TextAlign.center,
@@ -422,7 +437,7 @@ class _TopicPageState extends State<TopicPage> {
                             });
                           },
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
                             child: Text(
                               'Favorited',
                               textAlign: TextAlign.center,

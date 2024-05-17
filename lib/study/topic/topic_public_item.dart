@@ -41,11 +41,13 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
   String userUid = FirebaseAuth.instance.currentUser!.uid;
   String? userName = FirebaseAuth.instance.currentUser!.displayName;
   late String userAvatar;
+  late int correctAnswers;
 
   @override
   void initState() {
     super.initState();
     fetchDisplayName();
+    fetchCorrectAnswers();
     FirebaseFirestore.instance
         .collection('users')
         .doc(userUid)
@@ -55,6 +57,45 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
         userAvatar = userSnapshot['avatarURL'];
       });
     });
+  }
+
+  Future<int> getCorrectAnswer() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(widget.topicId)
+          .collection('access')
+          .doc(userUid)
+          .get();
+
+      if (snapshot.exists) {
+        // Check if the document exists
+        var data = snapshot.data() as Map<String, dynamic>;
+        if (data.containsKey('correctAnswers')) {
+          // Check if the correctAnswers field exists
+          int correctAnswersValue = data['correctAnswers'];
+          return correctAnswersValue;
+        } else {
+          return 0;
+        }
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print('Error retrieving correctAnswers: $error');
+      return 0;
+    }
+  }
+
+  Future<void> fetchCorrectAnswers() async {
+    try {
+      int correctAnswersValue = await getCorrectAnswer();
+      setState(() {
+        correctAnswers = correctAnswersValue;
+      });
+    } catch (error) {
+      print('Error fetching correct answers: $error');
+    }
   }
 
   Future<void> fetchDisplayName() async {
@@ -87,7 +128,6 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -96,7 +136,10 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
         try {
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {
-            saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, currentTime, 0,  updateCompletionCount: false);
+            bool updateCompletionCount = false;
+            saveUserPerformance(
+                widget.topicId, userUid, userName!, userAvatar, currentTime, correctAnswers,
+                updateCompletionCount: updateCompletionCount);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -135,10 +178,20 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
             leading: const Icon(Icons.topic, size: 60, color: Colors.white),
             trailing: Column(
               children: [
-                Text(displayName.isNotEmpty ? displayName : 'Anonymous',
-                    style: normalSubText),
-                Text('People joined: ${widget.accessPeople.toString()}',
-                    style: const TextStyle(fontSize: 18, color: Colors.white))
+                Flexible(
+                  child: Text(
+                    displayName.isNotEmpty ? displayName : 'Anonymous',
+                    style: normalSubText,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    'Joined: ${widget.accessPeople.toString()}',
+                    style: const TextStyle(fontSize: 15, color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             title: Text(
@@ -147,6 +200,8 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                   fontSize: 30.0,
                   color: Colors.white,
                   fontWeight: FontWeight.bold),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,6 +209,8 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                 Text(
                   widget.text,
                   style: const TextStyle(fontSize: 20.0, color: Colors.white),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${widget.numberOfWords} words',
@@ -161,7 +218,6 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                 ),
               ],
             ),
-            // trailing:,
           ),
         ),
       ),
@@ -178,7 +234,8 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Are you sure you want to put this topic into your personal list?'),
+                Text(
+                    'Are you sure you want to put this topic into your personal list?'),
               ],
             ),
           ),

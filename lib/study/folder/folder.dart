@@ -39,7 +39,7 @@ class FolderItem extends StatelessWidget {
         child: Container(
           decoration: CustomCardDecoration.cardDecoration,
           child: ListTile(
-            leading: const Icon(Icons.topic, size: 60, color: Colors.white),
+            leading: const Icon(Icons.folder, size: 60, color: Colors.white),
             title: Text(
               folderName,
               style: const TextStyle(fontSize: 30.0, color: Colors.white),

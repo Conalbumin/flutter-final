@@ -143,6 +143,19 @@ Future<void> addTopicWithWords(String topicName, String text, bool isPrivate,
         'countLearn': countLearn
       });
     }
+
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .collection('access')
+        .doc(userUid)
+        .set({});
+
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(topicId)
+        .update({'accessPeople': FieldValue.increment(1)});
+
     print('Topic with words added successfully');
   } catch (e) {
     print('Error adding topic with words: $e');

@@ -188,7 +188,7 @@ class _RankingPageState extends State<RankingPage> {
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 320,
+                          height: 340,
                           child: StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('topics')
@@ -219,16 +219,39 @@ class _RankingPageState extends State<RankingPage> {
                                               widget.numberOfWords
                                           : false)
                                       .toList();
+                                  if (users.isEmpty) {
+                                    List<DocumentSnapshot> users = snapshot.data!.docs;
+                                    users.forEach((user) {
+                                      String userId = user.id;
+                                      FirebaseFirestore.instance
+                                          .collection('achievements')
+                                          .doc(userId)
+                                          .collection('topics')
+                                          .doc(widget.topicId)
+                                          .set({
+                                        'rank_shortest_time': 0,
+                                      }, SetOptions(merge: true));
+                                    });
+                                    return Swiper(
+                                      loop: false,
+                                      autoplay: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 1,
+                                      viewportFraction: 0.6,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                          return warning();
+                                      },
+                                    );
+                                  }
                                   Duration computeTimeDifference(DateTime lastStudied, DateTime timeTaken) {
                                     if (lastStudied.isAfter(timeTaken)) {
                                       final temp = lastStudied;
                                       lastStudied = timeTaken;
                                       timeTaken = temp;
                                     }
-
                                     return timeTaken.difference(lastStudied);
                                   }
-
                                   users.sort((a, b) {
                                     DateTime aLastStudied = (a.data() as Map<String, dynamic>)['lastStudied'].toDate();
                                     DateTime aTimeTaken = (a.data() as Map<String, dynamic>)['timeTaken'].toDate();
@@ -255,7 +278,6 @@ class _RankingPageState extends State<RankingPage> {
                                         .doc(widget.topicId)
                                         .set({
                                       'rank_shortest_time': rank,
-                                      // Add other relevant user information here
                                     }, SetOptions(merge: true));
                                   }
                                   return Swiper(

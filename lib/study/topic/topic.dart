@@ -39,20 +39,68 @@ class _TopicItemState extends State<TopicItem> {
   String userUid = FirebaseAuth.instance.currentUser!.uid;
   String? userName = FirebaseAuth.instance.currentUser!.displayName;
   late String userAvatar;
+  late int correctAnswers;
+
+  Future<int> getCorrectAnswer() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(widget.topicId)
+          .collection('access')
+          .doc(userUid)
+          .get();
+
+      if (snapshot.exists) {
+        // Check if the document exists
+        var data = snapshot.data() as Map<String, dynamic>;
+        if (data.containsKey('correctAnswers')) {
+          // Check if the correctAnswers field exists
+          int correctAnswersValue = data['correctAnswers'];
+          return correctAnswersValue;
+        } else {
+          return 0;
+        }
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print('Error retrieving correctAnswers: $error');
+      return 0; // Return a default value if an error occurs
+    }
+  }
+
+  Future<void> fetchCorrectAnswers() async {
+    try {
+      int correctAnswersValue = await getCorrectAnswer();
+      setState(() {
+        correctAnswers = correctAnswersValue; // Set the value of correctAnswers
+      });
+    } catch (error) {
+      print('Error fetching correct answers: $error');
+    }
+  }
+
+  Future<void> fetchUserAvatar() async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUid)
+          .get();
+      setState(() {
+        userAvatar = userSnapshot['avatarURL'];
+      });
+    } catch (error) {
+      print('Error fetching user avatar: $error');
+    }
+  }
+
 
   @override
   void initState() {
     super.initState();
     _key = GlobalKey();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(userUid)
-        .get()
-        .then((DocumentSnapshot userSnapshot) {
-      setState(() {
-        userAvatar = userSnapshot['avatarURL'];
-      });
-    });
+    fetchCorrectAnswers();
+    fetchUserAvatar();
   }
 
   @override
@@ -60,9 +108,12 @@ class _TopicItemState extends State<TopicItem> {
     return GestureDetector(
       onTap: () async {
         DateTime currentTime = DateTime.now();
-        saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, currentTime, 0, updateCompletionCount: false);
         try {
           checkAndAddAccess(widget.topicId);
+          bool updateCompletionCount = false;
+          saveUserPerformance(
+              widget.topicId, userUid, userName!, userAvatar, currentTime, correctAnswers,
+              updateCompletionCount: updateCompletionCount);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -97,14 +148,21 @@ class _TopicItemState extends State<TopicItem> {
             leading: const Icon(Icons.topic, size: 60, color: Colors.white),
             title: Text(
               widget.topicName,
-              style: const TextStyle(fontSize: 30.0, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 30.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.text,
-                  style: const TextStyle(fontSize: 18.0, color: Colors.white),
+                  style: const TextStyle(fontSize: 20.0, color: Colors.white),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${widget.numberOfWords} words',
