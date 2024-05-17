@@ -237,7 +237,7 @@ class _TopicPageState extends State<TopicPage> {
                       return Swiper(
                         scrollDirection: Axis.horizontal,
                         itemCount: words.length,
-                        loop: true,
+                        loop: false,
                         viewportFraction: 0.6,
                         itemBuilder: (context, index) {
                           String word = words[index]['word'];

@@ -93,16 +93,10 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
     return GestureDetector(
       onTap: () async {
         DateTime currentTime = DateTime.now();
-        saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, currentTime, 0,  updateCompletionCount: false);
         try {
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {
-            await FirebaseFirestore.instance
-                .collection('topics')
-                .doc(widget.topicId)
-                .update({
-              'lastAccess': currentTime,
-            });
+            saveUserPerformance(widget.topicId, userUid, userName!, userAvatar, currentTime, 0,  updateCompletionCount: false);
             Navigator.push(
               context,
               MaterialPageRoute(

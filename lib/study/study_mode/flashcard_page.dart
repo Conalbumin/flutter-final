@@ -242,6 +242,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                       });
                                     },
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Container(
                                           width: 40,
@@ -298,6 +299,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                                       });
                                     },
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         const Text("Learned",
                                             style: TextStyle(

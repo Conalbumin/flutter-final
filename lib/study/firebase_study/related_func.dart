@@ -11,13 +11,12 @@ Future<void> duplicateTopic(String topicId, String userId) async {
         .doc(topicId)
         .get();
     Map<String, dynamic> topicData =
-    topicSnapshot.data() as Map<String, dynamic>;
+        topicSnapshot.data() as Map<String, dynamic>;
     DateTime currentTime = DateTime.now();
 
     // Duplicate the topic
-    DocumentReference duplicatedTopicRef = await FirebaseFirestore.instance
-        .collection('topics')
-        .add({
+    DocumentReference duplicatedTopicRef =
+        await FirebaseFirestore.instance.collection('topics').add({
       ...topicData,
       'isPrivate': true,
       'createdBy': userId,
@@ -30,7 +29,8 @@ Future<void> duplicateTopic(String topicId, String userId) async {
     List<DocumentSnapshot> words = await fetchWords(topicId);
 
     // Add words to the duplicated topic
-    CollectionReference wordsCollection = duplicatedTopicRef.collection('words');
+    CollectionReference wordsCollection =
+        duplicatedTopicRef.collection('words');
     words.forEach((wordSnapshot) {
       wordsCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
     });
@@ -86,8 +86,7 @@ List<DocumentSnapshot> sortTopicsByTime(
   topics.sort((a, b) {
     DateTime timeA = (a[sortBy] as Timestamp).toDate();
     DateTime timeB = (b[sortBy] as Timestamp).toDate();
-    return timeB
-        .compareTo(timeA);
+    return timeB.compareTo(timeA);
   });
   return topics;
 }
@@ -95,23 +94,25 @@ List<DocumentSnapshot> sortTopicsByTime(
 Future<bool> checkAndAddAccess(String topicId) async {
   try {
     DateTime currentTime = DateTime.now();
-    await FirebaseFirestore.instance
-        .collection('topics')
-        .doc(topicId)
-        .update({
+    await FirebaseFirestore.instance.collection('topics').doc(topicId).update({
       'lastAccess': currentTime,
     });
     String userUid = FirebaseAuth.instance.currentUser!.uid;
     List<DocumentSnapshot> fetchedWords = await fetchWords(topicId);
 
-    DocumentSnapshot accessSnapshot = await FirebaseFirestore.instance
+    // Get all documents inside the "access" collection
+    QuerySnapshot accessSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('access')
-        .doc(userUid)
         .get();
 
-    if (!accessSnapshot.exists) {
+    print(accessSnapshot.docs);
+    // Check if the user's document exists in the "access" collection
+    bool userExists = accessSnapshot.docs.any((doc) => doc.id == userUid);
+
+    if (!userExists) {
+      // Add the user's document to the "access" collection
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
@@ -119,13 +120,14 @@ Future<bool> checkAndAddAccess(String topicId) async {
           .doc(userUid)
           .set({});
 
+      // Increment the value of accessPeople
       await FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
           .update({'accessPeople': FieldValue.increment(1)});
 
-      CollectionReference userProgressCollection =
-      FirebaseFirestore.instance
+      // Initialize the "user_progress" collection and add data for each word
+      CollectionReference userProgressCollection = FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
           .collection('access')
@@ -136,12 +138,11 @@ Future<bool> checkAndAddAccess(String topicId) async {
         userProgressCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
       });
 
-      print('Access added successfully');
+      print('Access added successfully 1');
       return false; // User didn't have access before
     } else {
-      // Check if user_progress collection exists
-      CollectionReference userProgressCollection =
-      FirebaseFirestore.instance
+      // Check if the "user_progress" collection exists
+      CollectionReference userProgressCollection = FirebaseFirestore.instance
           .collection('topics')
           .doc(topicId)
           .collection('access')
@@ -151,11 +152,12 @@ Future<bool> checkAndAddAccess(String topicId) async {
       QuerySnapshot userProgressSnapshot =
       await userProgressCollection.limit(1).get();
 
+      // If the "user_progress" collection doesn't exist, add data for each word
       if (userProgressSnapshot.docs.isEmpty) {
         fetchedWords.forEach((wordSnapshot) {
           userProgressCollection.doc(wordSnapshot.id).set(wordSnapshot.data());
         });
-        print('Access added successfully');
+        print('Access added successfully 2');
       } else {
         print('User already has access');
       }
