@@ -73,7 +73,7 @@ class _TopicItemState extends State<TopicItem> {
     try {
       int correctAnswersValue = await getCorrectAnswer();
       setState(() {
-        correctAnswers = correctAnswersValue; // Set the value of correctAnswers
+        correctAnswers = correctAnswersValue;
       });
     } catch (error) {
       print('Error fetching correct answers: $error');
@@ -111,6 +111,7 @@ class _TopicItemState extends State<TopicItem> {
         try {
           checkAndAddAccess(widget.topicId);
           bool updateCompletionCount = false;
+          print('correctAnswers topic $correctAnswers');
           saveUserPerformance(
               widget.topicId, userUid, userName!, userAvatar, currentTime, correctAnswers,
               updateCompletionCount: updateCompletionCount);

@@ -105,8 +105,6 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime currentTime = DateTime.now();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -325,6 +323,7 @@ class _TopicPageState extends State<TopicPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      DateTime currentTime = DateTime.now();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -341,6 +340,7 @@ class _TopicPageState extends State<TopicPage> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
+                      DateTime currentTime = DateTime.now();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -363,6 +363,7 @@ class _TopicPageState extends State<TopicPage> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
+                      DateTime currentTime = DateTime.now();
                       Navigator.push(
                         context,
                         MaterialPageRoute(

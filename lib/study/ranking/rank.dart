@@ -213,27 +213,34 @@ class _RankingPageState extends State<RankingPage> {
                                     style: normalText,
                                   );
                                 } else {
-                                  users = users
-                                      .where((user) =>
-                                          (user.data() as Map<String, dynamic>)
-                                                  .containsKey(
-                                            'correctAnswers',
-                                          )
-                                              ? (user.data() as Map<String,
-                                                          dynamic>)[
-                                                      'correctAnswers'] ==
-                                                  widget.numberOfWords
-                                              : false)
-                                      .toList();
+                                  // Users who do not meet the criteria
+                                  List<DocumentSnapshot> usersToUpdate =
+                                      users.where((user) {
+                                    var data =
+                                        user.data() as Map<String, dynamic>;
+                                    return !data
+                                            .containsKey('correctAnswers') ||
+                                        data['correctAnswers'] !=
+                                            widget.numberOfWords;
+                                  }).toList();
 
-                                  if (users.isEmpty) {
-                                    // Call a function to add default rank for users with no 'correctAnswers' field
-                                    users.forEach((user) {
-                                      addDefaultRankShortestTime(user.id);
-                                    });
-                                    return const SizedBox(); // Return an empty SizedBox since no users meet the criteria
+                                  // Update users with default rank
+                                  for (var user in usersToUpdate) {
+                                    addDefaultRankShortestTime(user.id);
                                   }
 
+                                  // Filter users who meet the criteria
+                                  users = users.where((user) {
+                                    var data =
+                                        user.data() as Map<String, dynamic>;
+                                    return data.containsKey('correctAnswers') &&
+                                        data['correctAnswers'] ==
+                                            widget.numberOfWords;
+                                  }).toList();
+
+                                  if (users.isEmpty) {
+                                    return const SizedBox(); // Return an empty SizedBox since no users meet the criteria
+                                  }
 
                                   Duration computeTimeDifference(
                                       DateTime lastStudied,
@@ -269,6 +276,7 @@ class _RankingPageState extends State<RankingPage> {
 
                                     return aDifference.compareTo(bDifference);
                                   });
+
                                   List<DocumentSnapshot> fastestUsers = users
                                       .take(users.length > 3 ? 3 : users.length)
                                       .toList();
@@ -286,6 +294,7 @@ class _RankingPageState extends State<RankingPage> {
                                       'rank_shortest_time': rank,
                                     }, SetOptions(merge: true));
                                   }
+
                                   return Swiper(
                                     loop: false,
                                     autoplay: true,

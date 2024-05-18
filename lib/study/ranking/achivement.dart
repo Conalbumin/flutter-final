@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quizlet_final_flutter/constant/text_style.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:quizlet_final_flutter/study/ranking/user_achievement.dart';
-
 import '../../constant/style.dart';
 
 class Achievement extends StatelessWidget {
@@ -38,7 +37,7 @@ class Achievement extends StatelessWidget {
 
   Widget _buildRankingCard(String title, String rankingField) {
     double swiperHeight = rankingField == 'rank_shortest_time' ? 250 : 180;
-    double swiperWidth = rankingField == 'rank_shortest_time' ? 320 : 250;
+    double swiperWidth = rankingField == 'rank_shortest_time' ? 350 : 300;
     bool hasAchievement = false;
 
     return Padding(

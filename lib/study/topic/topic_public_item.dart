@@ -137,6 +137,7 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {
             bool updateCompletionCount = false;
+            print('correctAnswers topic public $correctAnswers');
             saveUserPerformance(widget.topicId, userUid, userName!, userAvatar,
                 currentTime, correctAnswers,
                 updateCompletionCount: updateCompletionCount);
