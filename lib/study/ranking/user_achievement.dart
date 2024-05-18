@@ -47,7 +47,7 @@ class UserAchievementItem extends StatelessWidget {
     int seconds = difference.inSeconds.remainder(60);
 
     String formattedDifference =
-        '$hours hours, $minutes minutes,\n$seconds seconds';
+        '$hours hours, $minutes minutes \n$seconds seconds';
 
     return formattedDifference;
   }

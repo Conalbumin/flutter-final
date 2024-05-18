@@ -37,8 +37,9 @@ class Achievement extends StatelessWidget {
   }
 
   Widget _buildRankingCard(String title, String rankingField) {
-    double swiperHeight = rankingField == 'rank_shortest_time' ? 220 : 180;
-    double swiperWidth = rankingField == 'rank_shortest_time' ? 300 : 250;
+    double swiperHeight = rankingField == 'rank_shortest_time' ? 250 : 180;
+    double swiperWidth = rankingField == 'rank_shortest_time' ? 320 : 250;
+    bool hasAchievement = false;
 
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -78,6 +79,9 @@ class Achievement extends StatelessWidget {
                   final achievements = rankingDocs.map((doc) {
                     final topicId = doc.id;
                     final rank = doc[rankingField];
+                    if (rank != 0) {
+                      hasAchievement = true;
+                    }
                     return FutureBuilder<DocumentSnapshot>(
                       future: FirebaseFirestore.instance
                           .collection('topics')
@@ -94,9 +98,8 @@ class Achievement extends StatelessWidget {
                           return warning();
                         }
 
-                        final topicData = topicSnapshot.data!.data() as Map<
-                            String,
-                            dynamic>;
+                        final topicData =
+                        topicSnapshot.data!.data() as Map<String, dynamic>;
                         final topicName = topicData['name'];
                         final numberOfWords = topicData['numberOfWords'];
 
@@ -115,31 +118,17 @@ class Achievement extends StatelessWidget {
 
                             // Lấy các giá trị từ document trong collection 'access'
                             final accessDocs = accessSnapshot.data!.docs;
-                            final accessData = accessDocs.first.data() as Map<
-                                String,
-                                dynamic>;
+                            final accessData =
+                            accessDocs.first.data() as Map<String, dynamic>;
                             int completionCount = accessData['completionCount'];
                             int correctAnswers = accessData['correctAnswers'];
-                            DateTime lastStudied = accessData['lastStudied']
-                                .toDate();
-                            DateTime timeTaken = accessData['timeTaken']
-                                .toDate();
+                            DateTime lastStudied =
+                            accessData['lastStudied'].toDate();
+                            DateTime timeTaken =
+                            accessData['timeTaken'].toDate();
                             String userAvatar = accessData['userAvatar'];
                             String userName = accessData['userName'];
-
-                            if(rank == 0) {
-                              return Container(
-                                decoration: CustomCardDecoration
-                                    .cardDecoration,
-                                padding: const EdgeInsets.all(20.0),
-                                child: Center(
-                                  child: Text(
-                                    "Try harder \nto be in top 3",
-                                    style: rankText,
-                                  ),
-                                ),
-                              );
-                            } else {
+                            if (rank != 0) {
                               return _buildSwiperItem(
                                 topicName,
                                 rank,
@@ -152,6 +141,8 @@ class Achievement extends StatelessWidget {
                                 numberOfWords,
                                 rankingField,
                               );
+                            } else {
+                              return SizedBox.shrink(); // Trả về widget trống
                             }
                           },
                         );
@@ -159,14 +150,18 @@ class Achievement extends StatelessWidget {
                     );
                   }).toList();
 
-                  return Swiper(
-                    loop: true,
-                    autoplay: true,
-                    itemCount: achievements.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return achievements[index];
-                    },
-                  );
+                  if (hasAchievement) {
+                    return Swiper(
+                      loop: true,
+                      autoplay: true,
+                      itemCount: achievements.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return achievements[index];
+                      },
+                    );
+                  } else {
+                    return warning();
+                  }
                 },
               ),
             ),
@@ -176,16 +171,18 @@ class Achievement extends StatelessWidget {
     );
   }
 
-  Widget _buildSwiperItem(String topicName,
-      int rank,
-      int completionCount,
-      int correctAnswers,
-      DateTime lastStudied,
-      DateTime timeTaken,
-      String userAvatar,
-      String userName,
-      int numberOfWords,
-      String rankingField,) {
+  Widget _buildSwiperItem(
+    String topicName,
+    int rank,
+    int completionCount,
+    int correctAnswers,
+    DateTime lastStudied,
+    DateTime timeTaken,
+    String userAvatar,
+    String userName,
+    int numberOfWords,
+    String rankingField,
+  ) {
     CardAchievementType cardType;
 
     switch (rankingField) {
@@ -213,15 +210,13 @@ class Achievement extends StatelessWidget {
           completionCount: completionCount,
           numberOfWords: numberOfWords,
           cardType: cardType,
-          rank: rank
-      ),
+          rank: rank),
     );
   }
 
   Widget warning() {
     return Container(
-      decoration: CustomCardDecoration
-          .cardDecoration,
+      decoration: CustomCardDecoration.cardDecoration,
       padding: const EdgeInsets.all(20.0),
       child: Center(
         child: Text(

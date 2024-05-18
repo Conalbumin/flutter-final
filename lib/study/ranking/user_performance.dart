@@ -83,14 +83,15 @@ Future<void> saveUserPerformance(
             userAvatar: userAvatar,
           );
         } else {
-          int currentCompletionCount = data?['completionCount'] ?? 0;
+          int currentCompletionCount = data?['completionCount'];
+          print(data?['lastStudied'].toDate());
           userPerformance = UserPerformance(
             userId: userUid,
             topicId: topicId,
             correctAnswers: numberOfCorrectAnswers,
             timeTaken: timeTaken,
             completionCount: currentCompletionCount,
-            lastStudied: DateTime.now(),
+            lastStudied: data?['lastStudied'].toDate(),
             userName: userName,
             userAvatar: userAvatar,
           );

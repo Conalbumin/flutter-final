@@ -137,8 +137,8 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
           bool hasAccess = await checkAndAddAccess(widget.topicId);
           if (hasAccess) {
             bool updateCompletionCount = false;
-            saveUserPerformance(
-                widget.topicId, userUid, userName!, userAvatar, currentTime, correctAnswers,
+            saveUserPerformance(widget.topicId, userUid, userName!, userAvatar,
+                currentTime, correctAnswers,
                 updateCompletionCount: updateCompletionCount);
             Navigator.push(
               context,
@@ -152,7 +152,7 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                   userId: widget.userId,
                   refreshCallback: () {},
                   timeCreated: widget.timeCreated,
-                  lastAccess: currentTime,
+                  lastAccess: widget.lastAccess,
                   accessPeople: widget.accessPeople,
                 ),
               ),
@@ -180,13 +180,6 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
               children: [
                 Flexible(
                   child: Text(
-                    displayName.isNotEmpty ? displayName : 'Anonymous',
-                    style: normalSubText,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Flexible(
-                  child: Text(
                     'Joined: ${widget.accessPeople.toString()}',
                     style: const TextStyle(fontSize: 15, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
@@ -200,21 +193,21 @@ class _TopicPublicItemState extends State<TopicPublicItem> {
                   fontSize: 30.0,
                   color: Colors.white,
                   fontWeight: FontWeight.bold),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.text,
-                  style: const TextStyle(fontSize: 20.0, color: Colors.white),
-                  maxLines: 2,
+                  displayName.isNotEmpty ? displayName : 'Anonymous',
+                  style: normalSubText,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${widget.numberOfWords} words',
-                  style: const TextStyle(fontSize: 20.0, color: Colors.white),
+                  style: const TextStyle(fontSize: 15.0, color: Colors.white),
                 ),
               ],
             ),

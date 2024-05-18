@@ -124,7 +124,6 @@ class _RankingPageState extends State<RankingPage> {
                                         .doc(widget.topicId)
                                         .set({
                                       'rank_most_correct_answer': rank,
-                                      'rank_shortest_time': 0
                                     }, SetOptions(merge: true));
                                   }
                                   if (mostCorrectAnsUser.isNotEmpty) {
@@ -191,7 +190,7 @@ class _RankingPageState extends State<RankingPage> {
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 340,
+                          height: 400,
                           child: StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('topics')
@@ -226,6 +225,15 @@ class _RankingPageState extends State<RankingPage> {
                                                   widget.numberOfWords
                                               : false)
                                       .toList();
+
+                                  if (users.isEmpty) {
+                                    // Call a function to add default rank for users with no 'correctAnswers' field
+                                    users.forEach((user) {
+                                      addDefaultRankShortestTime(user.id);
+                                    });
+                                    return const SizedBox(); // Return an empty SizedBox since no users meet the criteria
+                                  }
+
 
                                   Duration computeTimeDifference(
                                       DateTime lastStudied,

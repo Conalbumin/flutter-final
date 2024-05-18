@@ -105,6 +105,8 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime currentTime = DateTime.now();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -323,7 +325,6 @@ class _TopicPageState extends State<TopicPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      DateTime currentTime = DateTime.now();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -352,7 +353,7 @@ class _TopicPageState extends State<TopicPage> {
                               // Handle selected answers here
                             },
                             showAllWords: showAllWords,
-                            lastAccess: DateTime.now(),
+                            lastAccess: currentTime,
                           ),
                         ),
                       );
@@ -374,7 +375,7 @@ class _TopicPageState extends State<TopicPage> {
                             onType: (answers) {
                               // Handle typed answers here
                             },
-                            lastAccess: DateTime.now(),
+                            lastAccess: currentTime,
                           ),
                         ),
                       );
