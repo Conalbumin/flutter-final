@@ -81,13 +81,11 @@ void deleteTopic(BuildContext context, String topicId) async {
     // Delete the topic document
     DocumentReference topicRef =
     FirebaseFirestore.instance.collection('topics').doc(topicId);
-    print('topicRef $topicRef');
     batch.delete(topicRef);
 
     // Delete the access document for the current user
     DocumentReference accessRef =
     FirebaseFirestore.instance.collection('topics').doc(topicId).collection('access').doc(userUid);
-    print('accessRef $accessRef');
     batch.delete(accessRef);
 
     // Delete all words related to the topic

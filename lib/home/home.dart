@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                   sortTopicsByTime(snapshot.data!.docs, _sortBy);
 
               return ListView.builder(
-                itemCount: sortedTopics.length > 5 ? 5 : sortedTopics.length,
+                itemCount: sortedTopics.length,
                 itemBuilder: (BuildContext context, int index) {
                   DocumentSnapshot document = sortedTopics[index];
                   String topicId = document.id;

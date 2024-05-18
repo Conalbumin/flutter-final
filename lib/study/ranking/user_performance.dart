@@ -28,10 +28,10 @@ class UserPerformance {
       userName: data['userName'],
       userAvatar: data['userAvatar'],
       topicId: data['topicId'],
-      correctAnswers: data['correctAnswers'],
-      timeTaken: data['timeTaken'].toDate(),
-      completionCount: data['completionCount'],
-      lastStudied: data['lastStudied'].toDate(),
+      correctAnswers: data['correctAnswers'] ?? 0,
+      timeTaken: (data['timeTaken'] as Timestamp).toDate(),
+      completionCount: data['completionCount'] ?? 0,
+      lastStudied: (data['lastStudied'] as Timestamp).toDate(),
     );
   }
 
@@ -59,78 +59,56 @@ Future<void> saveUserPerformance(
     {bool updateCompletionCount = true}
     ) async {
   try {
-    await FirebaseFirestore.instance
+    DocumentSnapshot accessSnapshot = await FirebaseFirestore.instance
         .collection('topics')
         .doc(topicId)
         .collection('access')
         .doc(userUid)
-        .get()
-        .then((DocumentSnapshot accessSnapshot) {
-      if (accessSnapshot.exists) {
-        UserPerformance userPerformance;
+        .get();
 
-        Map<String, dynamic>? data = accessSnapshot.data() as Map<String, dynamic>?;
-        if (data != null && data.containsKey('completionCount') && data.containsKey('correctAnswers') && updateCompletionCount == true) {
-          int currentCompletionCount = data['completionCount'] ?? 0;
-          userPerformance = UserPerformance(
-            userId: userUid,
-            topicId: topicId,
-            correctAnswers: numberOfCorrectAnswers,
-            timeTaken: timeTaken,
-            completionCount: currentCompletionCount + 1,
-            lastStudied: DateTime.now(),
-            userName: userName,
-            userAvatar: userAvatar,
-          );
-        } else {
-          int currentCompletionCount = data?['completionCount'];
-          print(data?['lastStudied'].toDate());
-          userPerformance = UserPerformance(
-            userId: userUid,
-            topicId: topicId,
-            correctAnswers: numberOfCorrectAnswers,
-            timeTaken: timeTaken,
-            completionCount: currentCompletionCount,
-            lastStudied: data?['lastStudied'].toDate(),
-            userName: userName,
-            userAvatar: userAvatar,
-          );
-        }
+    if (accessSnapshot.exists) {
+      Map<String, dynamic>? data = accessSnapshot.data() as Map<String, dynamic>?;
+      int currentCompletionCount = data?['completionCount'] ?? 0;
+      DateTime lastStudied = (data?['lastStudied'] as Timestamp?)?.toDate() ?? DateTime.now();
 
-        accessSnapshot.reference
-            .set(userPerformance.toMap())
-            .then((value) => print('User performance updated successfully'))
-            .catchError(
-                (error) => print('Failed to update user performance: $error'));
-      } else {
-        UserPerformance userPerformance = UserPerformance(
-          userId: userUid,
-          topicId: topicId,
-          correctAnswers: 0, // Default value
-          timeTaken: timeTaken,
-          completionCount: 0,
-          lastStudied: DateTime.now(),
-          userName: userName,
-          userAvatar: userAvatar,
-        );
+      UserPerformance userPerformance = UserPerformance(
+        userId: userUid,
+        topicId: topicId,
+        correctAnswers: numberOfCorrectAnswers,
+        timeTaken: timeTaken,
+        completionCount: updateCompletionCount ? currentCompletionCount + 1 : currentCompletionCount,
+        lastStudied: lastStudied,
+        userName: userName,
+        userAvatar: userAvatar,
+      );
 
-        CollectionReference accessCollection = FirebaseFirestore.instance
-            .collection('topics')
-            .doc(topicId)
-            .collection('access');
+      await accessSnapshot.reference.set(userPerformance.toMap());
+      print('User performance updated successfully');
+    } else {
+      UserPerformance userPerformance = UserPerformance(
+        userId: userUid,
+        topicId: topicId,
+        correctAnswers: numberOfCorrectAnswers,
+        timeTaken: timeTaken,
+        completionCount: 0,
+        lastStudied: DateTime.now(),
+        userName: userName,
+        userAvatar: userAvatar,
+      );
 
-        accessCollection
-            .doc(userPerformance.userId)
-            .set(userPerformance.toMap())
-            .then((value) => print('User performance saved successfully'))
-            .catchError(
-                (error) => print('Failed to save user performance: $error'));
-      }
-    });
+      await FirebaseFirestore.instance
+          .collection('topics')
+          .doc(topicId)
+          .collection('access')
+          .doc(userPerformance.userId)
+          .set(userPerformance.toMap());
+      print('User performance saved successfully');
+    }
   } catch (e) {
     print('Error saving user performance: $e');
   }
 }
+
 
 
 
